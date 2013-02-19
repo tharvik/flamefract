@@ -5,10 +5,6 @@ public class Point {
 	final double x, y;
 	static final Point ORIGIN = new Point(0, 0);
 
-	public static void main(String[] args) {
-
-	}
-
 	public Point(double x, double y) {
 		this.x = x;
 		this.y = y;
@@ -17,20 +13,20 @@ public class Point {
 	public double x() {
 		return this.x;
 	}
-	
+
 	public double y() {
 		return this.y;
 	}
-	
+
 	public double r() {
-		return Math.sqrt(Math.pow(this.x, 2.0)+Math.pow(this.y, 2.0));
+		return Math.sqrt(Math.pow(this.x, 2.0) + Math.pow(this.y, 2.0));
 	}
-	
+
 	public double theta() {
 		return Math.atan2(y, x);
 	}
-	
+
 	public String toString() {
-		return "("+x+", "+y+")";
+		return "(" + x + ", " + y + ")";
 	}
 }
