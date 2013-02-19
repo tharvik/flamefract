@@ -44,9 +44,9 @@ public class Rectangle {
 		return this.center;
 	}
 
-	public boolean contain(Point p) {
-		return p.x() >= this.left() && p.x() < this.right()
-				|| p.y() >= this.bottom() && p.y() < this.top();
+	public boolean contains(Point p) {
+		return (p.x() >= this.left() && p.x() < this.right()
+				&& p.y() >= this.bottom() && p.y() < this.top());
 	}
 
 	public double aspectRatio() {

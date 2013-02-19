@@ -2,7 +2,7 @@ package ch.epfl.flamemaker.geometry2d;
 
 public class Point {
 
-	final double x, y;
+	final private double x, y;
 	static final Point ORIGIN = new Point(0, 0);
 
 	public Point(double x, double y) {
