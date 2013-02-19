@@ -53,23 +53,24 @@ public class Rectangle {
 		return this.width() / this.height();
 	}
 
-	public Rectangle expandToAspectRatio (double aspectRatio) {
+	public Rectangle expandToAspectRatio(double aspectRatio) {
 		if (aspectRatio <= 0) {
 			throw new IllegalArgumentException();
 		}
-		
-		Rectangle returnValue;
-		
+
 		if (aspectRatio < this.aspectRatio()) {
-			returnValue = new Rectangle(center, this.width(), this.height / aspectRatio);
+			return new Rectangle(center, this.width(), this.height
+					/ aspectRatio);
+		} else if (aspectRatio > this.aspectRatio()) {
+			return new Rectangle(center, this.width() * aspectRatio,
+					this.height);
+		} else {
+			return new Rectangle(center, this.width(), this.height);
 		}
-		else if (aspectRatio > this.aspectRatio()) {
-			returnValue = new Rectangle(center, this.width() * aspectRatio, this.height);
-		}
-		else {
-			returnValue = new Rectangle(center, this.width(), this.height);
-		}
-		
-		return returnValue;
+	}
+
+	public String toString() {
+		return ("(" + this.center().toString() + "," + this.width() + ","
+				+ this.height + ")");
 	}
 }
