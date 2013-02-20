@@ -9,7 +9,7 @@ public class RectangleTest {
 
 	@Test
 	public void testRectangle() {
-		new Rectangle(Point.ORIGIN, 1, 1);		
+		new Rectangle(Point.ORIGIN, 1, 1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

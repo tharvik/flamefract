@@ -2,8 +2,8 @@ package ch.epfl.flamemaker.geometry2d;
 
 public class AffineTransformation implements Transformation {
 	final private double a, b, c, d, e, f;
-	public static final AffineTransformation IDENTITY = new AffineTransformation(1, 0,
-			0, 0, 1, 0);
+	public static final AffineTransformation IDENTITY = new AffineTransformation(
+			1, 0, 0, 0, 1, 0);
 
 	public AffineTransformation(double a, double b, double c, double d,
 			double e, double f) {

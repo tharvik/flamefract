@@ -33,7 +33,7 @@ public class IFSAccumulatorBuilderTest {
 	@Test
 	public final void testHit() {
 		IFSAccumulatorBuilder builder = new IFSAccumulatorBuilder(frame, 1, 1);
-		
+
 		builder.hit(new Point(-1, -1));
 		builder.hit(new Point(0, 0));
 		builder.hit(new Point(1, 1));
@@ -45,7 +45,7 @@ public class IFSAccumulatorBuilderTest {
 
 		assertFalse(builder.build().isHit(0, 0));
 		assertFalse(builder.build().isHit(2, 3));
-		
+
 		builder.hit(new Point(-1, -1));
 		builder.hit(new Point(0, 0));
 		builder.hit(new Point(1, 1));
