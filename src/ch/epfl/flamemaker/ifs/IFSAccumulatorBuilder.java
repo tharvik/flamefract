@@ -6,6 +6,7 @@ public class IFSAccumulatorBuilder {
 
 	private boolean[][] isHit;
 
+	// ? get width/height from frame
 	public IFSAccumulatorBuilder(Rectangle frame, int width, int height) {
 		if (width <= 0 || height <= 0) {
 			throw new IllegalArgumentException();
@@ -15,6 +16,8 @@ public class IFSAccumulatorBuilder {
 	}
 
 	public void hit(Point p) {
+		p = new Point(p.x() * this.isHit.length, p.y() * this.isHit[0].length);
+
 		if (p.x() >= this.isHit.length || p.y() >= this.isHit[0].length
 				|| p.x() < 0 || p.y() < 0) {
 			return;
