@@ -15,12 +15,11 @@ public class IFSAccumulatorBuilder {
 	}
 
 	public void hit(Point p) {
-		if (p.x() >= this.isHit.length || p.y() >= this.isHit[0].length) {
+		if (p.x() >= this.isHit.length || p.y() >= this.isHit[0].length
+				|| p.x() < 0 || p.y() < 0) {
 			return;
 		}
 
-		// ! Not recommended by instructions (use Math.floor()), same value
-		// ! Wrong logic? Unused information in instructions
 		this.isHit[(int) (p.x())][(int) (p.y())] = true;
 	}
 
