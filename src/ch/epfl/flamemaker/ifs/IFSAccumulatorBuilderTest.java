@@ -49,9 +49,12 @@ public class IFSAccumulatorBuilderTest {
 		builder.hit(new Point(-1, -1));
 		builder.hit(new Point(0, 0));
 		builder.hit(new Point(1, 1));
+		builder.hit(new Point(2, 3));
+		builder.hit(new Point(10, 10));
 
 		assertTrue(builder.build().isHit(0, 0));
 		assertTrue(builder.build().isHit(1, 1));
+		assertTrue(builder.build().isHit(2, 3));
 	}
 
 }
