@@ -7,7 +7,7 @@ public class Rectangle {
 
 	Rectangle(Point center, double width, double height) {
 
-		if (width < 0 || height < 0) {
+		if (width <= 0 || height <= 0) {
 			throw new IllegalArgumentException();
 		}
 

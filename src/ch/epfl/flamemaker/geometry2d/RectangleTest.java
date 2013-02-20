@@ -9,7 +9,17 @@ public class RectangleTest {
 
 	@Test
 	public void testRectangle() {
-		new Rectangle(Point.ORIGIN, 0, 0);
+		new Rectangle(Point.ORIGIN, 1, 1);		
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testRectangleNulWidth() {
+		new Rectangle(Point.ORIGIN, 0, 10);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testRectangleNulHeight() {
+		new Rectangle(Point.ORIGIN, 0, 10);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -24,13 +34,13 @@ public class RectangleTest {
 
 	@Test
 	public void testWidth() {
-		Rectangle r = new Rectangle(Point.ORIGIN, 10, 0);
+		Rectangle r = new Rectangle(Point.ORIGIN, 10, 1);
 		assertEquals(10, r.width(), DELTA);
 	}
 
 	@Test
 	public void testHeight() {
-		Rectangle r = new Rectangle(Point.ORIGIN, 0, 10);
+		Rectangle r = new Rectangle(Point.ORIGIN, 1, 10);
 		assertEquals(10, r.height(), DELTA);
 	}
 
