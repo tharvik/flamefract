@@ -4,13 +4,7 @@ public class IFSAccumulator {
 	private final boolean[][] isHit;
 
 	public IFSAccumulator(boolean[][] isHit) {
-		this.isHit = new boolean[isHit.length][isHit[0].length];
-
-		for (int x = 0; x < isHit.length; x++) {
-			for (int y = 0; y < isHit[0].length; y++) {
-				this.isHit[x][y] = isHit[x][y];
-			}
-		}
+		this.isHit = isHit.clone(); // ! Deeply copied
 	}
 
 	public int width() {
@@ -25,8 +19,8 @@ public class IFSAccumulator {
 		if (x > this.width() || x < 0 || y > this.height() || y < 0) {
 			throw new IndexOutOfBoundsException();
 		}
+
 		return (this.isHit[x][y]);
 	}
-	
-	
+
 }

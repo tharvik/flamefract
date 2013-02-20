@@ -17,15 +17,20 @@ public final class IFS {
 			int density) {
 		Random random = new Random();
 		Point p = new Point(0, 0);
-
+		int m = density * width * height;
+		IFSAccumulatorBuilder image = new IFSAccumulatorBuilder(frame, width, height);
+		
 		for (int j = 0; j < 20; j++) {
 			int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
 		}
 
-		for (int j = 0; j < density; j++) {
+		for (int j = 0; j < m; j++) {
 			int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
+			image.hit(p);
 		}
+		
+		return image.build();
 	}
 }
