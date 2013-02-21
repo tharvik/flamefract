@@ -1,11 +1,12 @@
 package ch.epfl.flamemaker.ifs;
 
-public class IFSAccumulator {
+public final class IFSAccumulator {
 	private final boolean[][] isHit;
 
 	public IFSAccumulator(boolean[][] isHit) {
 		this.isHit = new boolean[isHit.length][isHit[0].length];
 
+		// Deep copy of the array
 		for (int x = 0; x < isHit.length; x++) {
 			for (int y = 0; y < isHit[0].length; y++) {
 				this.isHit[x][y] = isHit[x][y];

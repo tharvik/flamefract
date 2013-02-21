@@ -15,8 +15,8 @@ public class AffineTransformation implements Transformation {
 		this.f = f;
 	}
 
-	public static AffineTransformation newTranslation(double dx, double dy) {
-		return new AffineTransformation(1, 0, dx, 0, 1, dy);
+	public static AffineTransformation newTranslation(double dX, double dY) {
+		return new AffineTransformation(1, 0, dX, 0, 1, dY);
 	}
 
 	public static AffineTransformation newRotation(double theta) {
@@ -26,23 +26,23 @@ public class AffineTransformation implements Transformation {
 		return new AffineTransformation(cos, -sin, 0.0, sin, cos, 0.0);
 	}
 
-	public static AffineTransformation newScaling(double sx, double sy) {
-		return new AffineTransformation(sx, 0.0, 0.0, 0.0, sy, 0.0);
+	public static AffineTransformation newScaling(double sX, double sY) {
+		return new AffineTransformation(sX, 0.0, 0.0, 0.0, sY, 0.0);
 	}
 
-	public static AffineTransformation newShearX(double sx) {
-		return new AffineTransformation(1, sx, 0, 0, 1, 0);
+	public static AffineTransformation newShearX(double sX) {
+		return new AffineTransformation(1, sX, 0, 0, 1, 0);
 	}
 
-	public static AffineTransformation newShearY(double sy) {
-		return new AffineTransformation(1, 0, 0, sy, 1, 0);
+	public static AffineTransformation newShearY(double sY) {
+		return new AffineTransformation(1, 0, 0, sY, 1, 0);
 	}
 
 	public Point transformPoint(Point p) {
-		double newx = p.x() * a + p.y() * b + c;
-		double newy = p.x() * d + p.y() * e + f;
+		double newX = p.x() * a + p.y() * b + c;
+		double newY = p.x() * d + p.y() * e + f;
 
-		return new Point(newx, newy);
+		return new Point(newX, newY);
 	}
 
 	public double translationX() {
