@@ -16,10 +16,12 @@ public class IFSAccumulatorBuilder {
 		this.frame = new Rectangle(frame.center(), frame.width(),
 				frame.height());
 
-		this.transformation = AffineTransformation.newTranslation(frame.left(),
-				frame.bottom());
-		this.transformation = AffineTransformation.newScaling(
-				width / frame.width(), height / frame.height());
+		// Convert from general point-system, to local, easy to use by array
+		this.transformation = AffineTransformation.newTranslation(
+				-frame.left(), -frame.bottom());
+		this.transformation = this.transformation
+				.composeWith(AffineTransformation.newScaling(
+						width / frame.width(), height / frame.height()));
 
 		this.isHit = new boolean[width][height];
 	}

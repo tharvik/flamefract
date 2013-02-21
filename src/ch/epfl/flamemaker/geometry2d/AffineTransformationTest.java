@@ -112,14 +112,22 @@ public class AffineTransformationTest {
 		AffineTransformation matrice = new AffineTransformation(1, 1, 1, 0, 0,
 				0);
 		AffineTransformation test = new AffineTransformation(2, 2, 2, 3, 4, 5);
-		Point ref = new Point(19, 0);
 
 		Point point = new Point(1, 1);
 		test = matrice.composeWith(test);
-		Point point2 = test.transformPoint(point);
+		point = test.transformPoint(point);
 
-		assertEquals(ref.x(), point2.x(), DELTA);
-		assertEquals(ref.y(), point2.y(), DELTA);
+		assertEquals(19, point.x(), DELTA);
+		assertEquals(0, point.y(), DELTA);
 
+		// Test with identity
+		matrice = AffineTransformation.IDENTITY;
+		test = AffineTransformation.IDENTITY;
+		
+		test = matrice.composeWith(test);		
+		point = test.transformPoint(new Point(1, 1));
+
+		assertEquals(1, point.x(), DELTA);
+		assertEquals(1, point.y(), DELTA);
 	}
 }
