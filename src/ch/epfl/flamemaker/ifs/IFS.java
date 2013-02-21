@@ -18,7 +18,7 @@ public final class IFS {
 			int density) {
 		
 		Random random = new Random();
-		Point p = new Point(0, 0);
+		Point p = Point.ORIGIN;
 		int m = density * width * height;
 		IFSAccumulatorBuilder image = new IFSAccumulatorBuilder(frame, width,
 				height);
