@@ -16,23 +16,21 @@ public class IFSAccumulatorBuilder {
 		this.frame = new Rectangle(frame.center(), frame.width(), frame.height());
 		
 		// Convert from general point-system, to local, easy to use by array
-		this.transformation = AffineTransformation.newTranslation(-frame.left(), -frame.bottom());
-		this.transformation = this.transformation.composeWith(AffineTransformation.newScaling(
-				width / frame.width(), height / frame.height()));
+		//? By debug,  scale then translation, why?
+		this.transformation = AffineTransformation.newScaling(width / frame.width(), height / frame.height());
+		this.transformation = this.transformation.composeWith(AffineTransformation.newTranslation(
+				-frame.left(), -frame.bottom()));
 		
 		this.isHit = new boolean[width][height];
 	}
 	
 	public void hit(Point p) {
 		if (!this.frame.contains(p)) {
-			System.out.println(p);
 			return;
 		}
 		
-		System.out.print(p + " ");
+		// We transform the point in our system
 		p = this.transformation.transformPoint(p);
-		System.out.println(p);
-		
 		this.isHit[(int) (p.x())][(int) (p.y())] = true;
 	}
 	

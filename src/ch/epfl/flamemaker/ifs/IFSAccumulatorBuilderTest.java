@@ -38,6 +38,8 @@ public class IFSAccumulatorBuilderTest {
 	
 	@Test
 	public final void testHit() {
+		
+		// Test using a using a frame containing the origin
 		IFSAccumulatorBuilder builder = new IFSAccumulatorBuilder(frame, 10, 10);
 		
 		for (int x = 0; x < 10; x++) {
@@ -47,6 +49,8 @@ public class IFSAccumulatorBuilderTest {
 		}
 		
 		builder.hit(new Point(-1, -1));
+		builder.hit(new Point(2, 2));
+		builder.hit(new Point(8, 8));
 		builder.hit(new Point(10, 10));
 		
 		for (int x = 0; x < 10; x++) {
@@ -61,6 +65,7 @@ public class IFSAccumulatorBuilderTest {
 			}
 		}
 		
+		// Test using not origine-centered frame
 		this.frame = new Rectangle(new Point(5, 5), 4, 4);
 		builder = new IFSAccumulatorBuilder(frame, 8, 8);
 		
@@ -70,19 +75,20 @@ public class IFSAccumulatorBuilderTest {
 			}
 		}
 		
+		// Some points, just for behavior
 		builder.hit(new Point(-1, -1));
 		builder.hit(new Point(2, 2));
 		builder.hit(new Point(8, 8));
 		builder.hit(new Point(10, 10));
 		
-		for (int x = 3; x < 7; x++) {
-			for (int y = 3; y < 7; y++) {
+		for (double x = 3; x < 7; x += 0.5) {
+			for (double y = 3; y < 7; y += 0.5) {
 				builder.hit(new Point(x, y));
 			}
 		}
 		
-		for (int x = 3; x < 7; x++) {
-			for (int y = 3; y < 7; y++) {
+		for (int x = 0; x < 7; x++) {
+			for (int y = 0; y < 7; y++) {
 				assertTrue(builder.build().isHit(x, y));
 			}
 		}
