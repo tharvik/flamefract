@@ -40,6 +40,7 @@ public class IFSMaker {
 
 	public static IFSAccumulator generateSierpinskiTriangle() {
 		ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
+		
 		transformations.add(new AffineTransformation(0.5, 0, 0, 0, 0.5, 0));
 		transformations.add(new AffineTransformation(0.5, 0, 0.5, 0, 0.5, 0));
 		transformations
