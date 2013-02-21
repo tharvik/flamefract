@@ -39,20 +39,52 @@ public class IFSAccumulatorBuilderTest {
 	@Test
 	public final void testHit() {
 		IFSAccumulatorBuilder builder = new IFSAccumulatorBuilder(frame, 10, 10);
-		
-		assertFalse(builder.build().isHit(0, 0));
-		assertFalse(builder.build().isHit(9, 9));
+
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 10; y++) {
+				assertFalse(builder.build().isHit(x, y));
+			}
+		}
 
 		builder.hit(new Point(-1, -1));
-		builder.hit(new Point(0, 0));
-		builder.hit(new Point(1, 1));
-		builder.hit(new Point(3, 3));
-		builder.hit(new Point(9, 9));
 		builder.hit(new Point(10, 10));
 
-		assertTrue(builder.build().isHit(0, 0));
-		assertTrue(builder.build().isHit(1, 1));
-		assertTrue(builder.build().isHit(3, 3));
-		assertTrue(builder.build().isHit(9, 9));
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 10; y++) {
+				builder.hit(new Point(x, y));
+			}
+		}
+
+		for (int x = 0; x < 10; x++) {
+			for (int y = 0; y < 10; y++) {
+				assertTrue(builder.build().isHit(x, y));
+			}
+		}
+
+		this.frame = new Rectangle(new Point(5, 5), 4, 4);
+		builder = new IFSAccumulatorBuilder(frame, 8, 8);
+
+		for (int x = 3; x < 7; x++) {
+			for (int y = 3; y < 7; y++) {
+				assertFalse(builder.build().isHit(x, y));
+			}
+		}
+
+		builder.hit(new Point(-1, -1));
+		builder.hit(new Point(2, 2));
+		builder.hit(new Point(8, 8));
+		builder.hit(new Point(10, 10));
+
+		for (int x = 3; x < 7; x++) {
+			for (int y = 3; y < 7; y++) {
+				builder.hit(new Point(x, y));
+			}
+		}
+
+		for (int x = 3; x < 7; x++) {
+			for (int y = 3; y < 7; y++) {
+				assertTrue(builder.build().isHit(x, y));
+			}
+		}
 	}
 }
