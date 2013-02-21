@@ -11,8 +11,8 @@ public class IFSAccumulatorBuilderTest {
 
 	@Before
 	public void setup() {
-		Point centerFrame = new Point(0, 0);
-		this.frame = new Rectangle(centerFrame, 1, 1);
+		Point centerFrame = new Point(5, 5);
+		this.frame = new Rectangle(centerFrame, 10, 10);
 	}
 
 	@Test
@@ -31,30 +31,28 @@ public class IFSAccumulatorBuilderTest {
 	}
 
 	@Test
-	public final void testHit() {
+	public final void testBuild() {
 		IFSAccumulatorBuilder builder = new IFSAccumulatorBuilder(frame, 1, 1);
-
-		builder.hit(new Point(-1, -1));
-		builder.hit(new Point(0, 0));
-		builder.hit(new Point(1, 1));
+		builder.build();
 	}
 
 	@Test
-	public final void testBuild() {
-		IFSAccumulatorBuilder builder = new IFSAccumulatorBuilder(frame, 3, 4);
-
+	public final void testHit() {
+		IFSAccumulatorBuilder builder = new IFSAccumulatorBuilder(frame, 10, 10);
+		
 		assertFalse(builder.build().isHit(0, 0));
-		assertFalse(builder.build().isHit(2, 3));
+		assertFalse(builder.build().isHit(9, 9));
 
 		builder.hit(new Point(-1, -1));
 		builder.hit(new Point(0, 0));
 		builder.hit(new Point(1, 1));
-		builder.hit(new Point(2, 3));
+		builder.hit(new Point(3, 3));
+		builder.hit(new Point(9, 9));
 		builder.hit(new Point(10, 10));
 
 		assertTrue(builder.build().isHit(0, 0));
 		assertTrue(builder.build().isHit(1, 1));
-		assertTrue(builder.build().isHit(2, 3));
+		assertTrue(builder.build().isHit(3, 3));
+		assertTrue(builder.build().isHit(9, 9));
 	}
-
 }

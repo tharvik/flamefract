@@ -16,6 +16,7 @@ public final class IFS {
 
 	public IFSAccumulator compute(Rectangle frame, int width, int height,
 			int density) {
+		
 		Random random = new Random();
 		Point p = new Point(0, 0);
 		int m = density * width * height;

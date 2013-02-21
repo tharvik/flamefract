@@ -5,23 +5,34 @@ import ch.epfl.flamemaker.geometry2d.*;
 public class IFSAccumulatorBuilder {
 
 	private boolean[][] isHit;
+	private Rectangle frame;
+	private AffineTransformation transformation;
 
-	// ? get width/height from frame
 	public IFSAccumulatorBuilder(Rectangle frame, int width, int height) {
 		if (width <= 0 || height <= 0) {
 			throw new IllegalArgumentException();
 		}
 
+		this.frame = new Rectangle(frame.center(), frame.width(),
+				frame.height());
+
+		this.transformation = AffineTransformation.newTranslation(frame.left(),
+				frame.bottom());
+		this.transformation = AffineTransformation.newScaling(
+				width / frame.width(), height / frame.height());
+
 		this.isHit = new boolean[width][height];
 	}
 
 	public void hit(Point p) {
-		p = new Point(p.x() * this.isHit.length, p.y() * this.isHit[0].length);
-
-		if (p.x() >= this.isHit.length || p.y() >= this.isHit[0].length
-				|| p.x() < 0 || p.y() < 0) {
+		if (!this.frame.contains(p)) {
+			System.out.println(p);
 			return;
 		}
+
+		System.out.print(p + " ");
+		p = this.transformation.transformPoint(p);
+		System.out.println(p);
 
 		this.isHit[(int) (p.x())][(int) (p.y())] = true;
 	}
