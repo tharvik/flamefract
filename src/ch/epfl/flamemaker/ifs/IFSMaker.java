@@ -50,6 +50,7 @@ public class IFSMaker {
 	
 	public static IFSAccumulator generateBarnsleyFougere() {
 		ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
+		
 		transformations.add(new AffineTransformation(0, 0, 0, 0, 0.16, 0));
 		transformations.add(new AffineTransformation(0.2, -0.26, 0, 0.23, 0.22, 1.6));
 		transformations.add(new AffineTransformation(-0.15, 0.28, 0, 0.26, 0.24, 0.44));
@@ -57,7 +58,7 @@ public class IFSMaker {
 		
 		IFS ifs = new IFS(transformations);
 		Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
-		return ifs.compute(center, 120, 200, 150);
+		return ifs.compute(center, 1200, 2000, 1);
 	}
 	
 	public static void writeToBPM(IFSAccumulator accu, PrintStream stream) {
