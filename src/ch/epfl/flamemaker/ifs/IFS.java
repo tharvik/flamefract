@@ -7,7 +7,7 @@ import java.util.Random;
 import ch.epfl.flamemaker.geometry2d.*;
 
 public final class IFS {
-	private final ArrayList<AffineTransformation>	transformations;
+	private final List<AffineTransformation>	transformations;
 	
 	public IFS(List<AffineTransformation> transformations) {
 		this.transformations = new ArrayList<AffineTransformation>(transformations);
