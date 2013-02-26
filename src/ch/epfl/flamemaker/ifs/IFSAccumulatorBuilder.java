@@ -16,7 +16,7 @@ public class IFSAccumulatorBuilder {
 		this.frame = new Rectangle(frame.center(), frame.width(), frame.height());
 		
 		// Convert from general point-system, to local, easy to use by array
-		//? By debug,  scale then translation, why?
+		// By debug,  scale then translation, why?
 		this.transformation = AffineTransformation.newScaling(width / frame.width(), height / frame.height());
 		this.transformation = this.transformation.composeWith(AffineTransformation.newTranslation(
 				-frame.left(), -frame.bottom()));
