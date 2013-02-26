@@ -66,7 +66,7 @@ public abstract class Variation implements Transformation {
 										double x = (p.x() - p.y())
 												* (p.x() + p.y())
 												/ p.r();
-										double y = 2 * p.x() * p.y();
+										double y = 2 * p.x() * p.y() / p.r();
 										return new Point(x, y);
 									}
 								}, new Variation(5, "Bubble") {

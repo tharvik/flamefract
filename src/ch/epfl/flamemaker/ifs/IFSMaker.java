@@ -58,7 +58,7 @@ public class IFSMaker {
 
 		IFS ifs = new IFS(transformations);
 		Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
-		return ifs.compute(center, 1200, 2000, 1);
+		return ifs.compute(center, 120, 200, 150);
 	}
 
 	public static void writeToBPM(IFSAccumulator accu, PrintStream stream) {
