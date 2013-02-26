@@ -34,7 +34,7 @@ public class IFSAccumulatorBuilder {
 		this.isHit[(int) (p.x())][(int) (p.y())] = true;
 	}
 	
-	IFSAccumulator build() {
+	public IFSAccumulator build() {
 		return new IFSAccumulator(this.isHit);
 	}
 	
