@@ -12,39 +12,66 @@ public class FlamePGMMaker {
 
 	public static void main(String[] args) {
 
-		try {
-			PrintStream file = new PrintStream("SharkFin.pgm");
+		Runnable sharkfin = new Runnable() {
 
-			writeToPGM(generateSharkFin(), file);
+			@Override
+			public void run() {
+				try {
+					PrintStream file = new PrintStream("SharkFin.pgm");
 
-			file.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("Not able to open \"SharkFin.pgm\"! " + "Abort..");
-			System.exit(1);
-		}
+					writeToPGM(generateSharkFin(), file);
 
-		try {
-			PrintStream file = new PrintStream("Turbulence.pgm");
+					file.close();
+				} catch (FileNotFoundException e) {
+					System.out.println("Not able to open \"SharkFin.pgm\"! " + "Abort..");
+					System.exit(1);
+				}
 
-			writeToPGM(generateTurbulence(), file);
+			}
+		};
 
-			file.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("Not able to open \"Turbulence.pgm\"! " + "Abort..");
-			System.exit(1);
-		}
+		Runnable turbulence = new Runnable() {
 
-		try {
-			PrintStream file = new PrintStream("BarnsleyFougere.bpm");
+			@Override
+			public void run() {
 
-			writeToPGM(generateBarnsleyFougere(), file);
+				try {
+					PrintStream file = new PrintStream("Turbulence.pgm");
 
-			file.close();
-		} catch (FileNotFoundException e) {
-			System.out.println("Not able to open \"BarnsleyFougere.bpm\"! " + "Abort..");
-			System.exit(1);
-		}
+					writeToPGM(generateTurbulence(), file);
 
+					file.close();
+				} catch (FileNotFoundException e) {
+					System.out.println("Not able to open \"Turbulence.pgm\"! " + "Abort..");
+					System.exit(1);
+				}
+			}
+		};
+
+		Runnable barnsleyFougere = new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					PrintStream file = new PrintStream("BarnsleyFougere.bpm");
+
+					writeToPGM(generateBarnsleyFougere(), file);
+
+					file.close();
+				} catch (FileNotFoundException e) {
+					System.out.println("Not able to open \"BarnsleyFougere.bpm\"! " + "Abort..");
+					System.exit(1);
+				}
+			}
+		};
+
+		Thread sharkFinThread = new Thread(sharkfin);
+		Thread turbulenceThread = new Thread(turbulence);
+		Thread barnsleyFougereThread = new Thread(barnsleyFougere);
+		
+		sharkFinThread.start();
+		turbulenceThread.start();
+		barnsleyFougereThread.start();
 	}
 
 	private static FlameAccumulator generateSharkFin() {

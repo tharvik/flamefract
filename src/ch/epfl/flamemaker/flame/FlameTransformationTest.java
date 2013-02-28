@@ -1,12 +1,8 @@
 package ch.epfl.flamemaker.flame;
 
-import static org.junit.Assert.*;
-
-import java.awt.geom.AffineTransform;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
-
-import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 
 public class FlameTransformationTest {
 
