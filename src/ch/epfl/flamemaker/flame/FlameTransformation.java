@@ -29,4 +29,54 @@ public class FlameTransformation implements Transformation {
 
 		return sum;
 	}
+	
+	public static class Builder {
+		private AffineTransformation	affineTransformation;
+		private double[]			variationWeight;
+
+		public Builder(FlameTransformation flameTransformation) {
+			this.affineTransformation = flameTransformation.affineTransformation;
+			this.variationWeight = flameTransformation.variationWeight;
+		}
+
+		public Builder(AffineTransformation affineTransformation, double[] variationWeight) {
+			this.affineTransformation = affineTransformation;
+
+			if (variationWeight == null || variationWeight.length != 6) {
+				throw new IllegalArgumentException();
+			}
+			this.variationWeight = variationWeight.clone();
+		}
+
+		private void checkIndex (int index) {
+			if (index < 0 || index > 6) {
+				throw new IndexOutOfBoundsException();
+			}
+		}
+		
+		public void setVariationWeight(int index, int value) {
+
+			// TODO negative value?
+			checkIndex(index);
+
+			this.variationWeight[index] = value;
+		}
+		
+		public void setAffineTransformation(AffineTransformation affineTransformation) {
+			this.affineTransformation = affineTransformation;
+		}
+
+		public AffineTransformation getAffineTransformation() {
+			return affineTransformation;
+		}
+		
+		public double getVariationWeightValue(int index) {
+			checkIndex(index);
+			return variationWeight[index];
+		}
+		
+		public FlameTransformation build() {
+			return new FlameTransformation(this.affineTransformation, this.variationWeight);
+		}
+	}
 }
