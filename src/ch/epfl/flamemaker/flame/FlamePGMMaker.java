@@ -109,7 +109,7 @@ public class FlamePGMMaker {
 
 		Flame flame = new Flame(transformations);
 		Rectangle center = new Rectangle(new Point(0.1, 0.1), 3, 3);
-		return flame.compute(center, 500, 500, 50);
+		return flame.compute(center, 500, 400, 50);
 	}
 
 	private static FlameAccumulator generateBarnsleyFougere() {
