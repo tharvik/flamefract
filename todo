@@ -1,4 +1,4 @@
 support superlarge images
 add random fractales
-add clone()
+add clone(), isEqual(), toString()
 add config file

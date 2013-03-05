@@ -22,6 +22,8 @@ public abstract class PaletteTest {
 		arrayBuilder.add(new Color(0, 1, 0));
 		arrayBuilder.add(new Color(0, 0, 1));
 		this.array = arrayBuilder;
+		
+		System.out.println("ioad");
 	}
 
 	@Test

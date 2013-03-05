@@ -1,15 +1,27 @@
 package ch.epfl.flamemaker;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import ch.epfl.flamemaker.color.Color;
 
 public class InterpolatedPaletteTest extends PaletteTest {
+
+	List<Color>	array;
+
+	@Before
+	public void setUp() {
+		this.array = new ArrayList<Color>();
+		this.array.add(new Color(1, 0, 0));
+		this.array.add(new Color(0, 1, 0));
+		this.array.add(new Color(0, 0, 1));
+
+	}
 
 	@Override
 	Palette newPalette(List<Color> colors) {
@@ -18,12 +30,7 @@ public class InterpolatedPaletteTest extends PaletteTest {
 
 	@Test
 	public void testColorForIndex() {
-		ArrayList<Color> arrayBuilder = new ArrayList<Color>();
-		arrayBuilder.add(new Color(1, 0, 0));
-		arrayBuilder.add(new Color(0, 1, 0));
-		arrayBuilder.add(new Color(0, 0, 1));
-		
-		Palette p = newPalette(arrayBuilder);
+		Palette p = newPalette(this.array);
 
 		Color c = p.colorForIndex(0);
 		assertEquals(1, c.red(), PaletteTest.DELTA);
@@ -52,5 +59,20 @@ public class InterpolatedPaletteTest extends PaletteTest {
 
 		p.colorForIndex(0.5);
 		p.colorForIndex(1);
+	}
+
+	@Test
+	public void testToString() {
+		Palette p = newPalette(this.array);
+
+		assertEquals("((1.0,0.0,0.0),(0.0,1.0,0.0),(0.0,0.0,1.0))", p.toString());
+	}
+
+	@Test
+	public void testEquals() {
+		Palette p1 = newPalette(this.array);
+		Palette p2 = newPalette(this.array);
+
+		assertTrue(p1.equals(p2));
 	}
 }

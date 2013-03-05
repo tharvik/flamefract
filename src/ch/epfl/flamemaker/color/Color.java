@@ -65,4 +65,24 @@ public final class Color {
 	public String toString() {
 		return ("(" + this.red() + "," + this.green() + "," + this.blue() + ")");
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Color that = (Color) obj;
+		if (this.red() != that.red() || this.green() != that.green() || this.blue() != that.blue()) {
+			return false;
+		}
+		
+		return true;
+	}
+
 }

@@ -138,7 +138,7 @@ public class FlamePPMMaker {
 		stream.println(accu.width() + " " + accu.height());
 		stream.println(100);
 
-		// TODO
+		// TODO waiting update of FlameAccumulator
 
 		for (int y = accu.height() - 1; y >= 0; y--) {
 			String line = new String();

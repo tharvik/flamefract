@@ -1,8 +1,8 @@
 package ch.epfl.flamemaker.flame;
 
+import ch.epfl.flamemaker.Palette;
+import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.geometry2d.*;
-import ch.epfl.flamemaker.color.*;
-import ch.epfl.flamemaker.*;
 
 public class FlameAccumulator {
 	
@@ -82,7 +82,8 @@ public class FlameAccumulator {
 		}
 		
 		public FlameAccumulator build() {
-			return new FlameAccumulator(this.hitCount);
+			// TODO update to new FlameAccumulator
+			return new FlameAccumulator(this.hitCount, null);
 		}
 	}
 	
@@ -90,6 +91,6 @@ public class FlameAccumulator {
 	public Color color(Palette palette, Color bg, int x, int y) {
 		// i.e logically bg stands for background...
 		//TODO
-		
+		return null;
 	}
 }

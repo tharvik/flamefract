@@ -1,5 +1,6 @@
 package ch.epfl.flamemaker;
 
+import java.util.Iterator;
 import java.util.List;
 
 import ch.epfl.flamemaker.color.Color;
@@ -35,4 +36,43 @@ public class InterpolatedPalette implements Palette {
 
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		String returnValue = "(";
+		
+		for (Iterator<Color> iterator = this.colors.iterator(); iterator.hasNext();) {
+			returnValue += iterator.next().toString();
+			returnValue += (iterator.hasNext()) ? "," : "";
+		}
+		
+		return returnValue + ")";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		InterpolatedPalette that = (InterpolatedPalette) obj;
+		if (colors == null) {
+			if (that.colors != null) {
+				return false;
+			}
+		} else if (!colors.equals(that.colors)) {
+			return false;
+		}
+		
+		// TODO missing individual checks?
+		
+		return true;
+	}
+
+	
 }
