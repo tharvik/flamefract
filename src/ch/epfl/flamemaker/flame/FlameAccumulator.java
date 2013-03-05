@@ -41,7 +41,7 @@ public class FlameAccumulator {
 		if (x < 0 || y < 0 || x > this.width() || y > this.height()) {
 			throw new IndexOutOfBoundsException();
 		}
-		
+
 		return (Math.log(this.hitCount[x][y] + 1) / this.denominator);
 	}
 

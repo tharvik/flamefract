@@ -31,7 +31,6 @@ public class Flame {
 		}
 
 		for (int j = 0; j < m; j++) {
-			
 			int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
 			image.hit(p);

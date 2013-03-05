@@ -9,7 +9,7 @@ public class FlameTransformation implements Transformation {
 	public FlameTransformation(AffineTransformation affineTransformation, double[] variationWeight) {
 		this.affineTransformation = affineTransformation;
 
-		if (variationWeight.length != 6) {
+		if (variationWeight == null || variationWeight.length != 6) {
 			throw new IllegalArgumentException();
 		}
 		this.variationWeight = variationWeight.clone();
