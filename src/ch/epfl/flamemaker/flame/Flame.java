@@ -65,12 +65,9 @@ public class Flame {
 			this.list.get(index).setAffineTransformation(newTransformation);
 		}
 
-		private int getVariationIndex (Variation variation) {
-			return variation.index();
-		}
-
 		public void setVariationWeight(int index, Variation variation, double newWeight) {
-			// TODO
+			checkIndex(index);
+			this.list.get(index).setVariationWeight(variation.index(), newWeight);
 		}
 
 		public void removeTransformation(int index) {

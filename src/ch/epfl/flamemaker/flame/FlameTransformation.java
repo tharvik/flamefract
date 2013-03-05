@@ -29,10 +29,10 @@ public class FlameTransformation implements Transformation {
 
 		return sum;
 	}
-	
+
 	public static class Builder {
 		private AffineTransformation	affineTransformation;
-		private double[]			variationWeight;
+		private double[]		variationWeight;
 
 		public Builder(FlameTransformation flameTransformation) {
 			this.affineTransformation = flameTransformation.affineTransformation;
@@ -48,20 +48,20 @@ public class FlameTransformation implements Transformation {
 			this.variationWeight = variationWeight.clone();
 		}
 
-		private void checkIndex (int index) {
+		private void checkIndex(int index) {
 			if (index < 0 || index > 6) {
 				throw new IndexOutOfBoundsException();
 			}
 		}
-		
-		public void setVariationWeight(int index, int value) {
+
+		public void setVariationWeight(int index, double value) {
 
 			// TODO negative value?
 			checkIndex(index);
 
 			this.variationWeight[index] = value;
 		}
-		
+
 		public void setAffineTransformation(AffineTransformation affineTransformation) {
 			this.affineTransformation = affineTransformation;
 		}
@@ -69,12 +69,12 @@ public class FlameTransformation implements Transformation {
 		public AffineTransformation getAffineTransformation() {
 			return affineTransformation;
 		}
-		
+
 		public double getVariationWeightValue(int index) {
 			checkIndex(index);
 			return variationWeight[index];
 		}
-		
+
 		public FlameTransformation build() {
 			return new FlameTransformation(this.affineTransformation, this.variationWeight);
 		}
