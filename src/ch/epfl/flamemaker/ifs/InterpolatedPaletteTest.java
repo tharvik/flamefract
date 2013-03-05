@@ -26,7 +26,6 @@ public class InterpolatedPaletteTest extends PaletteTest {
 		Palette p = newPalette(arrayBuilder);
 
 		Color c = p.colorForIndex(0);
-		System.out.println(c);
 		assertEquals(1, c.red(), PaletteTest.DELTA);
 		assertEquals(0, c.green(), PaletteTest.DELTA);
 		assertEquals(0, c.blue(), PaletteTest.DELTA);

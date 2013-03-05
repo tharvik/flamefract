@@ -37,8 +37,8 @@ public final class Color {
 			throw new IllegalArgumentException();
 		}
 
-		return new Color(proportion * this.red() + (1 - proportion) * that.red(), proportion * this.green()
-				+ (1 - proportion) * that.green(), proportion * this.blue() + (1 - proportion)
+		return new Color((1 - proportion) * this.red() + proportion * that.red(), (1 - proportion)
+				* this.green() + proportion * that.green(), (1 - proportion) * this.blue() + proportion
 				* that.blue());
 	}
 
