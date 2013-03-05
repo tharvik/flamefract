@@ -1,4 +1,4 @@
-package ch.epfl.flamemaker.ifs;
+package ch.epfl.flamemaker;
 
 import ch.epfl.flamemaker.color.Color;
 
