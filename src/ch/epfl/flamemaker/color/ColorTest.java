@@ -84,18 +84,19 @@ public class ColorTest {
 		Color c = new Color(0, 0, 0);
 		c.mixWith(new Color(0, 0, 0), 2);
 	}
-	
+
 	@Test
 	public void testAsPackedRGB() {
 		Color c = new Color(0, 0, 0);
 		assertEquals(0, c.asPackedRGB());
-		
+
+		// TODO Not working by double ?
 		c = new Color(0.5, 0.5, 0.5);
 		assertEquals(0x808080, c.asPackedRGB());
-		
+
 		c = new Color(1, 1, 1);
 		assertEquals(0xFFFFFF, c.asPackedRGB());
-		
+
 		c = new Color(0, 0.5, 1);
 		assertEquals(0x0080FF, c.asPackedRGB());
 	}
@@ -107,12 +108,32 @@ public class ColorTest {
 
 	@Test
 	public void testToString() {
-		fail("Not yet implemented");
+		Color c = new Color(0, 0, 0);
+		assertEquals("(0.0,0.0,0.0)", c.toString());
+
+		c = new Color(0.5, 0.5, 0.5);
+		assertEquals("(0.5,0.5,0.5)", c.toString());
+
+		c = new Color(1, 1, 1);
+		assertEquals("(1.0,1.0,1.0)", c.toString());
+
+		c = new Color(0, 0.5, 1);
+		assertEquals("(0.0,0.5,1.0)", c.toString());
 	}
 
 	@Test
 	public void testEqualsObject() {
-		fail("Not yet implemented");
-	}
 
+		for (double r = 0; r <= 1; r += 0.1) {
+			for (double g = 0; g <= 1; g += 0.1) {
+				for (double b = 0; b <= 1; b += 0.1) {
+					Color c1 = new Color(r, g, b);
+					Color c2 = new Color(r, g, b);
+
+					assertTrue(c1.equals(c2));
+					assertTrue(c2.equals(c1));
+				}
+			}
+		}
+	}
 }
