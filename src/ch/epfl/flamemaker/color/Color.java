@@ -43,11 +43,11 @@ public final class Color {
 	}
 
 	public int asPackedRGB() {
-		int color = 0x0;
-
-		color = color << (int) (this.red() * 255);
-		color = color << (int) (this.green() * 255);
-		color = color << (int) (this.blue() * 255);
+		int color = (int) (this.red() * 255);
+		color = color << 8;
+		color += (int) (this.green() * 255);
+		color = color << 8;
+		color += (int) (this.blue() * 255);
 
 		return color;
 	}
@@ -81,7 +81,7 @@ public final class Color {
 		if (this.red() != that.red() || this.green() != that.green() || this.blue() != that.blue()) {
 			return false;
 		}
-		
+
 		return true;
 	}
 

@@ -68,7 +68,7 @@ public class FlamePPMMaker {
 		Thread sharkFinThread = new Thread(sharkfin);
 		Thread turbulenceThread = new Thread(turbulence);
 		Thread barnsleyFougereThread = new Thread(barnsleyFougere);
-
+		
 		sharkFinThread.start();
 		turbulenceThread.start();
 		barnsleyFougereThread.start();
@@ -137,8 +137,6 @@ public class FlamePPMMaker {
 		stream.println("P3");
 		stream.println(accu.width() + " " + accu.height());
 		stream.println(100);
-
-		// TODO waiting update of FlameAccumulator
 
 		for (int y = accu.height() - 1; y >= 0; y--) {
 			String line = new String();

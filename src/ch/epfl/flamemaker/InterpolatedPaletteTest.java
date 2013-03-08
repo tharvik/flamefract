@@ -15,12 +15,11 @@ public class InterpolatedPaletteTest extends PaletteTest {
 	List<Color>	array;
 
 	@Before
-	public void setUp() {
+	public void setUpInterpolatedPalette() {
 		this.array = new ArrayList<Color>();
 		this.array.add(new Color(1, 0, 0));
 		this.array.add(new Color(0, 1, 0));
 		this.array.add(new Color(0, 0, 1));
-
 	}
 
 	@Override
