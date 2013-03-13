@@ -1,9 +1,8 @@
-package ch.epfl.flamemaker;
+package ch.epfl.flamemaker.color;
 
 import java.util.Iterator;
 import java.util.List;
 
-import ch.epfl.flamemaker.color.Color;
 
 public class InterpolatedPalette implements Palette {
 

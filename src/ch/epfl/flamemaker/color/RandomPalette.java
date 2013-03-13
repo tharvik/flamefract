@@ -1,9 +1,8 @@
-package ch.epfl.flamemaker;
+package ch.epfl.flamemaker.color;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import ch.epfl.flamemaker.color.Color;
 
 public class RandomPalette implements Palette{
 

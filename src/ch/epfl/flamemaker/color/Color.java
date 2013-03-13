@@ -58,7 +58,6 @@ public final class Color {
 		} else {
 			return (int) (1.055 * Math.pow(v, 1 / 2.4) - 0.055) * max;
 		}
-
 	}
 
 	@Override

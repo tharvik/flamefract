@@ -1,4 +1,4 @@
-package ch.epfl.flamemaker;
+package ch.epfl.flamemaker.color;
 
 import static org.junit.Assert.*;
 
@@ -8,7 +8,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.epfl.flamemaker.color.Color;
 
 public class InterpolatedPaletteTest extends PaletteTest {
 

@@ -1,4 +1,4 @@
-package ch.epfl.flamemaker;
+package ch.epfl.flamemaker.color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.epfl.flamemaker.color.Color;
 
 public abstract class PaletteTest {
 
@@ -22,8 +21,6 @@ public abstract class PaletteTest {
 		arrayBuilder.add(new Color(0, 1, 0));
 		arrayBuilder.add(new Color(0, 0, 1));
 		this.array = arrayBuilder;
-		
-		System.out.println("ioad");
 	}
 
 	@Test
@@ -57,5 +54,4 @@ public abstract class PaletteTest {
 		Palette p = newPalette(this.array);
 		p.colorForIndex(10);
 	}
-
 }
