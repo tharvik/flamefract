@@ -6,8 +6,10 @@ import org.junit.Test;
 
 public class ColorTest {
 
+	// delta use for assertEqual(double)
 	public static double	DELTA	= 0.000000001;
 
+	// only work if the class is defined
 	@Test
 	public void testColor() {
 		new Color(0, 0, 0);
@@ -90,14 +92,14 @@ public class ColorTest {
 		Color c = new Color(0, 0, 0);
 		assertEquals(0, c.asPackedRGB());
 
-		// TODO Not working by double ?
+		// 0.5 * 255 raise 0x7F (0.5 * 256 will raise 0x80)
 		c = new Color(0.5, 0.5, 0.5);
-		assertEquals(0x808080, c.asPackedRGB());
+		assertEquals(0x7F7F7F, c.asPackedRGB());
 
 		c = new Color(1, 1, 1);
 		assertEquals(0xFFFFFF, c.asPackedRGB());
 
-		c = new Color(0, 0.5, 1);
+		c = new Color(0, 0x80 / (double) 0xFF, 1);
 		assertEquals(0x0080FF, c.asPackedRGB());
 	}
 
@@ -134,6 +136,7 @@ public class ColorTest {
 					assertTrue(c2.equals(c1));
 				}
 			}
+
 		}
 	}
 }

@@ -54,9 +54,6 @@ public class InterpolatedPaletteTest extends PaletteTest {
 		assertEquals(0, c.red(), PaletteTest.DELTA);
 		assertEquals(0, c.green(), PaletteTest.DELTA);
 		assertEquals(1, c.blue(), PaletteTest.DELTA);
-
-		p.colorForIndex(0.5);
-		p.colorForIndex(1);
 	}
 
 	@Test

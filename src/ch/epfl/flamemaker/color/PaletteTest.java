@@ -6,9 +6,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public abstract class PaletteTest {
 
+	// will have to be subclassed to test both instance of palette
 	abstract Palette newPalette(List<Color> colors);
 
 	public static double	DELTA	= 0.000000001;

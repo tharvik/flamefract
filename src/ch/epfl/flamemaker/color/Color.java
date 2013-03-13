@@ -2,8 +2,10 @@ package ch.epfl.flamemaker.color;
 
 public final class Color {
 
+	// the three colors
 	private final double		r, g, b;
 
+	// some default values for class
 	public static final Color	BLACK	= new Color(0, 0, 0);
 	public static final Color	WHITE	= new Color(1, 1, 1);
 	public static final Color	RED	= new Color(1, 0, 0);
@@ -11,6 +13,8 @@ public final class Color {
 	public static final Color	BLUE	= new Color(0, 0, 1);
 
 	public Color(double r, double g, double b) {
+
+		// if r,g,b not in [0,1]
 		if (r < 0 || g < 0 || b < 0 || r > 1 || g > 1 || b > 1) {
 			throw new IllegalArgumentException();
 		}
@@ -42,6 +46,7 @@ public final class Color {
 				* that.blue());
 	}
 
+	// return color as int, a value by byte
 	public int asPackedRGB() {
 		int color = (int) (this.red() * 255);
 		color = color << 8;
@@ -60,6 +65,7 @@ public final class Color {
 		}
 	}
 
+	// "(0,0,0)"
 	@Override
 	public String toString() {
 		return ("(" + this.red() + "," + this.green() + "," + this.blue() + ")");
@@ -77,7 +83,7 @@ public final class Color {
 			return false;
 		}
 		Color that = (Color) obj;
-		if (this.red() != that.red() || this.green() != that.green() || this.blue() != that.blue()) {
+		if (this.asPackedRGB() != that.asPackedRGB()) {
 			return false;
 		}
 
