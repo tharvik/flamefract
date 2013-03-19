@@ -24,26 +24,11 @@ public class InterpolatedPalette implements Palette {
 			throw new IllegalArgumentException();
 		}
 
-		int low = 0;
-		for (double lowIndex = 0; low < this.colors.size(); low++) {
-
-			// increment the lower index by the "width" of a color
-			lowIndex += (1.0 / (this.colors.size() - 1));
-
-			// if the lowIndex is greater than the index (then the
-			// previous color is mixed with this one)
-			if (lowIndex > index) {
-
-				// find the proportion of the color (place of
-				// index between the two colors)
-				double proportion = 1 - (lowIndex - index) * (this.colors.size() - 1);
-				Color mixWith = this.colors.get((low + 1 == this.colors.size()) ? low : low + 1);
-				return this.colors.get(low).mixWith(mixWith, proportion);
-			}
-		}
-
-		// this should never happened
-		throw new IllegalStateException();
+		double indexColors = index * (this.colors.size() - 1);
+		int low = (int) indexColors;
+		double proportion = (indexColors - low) * (this.colors.size() - 1) / 2;
+		return this.colors.get(low).mixWith(this.colors.get(low + 1 == this.colors.size() ? low : low + 1),
+				proportion);
 	}
 
 	// "((0,0,0),(1,1,1))"

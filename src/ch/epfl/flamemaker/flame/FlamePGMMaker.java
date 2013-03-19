@@ -68,7 +68,7 @@ public class FlamePGMMaker {
 		Thread sharkFinThread = new Thread(sharkfin);
 		Thread turbulenceThread = new Thread(turbulence);
 		Thread barnsleyFougereThread = new Thread(barnsleyFougere);
-		
+
 		sharkFinThread.start();
 		turbulenceThread.start();
 		barnsleyFougereThread.start();

@@ -4,6 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import ch.epfl.flamemaker.color.Color;
+import ch.epfl.flamemaker.color.InterpolatedPalette;
+import ch.epfl.flamemaker.color.Palette;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
@@ -68,7 +71,7 @@ public class FlamePPMMaker {
 		Thread sharkFinThread = new Thread(sharkfin);
 		Thread turbulenceThread = new Thread(turbulence);
 		Thread barnsleyFougereThread = new Thread(barnsleyFougere);
-		
+
 		sharkFinThread.start();
 		turbulenceThread.start();
 		barnsleyFougereThread.start();
@@ -138,10 +141,19 @@ public class FlamePPMMaker {
 		stream.println(accu.width() + " " + accu.height());
 		stream.println(100);
 
+		final ArrayList<Color> list = new ArrayList<Color>(3);
+		list.add(Color.RED);
+		list.add(Color.GREEN);
+		list.add(Color.BLUE);
+		final Palette palette = new InterpolatedPalette(list);
+
 		for (int y = accu.height() - 1; y >= 0; y--) {
 			String line = new String();
 			for (int x = 0; x < accu.width(); x++) {
-				line += (int) (accu.intensity(x, y) * 100.0);
+				Color c = accu.color(palette, Color.BLACK, x, y);
+				line += (int) (c.red() * 100) + " ";
+				line += (int) (c.green() * 100) + " ";
+				line += (int) (c.blue() * 100);
 				line += ((x + 1 == accu.width()) ? "" : " ");
 			}
 			stream.println(line);

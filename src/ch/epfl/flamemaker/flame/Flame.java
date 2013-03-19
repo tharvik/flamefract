@@ -31,10 +31,22 @@ public class Flame {
 			p = this.transformations.get(i).transformPoint(p);
 		}
 
+		double lastColor = 0;
 		for (int j = 0; j < m; j++) {
 			int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
-			image.hit(p);
+			double colorIndex;
+			if (j == 0) {
+				colorIndex = 0;
+			} else if (j == 1) {
+				colorIndex = 1;
+			} else {
+				colorIndex = ((j - (Math.pow(2, Math.floor(Math.log(j) / Math.log(2))))) * 2 - 1)
+						/ (Math.pow(2, Math.ceil(Math.log(j) / Math.log(2))));
+			}
+
+			image.hit(p, lastColor);
+			lastColor = (colorIndex + lastColor) / 2.0;
 		}
 
 		return image.build();
@@ -74,8 +86,8 @@ public class Flame {
 			this.checkIndex(index);
 			this.list.remove(index);
 		}
-		
-		private void checkIndex (int index) {
+
+		private void checkIndex(int index) {
 			if (index < 0 || index > this.transformationCount()) {
 				throw new IndexOutOfBoundsException();
 			}
@@ -86,7 +98,7 @@ public class Flame {
 			for (FlameTransformation.Builder builder : this.list) {
 				transformations.add(builder.build());
 			}
-			
+
 			return new Flame(transformations);
 		}
 	}

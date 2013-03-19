@@ -1,5 +1,6 @@
 package ch.epfl.flamemaker.flame;
 
+import sun.awt.SunToolkit.InfiniteLoop;
 import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.color.Palette;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
@@ -16,17 +17,19 @@ public class FlameAccumulator {
 		this.hitCount = new int[hitCount.length][hitCount[0].length];
 		this.colorIndexSum = new double[colorIndexSum.length][colorIndexSum[0].length];
 
-		// Deep copy of the hitCount array
+		// TODO test same size
+
+		// deep copy of the hitCount array
 		for (int x = 0; x < this.hitCount.length; x++) {
-			this.hitCount[x] = hitCount[x];
+			this.hitCount[x] = hitCount[x].clone();
 		}
 
-		// Deep copy of the colorIndexSum array
+		// deep copy of the colorIndexSum array
 		for (int x = 0; x < this.colorIndexSum.length; x++) {
-			this.colorIndexSum[x] = colorIndexSum[x];
+			this.colorIndexSum[x] = colorIndexSum[x].clone();
 		}
 
-		// Get max value and calculate denominator
+		// get max value and calculate denominator
 		int max = 0;
 		for (int[] x : hitCount) {
 			for (int value : x) {
@@ -54,8 +57,20 @@ public class FlameAccumulator {
 		return (Math.log(this.hitCount[x][y] + 1) / this.denominator);
 	}
 
+	public Color color(Palette palette, Color background, int x, int y) {
+		if (x < 0 || y < 0 || x > this.width() || y > this.height()) {
+			throw new IndexOutOfBoundsException();
+		}
+		System.out.println(palette.colorForIndex(this.colorIndexSum[x][y]));
+		System.out.println(this.intensity(x, y));
+		System.out.println(background.mixWith(palette.colorForIndex(this.colorIndexSum[x][y]), this.intensity(x, y)));
+		System.out.println("---");
+		return background.mixWith(palette.colorForIndex(this.colorIndexSum[x][y]), this.intensity(x, y));
+	}
+
 	public static class Builder {
 		private int[][]			hitCount;
+		private double[][]		colorIndexSum;
 		private Rectangle		frame;
 		private AffineTransformation	transformation;
 
@@ -71,28 +86,24 @@ public class FlameAccumulator {
 					-frame.left(), -frame.bottom()));
 
 			this.hitCount = new int[width][height];
+			this.colorIndexSum = new double[width][height];
 		}
 
-		public void hit(Point p) {
+		public void hit(Point p, double colorIndex) {
 			if (!this.frame.contains(p)) {
 				return;
 			}
 
-			// We transform the point in our system
+			// we transform the point in our system
 			p = this.transformation.transformPoint(p);
-			this.hitCount[(int) (p.x())][(int) (p.y())]++;
+			int x = (int) (p.x()), y = (int) (p.y());
+			this.hitCount[x][y]++;
+
+			this.colorIndexSum[x][y] = colorIndex;
 		}
 
 		public FlameAccumulator build() {
-			// TODO update to new FlameAccumulator
-			return new FlameAccumulator(this.hitCount, null);
+			return new FlameAccumulator(this.hitCount, this.colorIndexSum);
 		}
-	}
-
-	// Because we want some COLOR!
-	public Color color(Palette palette, Color bg, int x, int y) {
-		// i.e logically bg stands for background...
-		// TODO
-		return null;
 	}
 }
