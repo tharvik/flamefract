@@ -1,6 +1,5 @@
 package ch.epfl.flamemaker.flame;
 
-import sun.awt.SunToolkit.InfiniteLoop;
 import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.color.Palette;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
@@ -61,11 +60,9 @@ public class FlameAccumulator {
 		if (x < 0 || y < 0 || x > this.width() || y > this.height()) {
 			throw new IndexOutOfBoundsException();
 		}
-		System.out.println(palette.colorForIndex(this.colorIndexSum[x][y]));
-		System.out.println(this.intensity(x, y));
-		System.out.println(background.mixWith(palette.colorForIndex(this.colorIndexSum[x][y]), this.intensity(x, y)));
-		System.out.println("---");
-		return background.mixWith(palette.colorForIndex(this.colorIndexSum[x][y]), this.intensity(x, y));
+
+		return background.mixWith(palette.colorForIndex(this.colorIndexSum[x][y] / this.hitCount[x][y]),
+				this.intensity(x, y));
 	}
 
 	public static class Builder {
@@ -97,9 +94,8 @@ public class FlameAccumulator {
 			// we transform the point in our system
 			p = this.transformation.transformPoint(p);
 			int x = (int) (p.x()), y = (int) (p.y());
+			this.colorIndexSum[x][y] += colorIndex;
 			this.hitCount[x][y]++;
-
-			this.colorIndexSum[x][y] = colorIndex;
 		}
 
 		public FlameAccumulator build() {

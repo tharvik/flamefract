@@ -57,11 +57,11 @@ public final class Color {
 		return color;
 	}
 
-	public int sRGBEncode(double v, int max) {
+	public static int sRGBEncode(double v, int max) {
 		if (v <= 0.0031308) {
 			return (int) (12.92 * v * max);
 		} else {
-			return (int) (1.055 * Math.pow(v, 1 / 2.4) - 0.055) * max;
+			return (int) ((1.055 * Math.pow(v, 1 / 2.4) - 0.055) * max);
 		}
 	}
 

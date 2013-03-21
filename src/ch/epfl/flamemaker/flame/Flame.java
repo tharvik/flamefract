@@ -10,9 +10,27 @@ import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 public class Flame {
 	private final List<FlameTransformation>	transformations;
+	private final double[]			arrayIndex;		;
 
 	public Flame(List<FlameTransformation> transformations) {
 		this.transformations = new ArrayList<FlameTransformation>(transformations);
+
+		this.arrayIndex = new double[this.transformations.size()];
+		if (this.arrayIndex.length > 0) {
+			arrayIndex[0] = 0;
+
+			if (this.arrayIndex.length > 1) {
+				arrayIndex[1] = 1;
+
+				if (this.arrayIndex.length > 2) {
+					for (int i = 2; i < arrayIndex.length; i++) {
+						arrayIndex[i] = ((i - (Math.pow(2,
+								Math.floor(Math.log(i) / Math.log(2))))) * 2 + 1)
+								/ (Math.pow(2, Math.ceil(Math.log(i) / Math.log(2))));
+					}
+				}
+			}
+		}
 	}
 
 	public FlameAccumulator compute(Rectangle frame, int width, int height, int density) {
@@ -26,27 +44,20 @@ public class Flame {
 			return image.build();
 		}
 
+		double lastColor = 0;
 		for (int j = 0; j < 20; j++) {
 			int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
+			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
 		}
 
-		double lastColor = 0;
 		for (int j = 0; j < m; j++) {
+
 			int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
-			double colorIndex;
-			if (j == 0) {
-				colorIndex = 0;
-			} else if (j == 1) {
-				colorIndex = 1;
-			} else {
-				colorIndex = ((j - (Math.pow(2, Math.floor(Math.log(j) / Math.log(2))))) * 2 - 1)
-						/ (Math.pow(2, Math.ceil(Math.log(j) / Math.log(2))));
-			}
 
 			image.hit(p, lastColor);
-			lastColor = (colorIndex + lastColor) / 2.0;
+			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
 		}
 
 		return image.build();

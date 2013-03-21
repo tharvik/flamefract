@@ -20,13 +20,13 @@ public class FlamePPMMaker {
 			@Override
 			public void run() {
 				try {
-					PrintStream file = new PrintStream("SharkFin.pgm");
+					PrintStream file = new PrintStream("shark-fin.ppm");
 
 					writeToPPM(generateSharkFin(), file);
 
 					file.close();
 				} catch (FileNotFoundException e) {
-					System.out.println("Not able to open \"SharkFin.pgm\"! " + "Abort..");
+					System.out.println("Not able to open \"shark-fin.ppm\"! " + "Abort..");
 					System.exit(1);
 				}
 
@@ -39,30 +39,13 @@ public class FlamePPMMaker {
 			public void run() {
 
 				try {
-					PrintStream file = new PrintStream("Turbulence.pgm");
+					PrintStream file = new PrintStream("turbulence.ppm");
 
 					writeToPPM(generateTurbulence(), file);
 
 					file.close();
 				} catch (FileNotFoundException e) {
-					System.out.println("Not able to open \"Turbulence.pgm\"! " + "Abort..");
-					System.exit(1);
-				}
-			}
-		};
-
-		Runnable barnsleyFougere = new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					PrintStream file = new PrintStream("BarnsleyFougere.bpm");
-
-					writeToPPM(generateBarnsleyFougere(), file);
-
-					file.close();
-				} catch (FileNotFoundException e) {
-					System.out.println("Not able to open \"BarnsleyFougere.bpm\"! " + "Abort..");
+					System.out.println("Not able to open \"turbulence.ppm\"! " + "Abort..");
 					System.exit(1);
 				}
 			}
@@ -70,11 +53,9 @@ public class FlamePPMMaker {
 
 		Thread sharkFinThread = new Thread(sharkfin);
 		Thread turbulenceThread = new Thread(turbulence);
-		Thread barnsleyFougereThread = new Thread(barnsleyFougere);
 
 		sharkFinThread.start();
 		turbulenceThread.start();
-		barnsleyFougereThread.start();
 	}
 
 	private static FlameAccumulator generateSharkFin() {
@@ -115,27 +96,6 @@ public class FlamePPMMaker {
 		return flame.compute(center, 500, 400, 50);
 	}
 
-	private static FlameAccumulator generateBarnsleyFougere() {
-		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
-		double[] array = { 1, 0, 0, 0, 0, 0 };
-
-		AffineTransformation affine = new AffineTransformation(0, 0, 0, 0, 0.16, 0);
-		transformations.add(new FlameTransformation(affine, array));
-
-		affine = new AffineTransformation(0.2, -0.26, 0, 0.23, 0.22, 1.6);
-		transformations.add(new FlameTransformation(affine, array));
-
-		affine = new AffineTransformation(-0.15, 0.28, 0, 0.26, 0.24, 0.44);
-		transformations.add(new FlameTransformation(affine, array));
-
-		affine = new AffineTransformation(0.85, 0.04, 0, -0.04, 0.85, 1.6);
-		transformations.add(new FlameTransformation(affine, array));
-
-		Flame flame = new Flame(transformations);
-		Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
-		return flame.compute(center, 120, 200, 150);
-	}
-
 	private static void writeToPPM(FlameAccumulator accu, PrintStream stream) {
 		stream.println("P3");
 		stream.println(accu.width() + " " + accu.height());
@@ -151,9 +111,9 @@ public class FlamePPMMaker {
 			String line = new String();
 			for (int x = 0; x < accu.width(); x++) {
 				Color c = accu.color(palette, Color.BLACK, x, y);
-				line += (int) (c.red() * 100) + " ";
-				line += (int) (c.green() * 100) + " ";
-				line += (int) (c.blue() * 100);
+				line += (Color.sRGBEncode(c.red(), 100)) + " ";
+				line += (Color.sRGBEncode(c.green(), 100)) + " ";
+				line += (Color.sRGBEncode(c.blue(), 100));
 				line += ((x + 1 == accu.width()) ? "" : " ");
 			}
 			stream.println(line);
