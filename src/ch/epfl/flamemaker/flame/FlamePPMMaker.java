@@ -11,8 +11,17 @@ import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
 
+/**
+ * Main class, will generate all the fractals with colors to PPM files
+ */
 public class FlamePPMMaker {
 
+	/**
+	 * Generate all fractals, by using threads
+	 * 
+	 * @param args
+	 *                Not used
+	 */
 	public static void main(String[] args) {
 
 		Runnable sharkfin = new Runnable() {
@@ -58,7 +67,14 @@ public class FlamePPMMaker {
 		turbulenceThread.start();
 	}
 
+	/**
+	 * Generate the Shark Fin fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
 	private static FlameAccumulator generateSharkFin() {
+
+		// TODO use new Flame.Builder()
 		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
 		double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
 
@@ -77,7 +93,14 @@ public class FlamePPMMaker {
 		return flame.compute(center, 500, 400, 50);
 	}
 
+	/**
+	 * Generate the Turbulence fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
 	private static FlameAccumulator generateTurbulence() {
+
+		// TODO use new Flame.Builder()
 		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
 		double[][] array = { { 0.5, 0, 0, 0.4, 0, 0 }, { 1, 0, 0.1, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0 } };
 
@@ -96,6 +119,14 @@ public class FlamePPMMaker {
 		return flame.compute(center, 500, 400, 50);
 	}
 
+	/**
+	 * Write an accumulator to a stream
+	 * 
+	 * @param accu
+	 *                The accumulator containing a fractale
+	 * @param stream
+	 *                The stream to write the fractale to
+	 */
 	private static void writeToPPM(FlameAccumulator accu, PrintStream stream) {
 		stream.println("P3");
 		stream.println(accu.width() + " " + accu.height());

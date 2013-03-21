@@ -35,7 +35,7 @@ public class Flame {
 
 	public FlameAccumulator compute(Rectangle frame, int width, int height, int density) {
 
-		Random random = new Random();
+		Random rand = new Random(2013);
 		Point p = Point.ORIGIN;
 		int m = density * width * height;
 		FlameAccumulator.Builder image = new FlameAccumulator.Builder(frame, width, height);
@@ -46,14 +46,13 @@ public class Flame {
 
 		double lastColor = 0;
 		for (int j = 0; j < 20; j++) {
-			int i = random.nextInt(this.transformations.size());
+			int i = rand.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
 			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
 		}
 
 		for (int j = 0; j < m; j++) {
-
-			int i = random.nextInt(this.transformations.size());
+			int i = rand.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
 
 			image.hit(p, lastColor);
@@ -68,6 +67,9 @@ public class Flame {
 
 		public Builder(Flame flame) {
 			this.list = new ArrayList<FlameTransformation.Builder>();
+			for (FlameTransformation flameTransformation : flame.transformations) {
+				this.list.add(new FlameTransformation.Builder(flameTransformation));
+			}
 		}
 
 		public int transformationCount() {
