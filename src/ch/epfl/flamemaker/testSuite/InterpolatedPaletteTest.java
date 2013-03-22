@@ -1,6 +1,7 @@
 package ch.epfl.flamemaker.testSuite;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,6 @@ import org.junit.Test;
 import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.color.InterpolatedPalette;
 import ch.epfl.flamemaker.color.Palette;
-
 
 public class InterpolatedPaletteTest extends PaletteTest {
 
@@ -34,30 +34,12 @@ public class InterpolatedPaletteTest extends PaletteTest {
 	public void testColorForIndex() {
 		Palette p = newPalette(this.array);
 
-		Color c = p.colorForIndex(0);
-		assertEquals(1, c.red(), PaletteTest.DELTA);
-		assertEquals(0, c.green(), PaletteTest.DELTA);
-		assertEquals(0, c.blue(), PaletteTest.DELTA);
-
-		c = p.colorForIndex(0.25);
-		assertEquals(0.5, c.red(), PaletteTest.DELTA);
-		assertEquals(0.5, c.green(), PaletteTest.DELTA);
-		assertEquals(0, c.blue(), PaletteTest.DELTA);
-
-		c = p.colorForIndex(0.5);
-		assertEquals(0, c.red(), PaletteTest.DELTA);
-		assertEquals(1, c.green(), PaletteTest.DELTA);
-		assertEquals(0, c.blue(), PaletteTest.DELTA);
-
-		c = p.colorForIndex(0.75);
-		assertEquals(0, c.red(), PaletteTest.DELTA);
-		assertEquals(0.5, c.green(), PaletteTest.DELTA);
-		assertEquals(0.5, c.blue(), PaletteTest.DELTA);
-
-		c = p.colorForIndex(1);
-		assertEquals(0, c.red(), PaletteTest.DELTA);
-		assertEquals(0, c.green(), PaletteTest.DELTA);
-		assertEquals(1, c.blue(), PaletteTest.DELTA);
+		for (double i = 0; i <= 1; i += 0.001) {
+			Color c = p.colorForIndex(i);
+			assertEquals((-2 * i + 1) > 0 ? (-2 * i + 1) : 0, c.red(), PaletteTest.DELTA);
+			assertEquals((0.5 - Math.abs(i - 0.5)) * 2, c.green(), PaletteTest.DELTA);
+			assertEquals((2 * i - 1) > 0 ? (2 * i - 1) : 0, c.blue(), PaletteTest.DELTA);
+		}
 	}
 
 	@Test

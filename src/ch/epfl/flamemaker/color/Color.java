@@ -18,7 +18,6 @@ public final class Color {
 	 */
 	private final double		b;
 
-	// some default values for class
 	/**
 	 * A Color with the value representing black
 	 */
@@ -49,6 +48,7 @@ public final class Color {
 	 *                The green value
 	 * @param b
 	 *                The blue value
+	 * 
 	 * @throws IllegalArgumentException
 	 *                 if the value is not between 0 and 1 (both included)
 	 */
@@ -106,7 +106,9 @@ public final class Color {
 	 *                if 1, then the returned color is the <i>given
 	 *                color</i>
 	 *                </p>
+	 * 
 	 * @return The new Color mix
+	 * 
 	 * @throws IllegalArgumentException
 	 *                 if the proportion is not between 0 and 1 (both
 	 *                 included)
@@ -121,7 +123,6 @@ public final class Color {
 				* that.blue());
 	}
 
-	// return color as int, a value by byte
 	/**
 	 * Return the colors value as int, a value by byte, in red, green, blue
 	 * order
@@ -143,6 +144,7 @@ public final class Color {
 	 *                Value to encode in sRGB
 	 * @param max
 	 *                The maximum value to return
+	 * 
 	 * @return The value encode in sRGB multiplied by max
 	 */
 	public static int sRGBEncode(double v, int max) {
