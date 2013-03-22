@@ -1,6 +1,10 @@
-package ch.epfl.flamemaker.color;
+package ch.epfl.flamemaker.testSuite;
 
 import java.util.List;
+
+import ch.epfl.flamemaker.color.Color;
+import ch.epfl.flamemaker.color.Palette;
+import ch.epfl.flamemaker.color.RandomPalette;
 
 public class RandomPaletteTest extends PaletteTest {
 

@@ -1,8 +1,10 @@
-package ch.epfl.flamemaker.color;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import ch.epfl.flamemaker.color.Color;
 
 public class ColorTest {
 

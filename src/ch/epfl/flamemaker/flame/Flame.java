@@ -10,11 +10,12 @@ import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 public class Flame {
 	private final List<FlameTransformation>	transformations;
-	private final double[]			arrayIndex;		;
+	private final double[]			arrayIndex;
 
 	public Flame(List<FlameTransformation> transformations) {
 		this.transformations = new ArrayList<FlameTransformation>(transformations);
 
+		// TODO Ugly!
 		this.arrayIndex = new double[this.transformations.size()];
 		if (this.arrayIndex.length > 0) {
 			arrayIndex[0] = 0;

@@ -1,9 +1,11 @@
-package ch.epfl.flamemaker.ifs;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.epfl.flamemaker.ifs.IFSAccumulator;
 
 public class IFSAccumulatorTest {
 	

@@ -7,24 +7,51 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Transformation;
 
 public abstract class Variation implements Transformation {
+	/**
+	 * The name of the variation
+	 */
 	private final String	name;
+	/**
+	 * The index of the variation
+	 */
 	private final int	index;
 
+	/**
+	 * Construct a Variation with the given name and index
+	 * 
+	 * @param index
+	 *                The index
+	 * @param name
+	 *                The name
+	 */
 	private Variation(int index, String name) {
 		this.name = name;
 		this.index = index;
 	}
 
+	/**
+	 * Return the name of the variation
+	 * 
+	 * @return The name of the variation
+	 */
 	public String name() {
 		return this.name;
 	}
 
+	/**
+	 * Return the name of the variation
+	 * 
+	 * @return The index of the variation
+	 */
 	public int index() {
 		return this.index;
 	}
 
 	abstract public Point transformPoint(Point p);
 
+	/**
+	 * A list of all the variations
+	 */
 	public final static List<Variation>	ALL_VARIATIONS	= Arrays.asList(new Variation(0, "Linear") {
 									public Point transformPoint(Point p) {
 										return p;

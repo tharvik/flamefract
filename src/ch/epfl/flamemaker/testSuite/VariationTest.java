@@ -1,10 +1,11 @@
-package ch.epfl.flamemaker.flame;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import ch.epfl.flamemaker.flame.Variation;
 import ch.epfl.flamemaker.geometry2d.Point;
 
 public class VariationTest {

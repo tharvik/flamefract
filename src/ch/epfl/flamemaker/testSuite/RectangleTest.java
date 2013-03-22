@@ -1,8 +1,11 @@
-package ch.epfl.flamemaker.geometry2d;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import ch.epfl.flamemaker.geometry2d.Point;
+import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 public class RectangleTest {
 	private static double	DELTA	= 0.000000001;

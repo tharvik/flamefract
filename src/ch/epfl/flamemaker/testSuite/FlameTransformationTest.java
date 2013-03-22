@@ -1,8 +1,10 @@
-package ch.epfl.flamemaker.flame;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+
+import ch.epfl.flamemaker.flame.FlameTransformation;
 
 public class FlameTransformationTest {
 

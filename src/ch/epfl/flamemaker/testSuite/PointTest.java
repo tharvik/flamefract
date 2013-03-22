@@ -1,8 +1,10 @@
-package ch.epfl.flamemaker.geometry2d;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import ch.epfl.flamemaker.geometry2d.Point;
 
 public class PointTest {
 	private static double DELTA = 0.000000001;

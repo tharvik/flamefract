@@ -1,10 +1,13 @@
-package ch.epfl.flamemaker.color;
+package ch.epfl.flamemaker.testSuite;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import ch.epfl.flamemaker.color.Color;
+import ch.epfl.flamemaker.color.Palette;
 
 public abstract class PaletteTest {
 

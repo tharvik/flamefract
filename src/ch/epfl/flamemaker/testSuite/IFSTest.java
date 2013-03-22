@@ -1,4 +1,4 @@
-package ch.epfl.flamemaker.ifs;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.*;
 
@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import ch.epfl.flamemaker.geometry2d.*;
+import ch.epfl.flamemaker.ifs.IFS;
+import ch.epfl.flamemaker.ifs.IFSAccumulator;
 
 public class IFSTest {
 

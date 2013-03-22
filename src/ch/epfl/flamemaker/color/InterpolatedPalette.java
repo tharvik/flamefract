@@ -3,10 +3,24 @@ package ch.epfl.flamemaker.color;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Palette which interpolate between the color given in the list
+ */
 public class InterpolatedPalette implements Palette {
 
+	/**
+	 * List of colors to interpolate with
+	 */
 	private List<Color>	colors;
 
+	/**
+	 * Construct an InterpolatedPalette with the given list of Color
+	 * 
+	 * @param colors
+	 *                List of Color to interpolate
+	 * @throws IllegalArgumentException
+	 *                 if the size of the given list is less than two
+	 */
 	public InterpolatedPalette(List<Color> colors) {
 
 		// because, if we do not have two colors, the palette will not

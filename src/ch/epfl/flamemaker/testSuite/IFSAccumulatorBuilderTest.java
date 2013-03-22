@@ -1,9 +1,10 @@
-package ch.epfl.flamemaker.ifs;
+package ch.epfl.flamemaker.testSuite;
 
 import static org.junit.Assert.*;
 import org.junit.*;
 
 import ch.epfl.flamemaker.geometry2d.*;
+import ch.epfl.flamemaker.ifs.IFSAccumulatorBuilder;
 
 public class IFSAccumulatorBuilderTest {
 	
