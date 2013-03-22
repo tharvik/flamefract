@@ -56,8 +56,9 @@ public class Flame {
 			int i = rand.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
 
-			image.hit(p, lastColor);
+			// TODO wrong sens
 			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
+			image.hit(p, lastColor);
 		}
 
 		return image.build();
