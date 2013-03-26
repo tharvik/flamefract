@@ -1,4 +1,4 @@
-package ch.epfl.flamemaker.testSuite;
+package ch.epfl.flamemaker.tests;
 
 import java.util.ArrayList;
 import java.util.List;

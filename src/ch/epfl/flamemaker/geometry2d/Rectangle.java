@@ -1,27 +1,28 @@
 package ch.epfl.flamemaker.geometry2d;
 
 /**
- * A rectangle with a position
+ * A rectangle parallel to x and y (not rotated) with a center as a
+ * {@link Point}
  */
 public class Rectangle {
 
 	/**
 	 * The center
 	 */
-	final private Point	center;
-
-	/**
-	 * The width
-	 */
-	final private double	width;
+	private final Point	center;
 
 	/**
 	 * The height
 	 */
-	final private double	height;
+	private final double	height;
 
 	/**
-	 * Construct a rectangle with the given value
+	 * The width
+	 */
+	private final double	width;
+
+	/**
+	 * Construct a rectangle with the given values
 	 * 
 	 * @param center
 	 *                The center
@@ -47,21 +48,12 @@ public class Rectangle {
 	}
 
 	/**
-	 * Return the left side value
+	 * Return the ration width/height
 	 * 
-	 * @return The left side value
+	 * @return The ration width/height
 	 */
-	public double left() {
-		return this.center.x() - this.width() / 2;
-	}
-
-	/**
-	 * Return the right side value
-	 * 
-	 * @return The right side value
-	 */
-	public double right() {
-		return this.center.x() + this.width() / 2;
+	public double aspectRatio() {
+		return this.width() / this.height();
 	}
 
 	/**
@@ -71,33 +63,6 @@ public class Rectangle {
 	 */
 	public double bottom() {
 		return this.center.y() - this.height() / 2;
-	}
-
-	/**
-	 * Return the top side value
-	 * 
-	 * @return The top side value
-	 */
-	public double top() {
-		return this.center.y() + this.height() / 2;
-	}
-
-	/**
-	 * Return the width
-	 * 
-	 * @return The width
-	 */
-	public double width() {
-		return this.width;
-	}
-
-	/**
-	 * Return the height
-	 * 
-	 * @return The height
-	 */
-	public double height() {
-		return this.height;
 	}
 
 	/**
@@ -119,15 +84,6 @@ public class Rectangle {
 	 */
 	public boolean contains(Point p) {
 		return (p.x() >= this.left() && p.x() < this.right() && p.y() >= this.bottom() && p.y() < this.top());
-	}
-
-	/**
-	 * Return the ration width/height
-	 * 
-	 * @return The ration width/height
-	 */
-	public double aspectRatio() {
-		return this.width() / this.height();
 	}
 
 	/**
@@ -155,8 +111,53 @@ public class Rectangle {
 		}
 	}
 
+	/**
+	 * Return the height
+	 * 
+	 * @return The height
+	 */
+	public double height() {
+		return this.height;
+	}
+
+	/**
+	 * Return the left side value
+	 * 
+	 * @return The left side value
+	 */
+	public double left() {
+		return this.center.x() - this.width() / 2;
+	}
+
+	/**
+	 * Return the right side value
+	 * 
+	 * @return The right side value
+	 */
+	public double right() {
+		return this.center.x() + this.width() / 2;
+	}
+
+	/**
+	 * Return the top side value
+	 * 
+	 * @return The top side value
+	 */
+	public double top() {
+		return this.center.y() + this.height() / 2;
+	}
+
 	@Override
 	public String toString() {
 		return ("(" + this.center().toString() + "," + this.width() + "," + this.height + ")");
+	}
+
+	/**
+	 * Return the width
+	 * 
+	 * @return The width
+	 */
+	public double width() {
+		return this.width;
 	}
 }

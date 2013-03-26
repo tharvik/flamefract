@@ -1,4 +1,4 @@
-package ch.epfl.flamemaker.testSuite;
+package ch.epfl.flamemaker.tests;
 
 import static org.junit.Assert.fail;
 

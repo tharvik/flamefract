@@ -73,22 +73,11 @@ public abstract class Variation implements Transformation {
 									}
 								}, new Variation(3, "Swirl") {
 									public Point transformPoint(Point p) {
-										double x = p.x()
-												* Math.sin(Math.pow(
-														p.r(),
-														2))
-												- p.y()
-												* Math.cos(Math.pow(
-														p.r(),
-														2));
-										double y = p.x()
-												* Math.cos(Math.pow(
-														p.r(),
-														2))
-												+ p.y()
-												* Math.sin(Math.pow(
-														p.r(),
-														2));
+										double r = Math.pow(p.r(), 2);
+										double x = p.x() * Math.sin(r) - p.y()
+												* Math.cos(r);
+										double y = p.x() * Math.cos(r) + p.y()
+												* Math.sin(r);
 										return new Point(x, y);
 									}
 								}, new Variation(4, "Horseshoe") {
@@ -101,12 +90,9 @@ public abstract class Variation implements Transformation {
 									}
 								}, new Variation(5, "Bubble") {
 									public Point transformPoint(Point p) {
-										double x = 4
-												* p.x()
-												/ (Math.pow(p.r(), 2) + 4);
-										double y = 4
-												* p.y()
-												/ (Math.pow(p.r(), 2) + 4);
+										double r = Math.pow(p.r(), 2) + 4;
+										double x = 4 * p.x() / (r);
+										double y = 4 * p.y() / (r);
 										return new Point(x, y);
 									}
 								});

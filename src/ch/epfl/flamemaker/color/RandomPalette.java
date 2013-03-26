@@ -14,7 +14,8 @@ public class RandomPalette implements Palette {
 	private Palette	palette;
 
 	/**
-	 * Construct a {@link RandomPalette} with the given number of wanted {@link Color}
+	 * Construct a {@link RandomPalette} with the given number of wanted
+	 * {@link Color}
 	 * 
 	 * @param numberOfRandomColor
 	 *                Total number of wanted {@link Color}
@@ -23,12 +24,17 @@ public class RandomPalette implements Palette {
 		Random random = new Random();
 		ArrayList<Color> list = new ArrayList<Color>();
 		for (int i = 0; i < numberOfRandomColor; i++) {
-			// move the range of the random from [0,1[ to [0,1]
-			double[] array = new double[3];
-			array[0] = random.nextInt(Integer.MAX_VALUE) / (Integer.MAX_VALUE - 1);
-			array[1] = random.nextInt(Integer.MAX_VALUE) / (Integer.MAX_VALUE - 1);
-			array[2] = random.nextInt(Integer.MAX_VALUE) / (Integer.MAX_VALUE - 1);
-			list.add(new Color(array[0], array[1], array[2]));
+			// move the range of the random from [0,1[ to [0,1] (not
+			// yet accepted)
+			// double[] array = new double[3];
+			// array[0] = random.nextInt(Integer.MAX_VALUE) /
+			// (Integer.MAX_VALUE - 1);
+			// array[1] = random.nextInt(Integer.MAX_VALUE) /
+			// (Integer.MAX_VALUE - 1);
+			// array[2] = random.nextInt(Integer.MAX_VALUE) /
+			// (Integer.MAX_VALUE - 1);
+			// list.add(new Color(array[0], array[1], array[2]));
+			list.add(new Color(random.nextDouble(), random.nextDouble(), random.nextDouble()));
 		}
 		this.palette = new InterpolatedPalette(list);
 	}
