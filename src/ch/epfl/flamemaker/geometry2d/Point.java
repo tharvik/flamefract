@@ -8,17 +8,17 @@ public class Point {
 	/**
 	 * The x value
 	 */
-	final private double		x;
+	private final double		x;
 
 	/**
 	 * The y value
 	 */
-	final private double		y;
+	private final double		y;
 
 	/**
 	 * The point of origin
 	 */
-	static final public Point	ORIGIN	= new Point(0, 0);
+	public static final Point	ORIGIN	= new Point(0, 0);
 
 	/**
 	 * Construct a new point with the given values
@@ -54,6 +54,7 @@ public class Point {
 
 	/**
 	 * Return the length of the vector to this point
+	 * 
 	 * @return The length of the vector to this point
 	 */
 	public double r() {
@@ -62,25 +63,15 @@ public class Point {
 
 	/**
 	 * Return the angle between y = 0 and this point
+	 * 
 	 * @return The angle between y = 0 and this point
 	 */
 	public double theta() {
 		return Math.atan2(y, x);
 	}
 
-	public String toString() {
-		return "(" + x + ", " + y + ")";
-	}
-
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		long temp;
-		temp = Double.doubleToLongBits(x);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(y);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
+	public String toString() {
+		return "(" + x + "," + y + ")";
 	}
 }

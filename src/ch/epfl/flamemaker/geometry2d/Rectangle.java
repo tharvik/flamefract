@@ -3,10 +3,6 @@ package ch.epfl.flamemaker.geometry2d;
 /**
  * A rectangle with a position
  */
-/**
- * @author tharvik
- * 
- */
 public class Rectangle {
 
 	/**
@@ -159,6 +155,7 @@ public class Rectangle {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return ("(" + this.center().toString() + "," + this.width() + "," + this.height + ")");
 	}
