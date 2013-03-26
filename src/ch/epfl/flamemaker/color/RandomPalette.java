@@ -4,28 +4,31 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * A Palette with a random set of color
+ * A {@link Palette} with a random set of color
  */
 public class RandomPalette implements Palette {
 
 	/**
-	 * InterpolatedPalette used in internal
+	 * {@link InterpolatedPalette} used in internal
 	 */
 	private Palette	palette;
 
 	/**
-	 * Construct a RandomPalette with the given number of wanted color
+	 * Construct a {@link RandomPalette} with the given number of wanted {@link Color}
 	 * 
 	 * @param numberOfRandomColor
-	 *                Total number of wanted color
+	 *                Total number of wanted {@link Color}
 	 */
 	public RandomPalette(int numberOfRandomColor) {
 		Random random = new Random();
 		ArrayList<Color> list = new ArrayList<Color>();
 		for (int i = 0; i < numberOfRandomColor; i++) {
-			// TODO random.nextDouble() in [0,1[, how to go to
-			// [0,1]?
-			list.add(new Color(random.nextDouble(), random.nextDouble(), random.nextDouble()));
+			// move the range of the random from [0,1[ to [0,1]
+			double[] array = new double[3];
+			array[0] = random.nextInt(Integer.MAX_VALUE) / (Integer.MAX_VALUE - 1);
+			array[1] = random.nextInt(Integer.MAX_VALUE) / (Integer.MAX_VALUE - 1);
+			array[2] = random.nextInt(Integer.MAX_VALUE) / (Integer.MAX_VALUE - 1);
+			list.add(new Color(array[0], array[1], array[2]));
 		}
 		this.palette = new InterpolatedPalette(list);
 	}
@@ -33,11 +36,6 @@ public class RandomPalette implements Palette {
 	@Override
 	public Color colorForIndex(double index) {
 		return this.palette.colorForIndex(index);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return this.palette.equals(obj);
 	}
 
 	@Override

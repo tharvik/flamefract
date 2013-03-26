@@ -144,14 +144,7 @@ public class FlamePPMMaker {
 				Color c = accu.color(palette, Color.BLACK, x, y);
 				line += (Color.sRGBEncode(c.red(), 100)) + " ";
 				line += (Color.sRGBEncode(c.green(), 100)) + " ";
-				line += (Color.sRGBEncode(c.blue(), 100));
-				line += ((x + 1 == accu.width()) ? " " : " "); // TODO
-										// Final
-										// have
-										// a
-										// trailing
-										// space,
-										// ugly
+				line += (Color.sRGBEncode(c.blue(), 100)) + " ";
 			}
 			stream.println(line);
 		}

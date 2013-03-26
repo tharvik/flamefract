@@ -6,6 +6,9 @@ import java.util.List;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Transformation;
 
+/**
+ * Class containing the six variations used by the fractals flames
+ */
 public abstract class Variation implements Transformation {
 	/**
 	 * The name of the variation

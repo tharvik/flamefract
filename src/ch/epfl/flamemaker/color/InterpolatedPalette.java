@@ -57,30 +57,4 @@ public class InterpolatedPalette implements Palette {
 
 		return returnValue + ")";
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		InterpolatedPalette that = (InterpolatedPalette) obj;
-		if (colors == null) {
-			if (that.colors != null) {
-				return false;
-			}
-		} else if (!colors.equals(that.colors)) {
-			return false;
-		}
-
-		// TODO missing individual checks?
-
-		return true;
-	}
-
 }

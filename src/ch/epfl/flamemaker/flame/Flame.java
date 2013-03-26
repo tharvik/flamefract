@@ -15,22 +15,26 @@ public class Flame {
 	public Flame(List<FlameTransformation> transformations) {
 		this.transformations = new ArrayList<FlameTransformation>(transformations);
 
-		// TODO Ugly!
 		this.arrayIndex = new double[this.transformations.size()];
-		if (this.arrayIndex.length > 0) {
+		switch (this.arrayIndex.length) {
+		case 2:
+			arrayIndex[1] = 1;
+
+		case 1:
 			arrayIndex[0] = 0;
+			break;
 
-			if (this.arrayIndex.length > 1) {
-				arrayIndex[1] = 1;
+		case 0:
+			break;
 
-				if (this.arrayIndex.length > 2) {
-					for (int i = 2; i < arrayIndex.length; i++) {
-						arrayIndex[i] = ((i - (Math.pow(2,
-								Math.floor(Math.log(i) / Math.log(2))))) * 2 + 1)
-								/ (Math.pow(2, Math.ceil(Math.log(i) / Math.log(2))));
-					}
-				}
+		default:
+			arrayIndex[0] = 0;
+			arrayIndex[1] = 1;
+			for (int i = 2; i < arrayIndex.length; i++) {
+				arrayIndex[i] = ((i - (Math.pow(2, Math.floor(Math.log(i) / Math.log(2))))) * 2 + 1)
+						/ (Math.pow(2, Math.ceil(Math.log(i) / Math.log(2))));
 			}
+			break;
 		}
 	}
 
@@ -56,7 +60,6 @@ public class Flame {
 			int i = rand.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
 
-			// TODO wrong sens
 			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
 			image.hit(p, lastColor);
 		}

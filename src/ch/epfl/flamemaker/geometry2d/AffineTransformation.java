@@ -61,14 +61,4 @@ public class AffineTransformation implements Transformation {
 		
 		return new AffineTransformation(newA, newB, newC, newD, newE, newF);
 	}
-	
-	public AffineTransformation clone () {
-		return new AffineTransformation(this.a, this.b, this.c, this.d, this.e, this.f);
-	}
-
-	@Override
-	public String toString() {
-		// TODO Nice way to do it?
-		return super.toString();
-	}
 }

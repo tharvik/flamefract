@@ -40,8 +40,10 @@ public class FlameAccumulator {
 		this.hitCount = new int[hitCount.length][hitCount[0].length];
 		this.colorIndexSum = new double[colorIndexSum.length][colorIndexSum[0].length];
 
-		// TODO test same size
-
+		if (hitCount.length != colorIndexSum.length || hitCount[0].length != colorIndexSum[0].length) {
+			throw new IllegalArgumentException();
+		}
+		
 		// deep copy of the hitCount array
 		for (int x = 0; x < this.hitCount.length; x++) {
 			this.hitCount[x] = hitCount[x].clone();
