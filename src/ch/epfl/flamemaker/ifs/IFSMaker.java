@@ -61,6 +61,11 @@ public class IFSMaker {
 		return ifs.compute(center, 120, 200, 150);
 	}
 
+	/**
+	 * Creates the actual image
+	 * @param accu The accumulator
+	 * @param stream The image file
+	 */
 	public static void writeToBPM(IFSAccumulator accu, PrintStream stream) {
 		stream.println("P1");
 		stream.println(accu.width() + " " + accu.height());

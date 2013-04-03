@@ -7,8 +7,12 @@ import java.util.Random;
 import ch.epfl.flamemaker.geometry2d.*;
 
 public final class IFS {
-	private final List<AffineTransformation>	transformations;
+	private final List<AffineTransformation> transformations;
 	
+	/**
+	 * Creates a fractal with the given transformations
+	 * @param transformations The list of the transformations of the fractal
+	 */
 	public IFS(List<AffineTransformation> transformations) {
 		this.transformations = new ArrayList<AffineTransformation>(transformations);
 	}
