@@ -1,23 +1,23 @@
 package ch.epfl.flamemaker.geometry2d;
 
 /**
- * A rectangle parallel to x and y (not rotated) with a center as a
+ * A rectangle parallel to the x-axis and the y-axis (not rotated) with a center as a
  * {@link Point}
  */
-public class Rectangle {
+public final class Rectangle {
 
 	/**
-	 * The center
+	 * The center of the rectangle
 	 */
 	private final Point	center;
 
 	/**
-	 * The height
+	 * The height of the rectangle
 	 */
 	private final double	height;
 
 	/**
-	 * The width
+	 * The width of the rectangle
 	 */
 	private final double	width;
 
@@ -28,13 +28,13 @@ public class Rectangle {
 	 *                The center
 	 * 
 	 * @param width
-	 *                The widht
+	 *                The width
 	 * 
 	 * @param height
 	 *                The height
 	 * 
 	 * @throws IllegalArgumentException
-	 *                 if the width or the height <= 0
+	 *                 if the width or the height <= 0 (mathematically impossible)
 	 */
 	public Rectangle(Point center, double width, double height) {
 
@@ -57,18 +57,18 @@ public class Rectangle {
 	}
 
 	/**
-	 * Return the bottom side value
-	 * 
-	 * @return The bottom side value
+	 * Return the height (y) of the bottom of the rectangle
+	 *  
+	 * @return The height (y) of the bottom of the rectangle
 	 */
 	public double bottom() {
 		return this.center.y() - this.height() / 2;
 	}
 
 	/**
-	 * Return the center
+	 * Return the center of the rectangle
 	 * 
-	 * @return The center
+	 * @return The center of the rectangle
 	 */
 	public Point center() {
 		return this.center;
@@ -112,50 +112,56 @@ public class Rectangle {
 	}
 
 	/**
-	 * Return the height
+	 * Return the height of the rectangle
 	 * 
-	 * @return The height
+	 * @return The height of the rectangle
 	 */
 	public double height() {
 		return this.height;
 	}
 
 	/**
-	 * Return the left side value
+	 * Return the distance from the y-axis to the left side of the rectangle
 	 * 
-	 * @return The left side value
+	 * @return The distance from the y-axis to the left side of the rectangle
 	 */
 	public double left() {
 		return this.center.x() - this.width() / 2;
 	}
 
 	/**
-	 * Return the right side value
+	 * Return the distance from the y-axis to the right side of the rectangle
 	 * 
-	 * @return The right side value
+	 * @return The distance from the y-axis to the right side of the rectangle
 	 */
 	public double right() {
 		return this.center.x() + this.width() / 2;
 	}
 
 	/**
-	 * Return the top side value
-	 * 
-	 * @return The top side value
+	 * Return the height (y) of the top of the rectangle
+	 *  
+	 * @return The height (y) of the top of the rectangle
 	 */
 	public double top() {
 		return this.center.y() + this.height() / 2;
 	}
 
+	/**
+	 * Return a textual representation of the rectangle
+	 * 
+	 * @return A textual representation of the rectangle
+	 * of the form "(center), width, height"
+	 */
 	@Override
 	public String toString() {
 		return ("(" + this.center().toString() + "," + this.width() + "," + this.height + ")");
 	}
 
 	/**
-	 * Return the width
+	 * Return the width of the rectangle
 	 * 
-	 * @return The width
+	 * @return The width of the rectangle
 	 */
 	public double width() {
 		return this.width;

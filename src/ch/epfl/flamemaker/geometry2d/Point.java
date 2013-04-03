@@ -3,10 +3,10 @@ package ch.epfl.flamemaker.geometry2d;
 /**
  * Represent a point
  */
-public class Point {
+public final class Point {
 
 	/**
-	 * The point of origin
+	 * The point of origin, i.e (0,0)
 	 */
 	public static final Point	ORIGIN	= new Point(0, 0);
 
@@ -35,23 +35,29 @@ public class Point {
 	}
 
 	/**
-	 * Return the length of the vector to this point
+	 * Return the length of the vector from the origin to the point (x, y)
 	 * 
-	 * @return The length of the vector to this point
+	 * @return The length of the vector from the origin to the point (x, y)
 	 */
 	public double r() {
 		return Math.sqrt(Math.pow(this.x, 2.0) + Math.pow(this.y, 2.0));
 	}
 
 	/**
-	 * Return the angle between y = 0 and this point
+	 * Return the angle between the vector r and the x axis
 	 * 
-	 * @return The angle between y = 0 and this point
+	 * @return The angle between the vector r and the x axis
 	 */
 	public double theta() {
 		return Math.atan2(y, x);
 	}
 
+	/**
+	 * Return a textual representation of our point
+	 * 
+	 * @return A textual representation of our point
+	 * of the form "(x, y)"
+	 */
 	@Override
 	public String toString() {
 		return "(" + x + "," + y + ")";

@@ -160,9 +160,9 @@ public class FlamePGMMaker {
 	 * Write an accumulator to a stream
 	 * 
 	 * @param accu
-	 *                The accumulator containing a fractale
+	 *                The accumulator containing a fractal
 	 * @param stream
-	 *                The stream to write the fractale to
+	 *                The stream to write the fractal to
 	 */
 	private static void writeToPGM(FlameAccumulator accu, PrintStream stream) {
 		stream.println("P2");

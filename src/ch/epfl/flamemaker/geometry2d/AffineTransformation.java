@@ -1,9 +1,37 @@
 package ch.epfl.flamemaker.geometry2d;
 
-public class AffineTransformation implements Transformation {
+public final class AffineTransformation implements Transformation {
+	/**
+	 *<p>Variables to express our matrix:</p>
+	 * 	a  b  c</br>
+	 * 	d  e  f</br>
+	 * 	0  0  1</br>
+	 * 
+	 */
 	final private double				a, b, c, d, e, f;
+	
+	/**
+	 *<p>The identity matrix</p>
+	 * 
+	 *<p>If multiply a matrix M by the identity (or we multiply the identity by M),
+	 * the result will be M.</p>
+	 * 
+	 * 	1  0  0</br>
+	 * 	0  1  0</br>
+	 * 	0  0  1</br>
+	 * 
+	 */
 	public static final AffineTransformation	IDENTITY	= new AffineTransformation(1, 0, 0, 0, 1, 0);
 	
+	/**
+	 * Construct the matrix we need for the transformation
+	 * @param a The 1,1 element of the matrix
+	 * @param b The 1,2 element of the matrix
+	 * @param c The 1,3 element of the matrix
+	 * @param d The 2,1 element of the matrix
+	 * @param e The 2,2 element of the matrix
+	 * @param f The 2,3 element of the matrix
+	 */
 	public AffineTransformation(double a, double b, double c, double d, double e, double f) {
 		this.a = a;
 		this.b = b;
@@ -13,10 +41,21 @@ public class AffineTransformation implements Transformation {
 		this.f = f;
 	}
 	
+	/**
+	 * The transformation we need to translate a vector
+	 * @param dX The delta between the actual vector and the transformed vector on the x-axis
+	 * @param dY The delta between the actual vector and the transformed vector on the y-axis
+	 * @return A matrix we use to translate a vector
+	 */
 	public static AffineTransformation newTranslation(double dX, double dY) {
 		return new AffineTransformation(1, 0, dX, 0, 1, dY);
 	}
 	
+	/**
+	 * The transformation we need to rotate a vector
+	 * @param theta The angle of the rotation (in radians)
+	 * @return A matrix we use to rotate a vector
+	 */
 	public static AffineTransformation newRotation(double theta) {
 		double sin = Math.sin(theta);
 		double cos = Math.cos(theta);
@@ -24,14 +63,30 @@ public class AffineTransformation implements Transformation {
 		return new AffineTransformation(cos, -sin, 0.0, sin, cos, 0.0);
 	}
 	
+	/**
+	 * The transformation we need to scale a vector
+	 * @param sX The dilation factor on the x-axis
+	 * @param sY The dilation factor on the y-axis
+	 * @return A matrix we use to scale a vector
+	 */
 	public static AffineTransformation newScaling(double sX, double sY) {
 		return new AffineTransformation(sX, 0.0, 0.0, 0.0, sY, 0.0);
 	}
 	
+	/**
+	 * The transformation we need to shear a vector on the x-axis
+	 * @param sX The factor of shearing
+	 * @return A matrix we use to shear a vector
+	 */
 	public static AffineTransformation newShearX(double sX) {
 		return new AffineTransformation(1, sX, 0, 0, 1, 0);
 	}
 	
+	/**
+	 * The transformation we need to shear a vector on the y-axis
+	 * @param sY The factor of shearing
+	 * @return A matrix we use to shear a vector
+	 */
 	public static AffineTransformation newShearY(double sY) {
 		return new AffineTransformation(1, 0, 0, sY, 1, 0);
 	}
@@ -43,14 +98,27 @@ public class AffineTransformation implements Transformation {
 		return new Point(newX, newY);
 	}
 	
+	/**
+	 * Returns the horizontal component of the translation
+	 * @return The horizontal component of the translation
+	 */
 	public double translationX() {
 		return c;
 	}
 	
+	/**
+	 * Returns the vertical component of the translation
+	 * @return The vertical component of the translation
+	 */
 	public double translationY() {
 		return f;
 	}
 	
+	/**
+	 * Gives us a matrix that represents the compounded function of two transformation
+	 * @param that A linear transformation
+	 * @return A matrix that represents the compounded function of two transformation
+	 */
 	public AffineTransformation composeWith(AffineTransformation that) {
 		double newA = this.a * that.a + this.b * that.d;
 		double newB = this.a * that.b + this.b * that.e;
