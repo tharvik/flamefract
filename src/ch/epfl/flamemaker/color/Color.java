@@ -128,11 +128,11 @@ public final class Color {
 	 * @return Colors as an int, a value by byte in red, green, blue order
 	 */
 	public int asPackedRGB() {
-		int color = (int) (this.red() * 255);
+		int color = (int) Math.round((this.red() * 255));
 		color = color << 8;
-		color += (int) (this.green() * 255);
+		color += (int) Math.round((this.green() * 255));
 		color = color << 8;
-		color += (int) (this.blue() * 255);
+		color += (int) Math.round((this.blue() * 255));
 
 		return color;
 	}
@@ -153,6 +153,11 @@ public final class Color {
 	}
 
 	// "(0,0,0)"
+	/**
+	 * Returns a textual form of a color
+	 * 
+	 * @return A textual form of a color, in the form "(red,green,blue)"
+	 */
 	@Override
 	public String toString() {
 		return ("(" + this.red() + "," + this.green() + "," + this.blue() + ")");
