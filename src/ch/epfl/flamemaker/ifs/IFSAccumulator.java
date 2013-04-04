@@ -1,5 +1,8 @@
 package ch.epfl.flamemaker.ifs;
 
+/**
+ * Accumulator contains the pseudo-image of a IFS fractal, with colors
+ */
 public final class IFSAccumulator {
 	/**
 	 * Bidimensional array of booleans that <i>is</i> the Accumulator

@@ -7,7 +7,7 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 /**
- * Accumulator contains the pseudo-image of a fractal, with colors
+ * Accumulator contains the pseudo-image of a flame fractal, with colors
  */
 public class FlameAccumulator {
 
