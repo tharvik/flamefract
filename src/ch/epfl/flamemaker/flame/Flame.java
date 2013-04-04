@@ -158,37 +158,96 @@ public class Flame {
 		 * 
 		 * @param index
 		 *                The index for the {@link FlameTransformation}
-		 *                
+		 * 
 		 * @return The {@link AffineTransformation} of the
 		 *         {@link FlameTransformation} at the given index in the
 		 *         list
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
 		 */
 		public AffineTransformation affineTransformation(int index) {
 			this.checkIndex(index);
 			return this.list.get(index).getAffineTransformation();
 		}
 
+		/**
+		 * Set the {@link AffineTransformation} of the
+		 * {@link FlameTransformation} at the given index in the list
+		 * 
+		 * @param index
+		 *                The index for the {@link FlameTransformation}
+		 * 
+		 * @param newTransformation
+		 *                The new {@link AffineTransformation}
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
+		 */
 		public void setAffineTransformation(int index, AffineTransformation newTransformation) {
 			this.checkIndex(index);
 			this.list.get(index).setAffineTransformation(newTransformation);
 		}
 
+		/**
+		 * Set the weight of given {@link Variation} of the
+		 * {@link FlameTransformation} at the given index in the list
+		 * 
+		 * @param index
+		 *                The index for the {@link FlameTransformation}
+		 * @param variation
+		 *                The {@link Variation} which we want to change
+		 *                the weight
+		 * @param newWeight
+		 *                The new weight
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
+		 */
 		public void setVariationWeight(int index, Variation variation, double newWeight) {
 			checkIndex(index);
 			this.list.get(index).setVariationWeight(variation.index(), newWeight);
 		}
 
+		/**
+		 * Remove the {@link FlameTransformation} at the given index
+		 * 
+		 * @param index
+		 *                The index in the list to remove
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
+		 */
 		public void removeTransformation(int index) {
 			this.checkIndex(index);
 			this.list.remove(index);
 		}
 
+		/**
+		 * Check if an index is in the {@link List}
+		 * 
+		 * @param index
+		 *                The index to check
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
+		 */
 		private void checkIndex(int index) {
 			if (index < 0 || index > this.transformationCount()) {
 				throw new IndexOutOfBoundsException();
 			}
 		}
 
+		/**
+		 * Return a {@link Flame} with the actual state of the Builder
+		 * 
+		 * @return A {@link Flame} with the actual state of the Builder
+		 */
 		public Flame build() {
 			ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
 			for (FlameTransformation.Builder builder : this.list) {
