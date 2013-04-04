@@ -9,11 +9,16 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 /**
- * Main class, will generate all the fractals with colors to PGM files
+ * Main class, will generate the following colored fractals to PGM files
+ * <ol>
+ * <li>Turbulence</li>
+ * <li>Barnsley's Fougere</li>
+ * <li>Shark Fin</li>
+ * </ol>
  */
 public class FlamePGMMaker {
 	/**
-	 * Generate all fractals, by using threads
+	 * Generate all fractals of the class, by using threads
 	 * 
 	 * @param args
 	 *                Not used

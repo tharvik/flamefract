@@ -8,13 +8,21 @@ import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
 
-/** 
- * The aim of this class is to create two fractals known as
- * #1 Sierpinskis' Triangle
- * #2 Barnsley's Fougere
- *
+/**
+ * Main class, will generate the following fractals to BPM files
+ * <ol>
+ * <li>Barnsley's Fougere</li>
+ * <li>Sierpinski's Triangle</li>
+ * </ol>
  */
 public class IFSMaker {
+
+	/**
+	 * Generate all fractals of the class
+	 * 
+	 * @param args
+	 *                Not used
+	 */
 
 	public static void main(String[] args) {
 
@@ -42,6 +50,11 @@ public class IFSMaker {
 
 	}
 
+	/**
+	 * Generate the Sierpinski's triangle fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
 	private static IFSAccumulator generateSierpinskiTriangle() {
 		ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
 
@@ -54,6 +67,11 @@ public class IFSMaker {
 		return ifs.compute(center, 100, 100, 1);
 	}
 
+	/**
+	 * Generate the Barnsley fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
 	private static IFSAccumulator generateBarnsleyFougere() {
 		ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
 
@@ -69,8 +87,11 @@ public class IFSMaker {
 
 	/**
 	 * Creates the actual image in BPM format
-	 * @param accu The accumulator to write
-	 * @param stream The stream to write to
+	 * 
+	 * @param accu
+	 *                The accumulator to write
+	 * @param stream
+	 *                The stream to write to
 	 */
 	public static void writeToBPM(IFSAccumulator accu, PrintStream stream) {
 		stream.println("P1");

@@ -2,6 +2,9 @@ package ch.epfl.flamemaker.ifs;
 
 import ch.epfl.flamemaker.geometry2d.*;
 
+/**
+ * Builder for {@link IFSAccumulator}
+ */
 public class IFSAccumulatorBuilder {
 
 	/**
@@ -9,19 +12,28 @@ public class IFSAccumulatorBuilder {
 	 */
 	private boolean[][]		isHit;
 	/**
-	 * The region of the whole picture we want to examine
+	 * The scope relevant to the fractal
 	 */
 	private Rectangle		frame;
-	/** 
-	 * Specific transformation
+	/**
+	 * Specific transformation used to <i>move</i> the point given in
+	 * hit(Point) to the actual position in our array
 	 */
 	private AffineTransformation	transformation;
 
 	/**
-	 * Build an accumulator for the "frame" region
-	 * @param frame The region into which the builder will build
-	 * @param width Width of the accumulator
-	 * @param height Height of the accumulator
+	 * Build an accumulator with the given scope (frame) and resolution
+	 * (width and height)
+	 * 
+	 * @param frame
+	 *                The region into which the builder will build
+	 * @param width
+	 *                Width of the accumulator
+	 * @param height
+	 *                Height of the accumulator
+	 * 
+	 * @throws IllegalArgumentException
+	 *                 if the widht or height are less or equal to zero
 	 */
 	public IFSAccumulatorBuilder(Rectangle frame, int width, int height) {
 		if (width <= 0 || height <= 0) {
@@ -37,8 +49,10 @@ public class IFSAccumulatorBuilder {
 	}
 
 	/**
-	 * Sets to true the "box" of the accumulator
-	 * @param p A point
+	 * Sets the given point as hit (which is <i>true</i> in our array)
+	 * 
+	 * @param p
+	 *                The point to hit
 	 */
 	public void hit(Point p) {
 		if (!this.frame.contains(p)) {
@@ -55,6 +69,7 @@ public class IFSAccumulatorBuilder {
 
 	/**
 	 * Returns an accumulator with the current points
+	 * 
 	 * @return An accumulator with the current points
 	 */
 	public IFSAccumulator build() {
