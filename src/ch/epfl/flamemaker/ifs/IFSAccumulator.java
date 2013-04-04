@@ -2,7 +2,7 @@ package ch.epfl.flamemaker.ifs;
 
 public final class IFSAccumulator {
 	/**
-	 * Bidimensional array of booleans that <i>is</i> the Accumulator
+	 * Accumulator contains the pseudo-image of a fractal
 	 */
 	private final boolean[][] isHit;
 

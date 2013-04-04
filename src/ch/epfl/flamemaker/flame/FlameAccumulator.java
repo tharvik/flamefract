@@ -7,7 +7,7 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 /**
- * Accumulator contain the pseudo-image of a fractal, with colors
+ * Accumulator contains the pseudo-image of a fractal, with colors
  */
 public class FlameAccumulator {
 
@@ -36,7 +36,7 @@ public class FlameAccumulator {
 	 * @param colorIndexSum
 	 *                Array of the sum of index of color per pixel
 	 */
-	public FlameAccumulator(int[][] hitCount, double[][] colorIndexSum) {
+	private FlameAccumulator(int[][] hitCount, double[][] colorIndexSum) {
 		this.hitCount = new int[hitCount.length][hitCount[0].length];
 		this.colorIndexSum = new double[colorIndexSum.length][colorIndexSum[0].length];
 
@@ -158,7 +158,7 @@ public class FlameAccumulator {
 		private AffineTransformation	transformation;
 
 		/**
-		 * Construct a builer of FlameAccumulator
+		 * Construct a builder of FlameAccumulator
 		 * 
 		 * @param frame
 		 *                Rectangle where the hit point is counted

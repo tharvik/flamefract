@@ -7,7 +7,7 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Transformation;
 
 /**
- * Class containing the six variations used by the fractals flames
+ * Class containing the six variations used by the flame fractals
  */
 public abstract class Variation implements Transformation {
 	/**
@@ -42,7 +42,7 @@ public abstract class Variation implements Transformation {
 	}
 
 	/**
-	 * Return the name of the variation
+	 * Return the index of the variation
 	 * 
 	 * @return The index of the variation
 	 */

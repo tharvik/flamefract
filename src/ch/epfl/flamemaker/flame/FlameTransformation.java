@@ -32,7 +32,7 @@ public class FlameTransformation implements Transformation {
 	 * @throws IllegalArgumentException
 	 *                 if the given variationWeight.lenght != 6 if any value
 	 *                 in variationWeight is not between 0 and 1 (both
-	 *                 inclusive)
+	 *                 included)
 	 */
 	public FlameTransformation(AffineTransformation affineTransformation, double[] variationWeight) {
 		this.affineTransformation = affineTransformation;

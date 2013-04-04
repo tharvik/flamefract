@@ -8,6 +8,12 @@ import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
 
+/** 
+ * The aim of this class is to create two fractals known as
+ * #1 Sierpinskis' Triangle
+ * #2 Barnsley's Fougere
+ *
+ */
 public class IFSMaker {
 
 	public static void main(String[] args) {

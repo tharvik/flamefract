@@ -1,7 +1,7 @@
 package ch.epfl.flamemaker.color;
 
 /**
- * RGB representation of a color
+ * sRGB representation of a color
  */
 public final class Color {
 
@@ -98,14 +98,10 @@ public final class Color {
 	 * @param that
 	 *                The color to mix with
 	 * @param proportion
-	 *                The proportion to mix the given color with this color
-	 *                <p>
-	 *                If 0, then the returned color is the <i>same</i>
-	 *                </p>
-	 *                <p>
+	 *                <p>The proportion to mix the given color with this color</p>
+	 *                If 0, then the returned color is the <i>same</i><br />
 	 *                if 1, then the returned color is the <i>given
-	 *                color</i>
-	 *                </p>
+	 *                color</i></p>
 	 * 
 	 * @return The new Color mix
 	 * 
@@ -124,10 +120,10 @@ public final class Color {
 	}
 
 	/**
-	 * Return the colors value as int, a value by byte, in red, green, blue
+	 * Return the colors value as an int, a value by byte, in red, green, blue
 	 * order
 	 * 
-	 * @return Colors as int, a value by byte in red, green, blue order
+	 * @return Colors as an int, a value by byte in red, green, blue order
 	 */
 	public int asPackedRGB() {
 		int color = (int) (this.red() * 255);

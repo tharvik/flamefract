@@ -31,8 +31,9 @@ public class Flame {
 			arrayIndex[0] = 0;
 			arrayIndex[1] = 1;
 			for (int i = 2; i < arrayIndex.length; i++) {
-				arrayIndex[i] = ((i - (Math.pow(2, Math.floor(Math.log(i) / Math.log(2))))) * 2 + 1)
-						/ (Math.pow(2, Math.ceil(Math.log(i) / Math.log(2))));
+				double log2I = Math.log(i) / Math.log(2);
+				arrayIndex[i] = ((i - (Math.pow(2, Math.floor(log2I)))) * 2 + 1)
+						/ (Math.pow(2, Math.ceil(log2I)));
 			}
 			break;
 		}
