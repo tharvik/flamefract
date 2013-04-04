@@ -98,7 +98,9 @@ public final class Color {
 	 * @param that
 	 *                The color to mix with
 	 * @param proportion
-	 *                <p>The proportion to mix the given color with this color</p>
+	 *                <p>
+	 *                The proportion to mix the given color with this color
+	 *                </p>
 	 *                If 0, then the returned color is the <i>same</i><br />
 	 *                if 1, then the returned color is the <i>given
 	 *                color</i></p>
@@ -120,8 +122,8 @@ public final class Color {
 	}
 
 	/**
-	 * Return the colors value as an int, a value by byte, in red, green, blue
-	 * order
+	 * Return the colors value as an int, a value by byte, in red, green,
+	 * blue order
 	 * 
 	 * @return Colors as an int, a value by byte in red, green, blue order
 	 */
@@ -146,9 +148,8 @@ public final class Color {
 	public static int sRGBEncode(double v, int max) {
 		if (v <= 0.0031308) {
 			return (int) (12.92 * v * max);
-		} else {
-			return (int) ((1.055 * Math.pow(v, 1 / 2.4) - 0.055) * max);
 		}
+		return (int) ((1.055 * Math.pow(v, 1 / 2.4) - 0.055) * max);
 	}
 
 	// "(0,0,0)"
