@@ -7,11 +7,34 @@ import java.util.Random;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
+import ch.epfl.flamemaker.geometry2d.Transformation;
+import ch.epfl.flamemaker.ifs.IFS;
 
+/**
+ * Represent a colored fractal of type flame
+ * <p>
+ * Very similar to {@link IFS}, but with a {@link List} of
+ * {@link FlameTransformation} in place of {@link AffineTransformation}
+ * </p>
+ */
 public class Flame {
+	/**
+	 * The list of the {@link FlameTransformation} to use in the computation
+	 */
 	private final List<FlameTransformation>	transformations;
+	/**
+	 * An array of index of color for each {@link Transformation}
+	 */
 	private final double[]			arrayIndex;
 
+	/**
+	 * Construct a {@link Flame} with the given {@link List} of
+	 * {@link FlameTransformation}
+	 * 
+	 * @param transformations
+	 *                The {@link FlameTransformation} to use to generate the
+	 *                fractal
+	 */
 	public Flame(List<FlameTransformation> transformations) {
 		this.transformations = new ArrayList<FlameTransformation>(transformations);
 
@@ -39,6 +62,24 @@ public class Flame {
 		}
 	}
 
+	/**
+	 * Compute the fractal, with the given scope (frame), the definition
+	 * (width and height) and the accuracy (density)
+	 * 
+	 * @param frame
+	 *                The scope of the fractal, used in the
+	 *                {@link FlameAccumulator}
+	 * @param width
+	 *                The width of the {@link FlameAccumulator}
+	 * @param height
+	 *                The height of the {@link FlameAccumulator}
+	 * @param density
+	 *                A constant representing the number of wanted iteration
+	 *                (the more, the better the fractal will be but the
+	 *                longer it will take to generate)
+	 * 
+	 * @return A {@link FlameAccumulator} with the generate fractal
+	 */
 	public FlameAccumulator compute(Rectangle frame, int width, int height, int density) {
 
 		Random rand = new Random(2013);
@@ -68,9 +109,22 @@ public class Flame {
 		return image.build();
 	}
 
+	/**
+	 * A incremental builder for {@link Flame}
+	 */
 	public static class Builder {
+		/**
+		 * The {@link ArrayList} of {@link FlameAccumulator.Builder}
+		 * which represent the current state of the Builder
+		 */
 		private ArrayList<FlameTransformation.Builder>	list;
 
+		/**
+		 * Construct a Flame.Builder with the given {@link Flame}
+		 * 
+		 * @param flame
+		 *                The {@link Flame} to take as base
+		 */
 		public Builder(Flame flame) {
 			this.list = new ArrayList<FlameTransformation.Builder>();
 			for (FlameTransformation flameTransformation : flame.transformations) {
@@ -78,14 +132,37 @@ public class Flame {
 			}
 		}
 
+		/**
+		 * Return the size of the list
+		 * 
+		 * @return The size of the list
+		 */
 		public int transformationCount() {
 			return this.list.size();
 		}
 
+		/**
+		 * Add a new {@link FlameTransformation} to the end of the list
+		 * 
+		 * @param transformation
+		 *                The {@link FlameTransformation} to add to the
+		 *                end of the list
+		 */
 		public void addTransformation(FlameTransformation transformation) {
 			this.list.add(new FlameTransformation.Builder(transformation));
 		}
 
+		/**
+		 * Return the {@link AffineTransformation} of the
+		 * {@link FlameTransformation} at the given index in the list
+		 * 
+		 * @param index
+		 *                The index for the {@link FlameTransformation}
+		 *                
+		 * @return The {@link AffineTransformation} of the
+		 *         {@link FlameTransformation} at the given index in the
+		 *         list
+		 */
 		public AffineTransformation affineTransformation(int index) {
 			this.checkIndex(index);
 			return this.list.get(index).getAffineTransformation();

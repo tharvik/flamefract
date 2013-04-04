@@ -68,9 +68,9 @@ public class IFSMaker {
 	}
 
 	/**
-	 * Creates the actual image
-	 * @param accu The accumulator
-	 * @param stream The image file
+	 * Creates the actual image in BPM format
+	 * @param accu The accumulator to write
+	 * @param stream The stream to write to
 	 */
 	public static void writeToBPM(IFSAccumulator accu, PrintStream stream) {
 		stream.println("P1");
