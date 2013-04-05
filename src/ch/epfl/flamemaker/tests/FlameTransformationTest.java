@@ -25,11 +25,6 @@ public class FlameTransformationTest {
 		new FlameTransformation(null, variationWeight);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testFlameTransformationNull() {
-		new FlameTransformation(null, null);
-	}
-
 	@Test
 	public void testTransformPoint() {
 		Assert.fail("Not yet implemented");

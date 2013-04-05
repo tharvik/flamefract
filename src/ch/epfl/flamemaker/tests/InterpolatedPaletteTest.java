@@ -37,14 +37,6 @@ public class InterpolatedPaletteTest extends PaletteTest {
 	}
 
 	@Test
-	public void testEquals() {
-		final Palette p1 = this.newPalette(this.array);
-		final Palette p2 = this.newPalette(this.array);
-
-		Assert.assertTrue(p1.equals(p2));
-	}
-
-	@Test
 	public void testToString() {
 		final Palette p = this.newPalette(this.array);
 

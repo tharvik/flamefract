@@ -17,7 +17,7 @@ public class ColorTest {
 
 		// 0.5 * 255 raise 0x7F (0.5 * 256 will raise 0x80)
 		c = new Color(0.5, 0.5, 0.5);
-		Assert.assertEquals(0x7F7F7F, c.asPackedRGB());
+		Assert.assertEquals(0x808080, c.asPackedRGB());
 
 		c = new Color(1, 1, 1);
 		Assert.assertEquals(0xFFFFFF, c.asPackedRGB());
@@ -68,23 +68,6 @@ public class ColorTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testColorTooBigR() {
 		new Color(2, 0, 0);
-	}
-
-	@Test
-	public void testEqualsObject() {
-
-		for (double r = 0; r <= 1; r += 0.1) {
-			for (double g = 0; g <= 1; g += 0.1) {
-				for (double b = 0; b <= 1; b += 0.1) {
-					final Color c1 = new Color(r, g, b);
-					final Color c2 = new Color(r, g, b);
-
-					Assert.assertTrue(c1.equals(c2));
-					Assert.assertTrue(c2.equals(c1));
-				}
-			}
-
-		}
 	}
 
 	@Test
