@@ -4,16 +4,16 @@ package ch.epfl.flamemaker.geometry2d;
  * A {@link Transformation} with a given matrix which will transform any given
  * point with his matrix
  * <p>
- * It have a lot of static methods to generate the an
+ * It has a lot of static methods to generate an
  * {@link AffineTransformation} containing the right matrix for e.g. to
  * translate a point with the wanted values
  * </p>
  * <p>
  * Variables to express our matrix:
  * </p>
- * <br>
- * a b c</br><br>
- * d e f</br><br>
+ * </br>
+ * a b c</br>
+ * d e f</br>
  * 0 0 1</br>
  */
 public final class AffineTransformation implements Transformation {
@@ -27,10 +27,10 @@ public final class AffineTransformation implements Transformation {
 	 * If multiply a matrix M by the identity (or we multiply the identity
 	 * by M), the result will be M.
 	 * </p>
-	 * <br>
-	 * 1 0 0</br><br>
-	 * 0 1 0</br><br>
-	 * 0 0 1</br><br>
+	 * </br>
+	 * 1 0 0</br>
+	 * 0 1 0</br>
+	 * 0 0 1</br>
 	 * 
 	 */
 	public static final AffineTransformation	IDENTITY	= new AffineTransformation(1, 0, 0, 0, 1, 0);

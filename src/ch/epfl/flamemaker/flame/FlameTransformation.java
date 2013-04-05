@@ -5,7 +5,7 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Transformation;
 
 /**
- * A Transformation with an array of variation weight and a AffineTransformation
+ * A Transformation with an array of variation weight and an AffineTransformation
  * used to transform point
  */
 public class FlameTransformation implements Transformation {
@@ -34,7 +34,7 @@ public class FlameTransformation implements Transformation {
 		 * 
 		 * @throws IndexOutOfBoundsException
 		 *                 if the given index is not between 0 and 5
-		 *                 (both inclusive)
+		 *                 (both included)
 		 */
 		private static void checkIndex(int index) {
 			if (index < 0 || index >= 6) {
@@ -49,7 +49,7 @@ public class FlameTransformation implements Transformation {
 		 * @param affineTransformation
 		 *                The AffineTransformation to use
 		 * @param variationWeight
-		 *                The weigth of every variation
+		 *                The weight of every variation
 		 */
 		public Builder(AffineTransformation affineTransformation, double[] variationWeight) {
 
@@ -104,7 +104,7 @@ public class FlameTransformation implements Transformation {
 		 * 
 		 * @throws IndexOutOfBoundsException
 		 *                 if the given index is not between 0 and 5
-		 *                 (both inclusive)
+		 *                 (both included)
 		 */
 		public double getVariationWeightValue(int index) {
 			Builder.checkIndex(index);
@@ -132,7 +132,7 @@ public class FlameTransformation implements Transformation {
 		 * 
 		 * @throws IndexOutOfBoundsException
 		 *                 if the given index is not between 0 and 5
-		 *                 (both inclusive)
+		 *                 (both included)
 		 * 
 		 * @throws IllegalArgumentException
 		 *                 if the given value is not between 0 and 1
@@ -168,7 +168,7 @@ public class FlameTransformation implements Transformation {
 	 * @throws IllegalArgumentException
 	 *                 if the given variationWeight.lenght != 6 if any value
 	 *                 in variationWeight is not between 0 and 1 (both
-	 *                 inclusive)
+	 *                 included)
 	 * 
 	 */
 	private static void checkValue(double[] variationWeight) {

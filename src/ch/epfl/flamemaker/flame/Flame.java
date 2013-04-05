@@ -12,10 +12,9 @@ import ch.epfl.flamemaker.ifs.IFS;
 
 /**
  * Represent a colored fractal of type flame
- * <p>
+ * </br>
  * Very similar to {@link IFS}, but with a {@link List} of
  * {@link FlameTransformation} in place of {@link AffineTransformation}
- * </p>
  */
 public class Flame {
 	/**

@@ -12,7 +12,7 @@ public interface Transformation {
 	 * @param p
 	 *                is the point that is going to be transformed
 	 * 
-	 * @return A new point that has been transformed
+	 * @return A new point that is p transformed
 	 */
 	Point transformPoint(Point p);
 }
