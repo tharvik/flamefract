@@ -25,17 +25,17 @@ public class FlamePGMMaker {
 	 */
 	public static void main(String[] args) {
 
-		Runnable sharkfin = new Runnable() {
+		final Runnable sharkfin = new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					PrintStream file = new PrintStream("SharkFin.pgm");
+					final PrintStream file = new PrintStream("SharkFin.pgm");
 
-					writeToPGM(generateSharkFin(), file);
+					FlamePGMMaker.writeToPGM(FlamePGMMaker.generateSharkFin(), file);
 
 					file.close();
-				} catch (FileNotFoundException e) {
+				} catch (final FileNotFoundException e) {
 					System.out.println("Not able to open \"SharkFin.pgm\"! " + "Abort..");
 					System.exit(1);
 				}
@@ -43,96 +43,48 @@ public class FlamePGMMaker {
 			}
 		};
 
-		Runnable turbulence = new Runnable() {
+		final Runnable turbulence = new Runnable() {
 
 			@Override
 			public void run() {
 
 				try {
-					PrintStream file = new PrintStream("Turbulence.pgm");
+					final PrintStream file = new PrintStream("Turbulence.pgm");
 
-					writeToPGM(generateTurbulence(), file);
+					FlamePGMMaker.writeToPGM(FlamePGMMaker.generateTurbulence(), file);
 
 					file.close();
-				} catch (FileNotFoundException e) {
+				} catch (final FileNotFoundException e) {
 					System.out.println("Not able to open \"Turbulence.pgm\"! " + "Abort..");
 					System.exit(1);
 				}
 			}
 		};
 
-		Runnable barnsleyFougere = new Runnable() {
+		final Runnable barnsleyFougere = new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					PrintStream file = new PrintStream("BarnsleyFougere.bpm");
+					final PrintStream file = new PrintStream("BarnsleyFougere.bpm");
 
-					writeToPGM(generateBarnsleyFougere(), file);
+					FlamePGMMaker.writeToPGM(FlamePGMMaker.generateBarnsleyFougere(), file);
 
 					file.close();
-				} catch (FileNotFoundException e) {
+				} catch (final FileNotFoundException e) {
 					System.out.println("Not able to open \"BarnsleyFougere.bpm\"! " + "Abort..");
 					System.exit(1);
 				}
 			}
 		};
 
-		Thread sharkFinThread = new Thread(sharkfin);
-		Thread turbulenceThread = new Thread(turbulence);
-		Thread barnsleyFougereThread = new Thread(barnsleyFougere);
+		final Thread sharkFinThread = new Thread(sharkfin);
+		final Thread turbulenceThread = new Thread(turbulence);
+		final Thread barnsleyFougereThread = new Thread(barnsleyFougere);
 
 		sharkFinThread.start();
 		turbulenceThread.start();
 		barnsleyFougereThread.start();
-	}
-
-	/**
-	 * Generate the Shark Fin fractal
-	 * 
-	 * @return An accumulator containing the fractal
-	 */
-	private static FlameAccumulator generateSharkFin() {
-		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
-		double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
-
-		AffineTransformation affine = new AffineTransformation(-0.4113504, -0.7124804, -0.4, 0.7124795,
-				-0.4113508, 0.8);
-		transformations.add(new FlameTransformation(affine, array[0]));
-
-		affine = new AffineTransformation(-0.3957339, 0, -1.6, 0, -0.3957337, 0.2);
-		transformations.add(new FlameTransformation(affine, array[1]));
-
-		affine = new AffineTransformation(0.4810169, 0, 1, 0, 0.4810169, 0.9);
-		transformations.add(new FlameTransformation(affine, array[2]));
-
-		Flame flame = new Flame(transformations);
-		Rectangle center = new Rectangle(new Point(-0.25, 0), 5, 4);
-		return flame.compute(center, 500, 400, 50);
-	}
-
-	/**
-	 * Generate the Turbulence fractal
-	 * 
-	 * @return An accumulator containing the fractal
-	 */
-	private static FlameAccumulator generateTurbulence() {
-		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
-		double[][] array = { { 0.5, 0, 0, 0.4, 0, 0 }, { 1, 0, 0.1, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0 } };
-
-		AffineTransformation affine = new AffineTransformation(0.7124807, -0.4113509, -0.3, 0.4113513,
-				0.7124808, -0.7);
-		transformations.add(new FlameTransformation(affine, array[0]));
-
-		affine = new AffineTransformation(0.3731079, -0.6462417, 0.4, 0.6462414, 0.3731076, 0.3);
-		transformations.add(new FlameTransformation(affine, array[1]));
-
-		affine = new AffineTransformation(0.0842641, -0.314478, -0.1, 0.314478, 0.0842641, 0.3);
-		transformations.add(new FlameTransformation(affine, array[2]));
-
-		Flame flame = new Flame(transformations);
-		Rectangle center = new Rectangle(new Point(0.1, 0.1), 3, 3);
-		return flame.compute(center, 500, 400, 50);
 	}
 
 	/**
@@ -141,8 +93,8 @@ public class FlamePGMMaker {
 	 * @return An accumulator containing the fractal
 	 */
 	private static FlameAccumulator generateBarnsleyFougere() {
-		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
-		double[] array = { 1, 0, 0, 0, 0, 0 };
+		final ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
+		final double[] array = { 1, 0, 0, 0, 0, 0 };
 
 		AffineTransformation affine = new AffineTransformation(0, 0, 0, 0, 0.16, 0);
 		transformations.add(new FlameTransformation(affine, array));
@@ -156,9 +108,57 @@ public class FlamePGMMaker {
 		affine = new AffineTransformation(0.85, 0.04, 0, -0.04, 0.85, 1.6);
 		transformations.add(new FlameTransformation(affine, array));
 
-		Flame flame = new Flame(transformations);
-		Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
+		final Flame flame = new Flame(transformations);
+		final Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
 		return flame.compute(center, 120, 200, 150);
+	}
+
+	/**
+	 * Generate the Shark Fin fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
+	private static FlameAccumulator generateSharkFin() {
+		final ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
+		final double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
+
+		AffineTransformation affine = new AffineTransformation(-0.4113504, -0.7124804, -0.4, 0.7124795,
+				-0.4113508, 0.8);
+		transformations.add(new FlameTransformation(affine, array[0]));
+
+		affine = new AffineTransformation(-0.3957339, 0, -1.6, 0, -0.3957337, 0.2);
+		transformations.add(new FlameTransformation(affine, array[1]));
+
+		affine = new AffineTransformation(0.4810169, 0, 1, 0, 0.4810169, 0.9);
+		transformations.add(new FlameTransformation(affine, array[2]));
+
+		final Flame flame = new Flame(transformations);
+		final Rectangle center = new Rectangle(new Point(-0.25, 0), 5, 4);
+		return flame.compute(center, 500, 400, 50);
+	}
+
+	/**
+	 * Generate the Turbulence fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
+	private static FlameAccumulator generateTurbulence() {
+		final ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
+		final double[][] array = { { 0.5, 0, 0, 0.4, 0, 0 }, { 1, 0, 0.1, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0 } };
+
+		AffineTransformation affine = new AffineTransformation(0.7124807, -0.4113509, -0.3, 0.4113513,
+				0.7124808, -0.7);
+		transformations.add(new FlameTransformation(affine, array[0]));
+
+		affine = new AffineTransformation(0.3731079, -0.6462417, 0.4, 0.6462414, 0.3731076, 0.3);
+		transformations.add(new FlameTransformation(affine, array[1]));
+
+		affine = new AffineTransformation(0.0842641, -0.314478, -0.1, 0.314478, 0.0842641, 0.3);
+		transformations.add(new FlameTransformation(affine, array[2]));
+
+		final Flame flame = new Flame(transformations);
+		final Rectangle center = new Rectangle(new Point(0.1, 0.1), 3, 3);
+		return flame.compute(center, 500, 400, 50);
 	}
 
 	/**

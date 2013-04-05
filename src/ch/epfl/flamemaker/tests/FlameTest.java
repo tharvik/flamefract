@@ -1,19 +1,18 @@
 package ch.epfl.flamemaker.tests;
 
-import static org.junit.Assert.*;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class FlameTest {
 
 	@Test
-	public void testFlame() {
-		fail("Not yet implemented");
+	public void testCompute() {
+		Assert.fail("Not yet implemented");
 	}
 
 	@Test
-	public void testCompute() {
-		fail("Not yet implemented");
+	public void testFlame() {
+		Assert.fail("Not yet implemented");
 	}
 
 }

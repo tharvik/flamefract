@@ -1,6 +1,8 @@
 package ch.epfl.flamemaker.ifs;
 
-import ch.epfl.flamemaker.geometry2d.*;
+import ch.epfl.flamemaker.geometry2d.AffineTransformation;
+import ch.epfl.flamemaker.geometry2d.Point;
+import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 /**
  * Builder for {@link IFSAccumulator}
@@ -8,13 +10,13 @@ import ch.epfl.flamemaker.geometry2d.*;
 public class IFSAccumulatorBuilder {
 
 	/**
-	 * Bidimensional array of booleans that <i>is</i> the accumulator
-	 */
-	private boolean[][]		isHit;
-	/**
 	 * The scope relevant to the fractal
 	 */
-	private Rectangle		frame;
+	private final Rectangle		frame;
+	/**
+	 * Bidimensional array of booleans that <i>is</i> the accumulator
+	 */
+	private final boolean[][]	isHit;
 	/**
 	 * Specific transformation used to <i>move</i> the point given in
 	 * hit(Point) to the actual position in our array
@@ -49,6 +51,15 @@ public class IFSAccumulatorBuilder {
 	}
 
 	/**
+	 * Returns an accumulator with the current points
+	 * 
+	 * @return An accumulator with the current points
+	 */
+	public IFSAccumulator build() {
+		return new IFSAccumulator(this.isHit);
+	}
+
+	/**
 	 * Sets the given point as hit (which is <i>true</i> in our array)
 	 * 
 	 * @param p
@@ -62,18 +73,9 @@ public class IFSAccumulatorBuilder {
 		// We transform the point in our system
 		p = this.transformation.transformPoint(p);
 		// A nice cast
-		int px = (int) Math.floor(p.x());
-		int py = (int) Math.floor(p.y());
+		final int px = (int) Math.floor(p.x());
+		final int py = (int) Math.floor(p.y());
 		this.isHit[px][py] = true;
-	}
-
-	/**
-	 * Returns an accumulator with the current points
-	 * 
-	 * @return An accumulator with the current points
-	 */
-	public IFSAccumulator build() {
-		return new IFSAccumulator(this.isHit);
 	}
 
 }

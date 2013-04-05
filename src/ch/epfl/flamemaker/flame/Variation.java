@@ -11,13 +11,66 @@ import ch.epfl.flamemaker.geometry2d.Transformation;
  */
 public abstract class Variation implements Transformation {
 	/**
-	 * The name of the variation
+	 * A list of all the variations
 	 */
-	private final String	name;
+	public final static List<Variation>	ALL_VARIATIONS	= Arrays.asList(new Variation(0, "Linear") {
+									@Override
+									public Point transformPoint(Point p) {
+										return p;
+									}
+								}, new Variation(1, "Sinusoidal") {
+									@Override
+									public Point transformPoint(Point p) {
+										final double x = Math.sin(p.x());
+										final double y = Math.sin(p.y());
+										return new Point(x, y);
+									}
+								}, new Variation(2, "Spherical") {
+									@Override
+									public Point transformPoint(Point p) {
+										final double x = p.x()
+												/ Math.pow(p.r(), 2);
+										final double y = p.y()
+												/ Math.pow(p.r(), 2);
+										return new Point(x, y);
+									}
+								}, new Variation(3, "Swirl") {
+									@Override
+									public Point transformPoint(Point p) {
+										final double r = Math.pow(p.r(), 2);
+										final double x = p.x() * Math.sin(r)
+												- p.y() * Math.cos(r);
+										final double y = p.x() * Math.cos(r)
+												+ p.y() * Math.sin(r);
+										return new Point(x, y);
+									}
+								}, new Variation(4, "Horseshoe") {
+									@Override
+									public Point transformPoint(Point p) {
+										final double x = (p.x() - p.y())
+												* (p.x() + p.y())
+												/ p.r();
+										final double y = 2 * p.x() * p.y()
+												/ p.r();
+										return new Point(x, y);
+									}
+								}, new Variation(5, "Bubble") {
+									@Override
+									public Point transformPoint(Point p) {
+										final double r = Math.pow(p.r(), 2) + 4;
+										final double x = 4 * p.x() / (r);
+										final double y = 4 * p.y() / (r);
+										return new Point(x, y);
+									}
+								});
 	/**
 	 * The index of the variation
 	 */
-	private final int	index;
+	private final int			index;
+	/**
+	 * The name of the variation
+	 */
+	private final String			name;
 
 	/**
 	 * Construct a Variation with the given name and index
@@ -33,15 +86,6 @@ public abstract class Variation implements Transformation {
 	}
 
 	/**
-	 * Return the name of the variation
-	 * 
-	 * @return The name of the variation
-	 */
-	public String name() {
-		return this.name;
-	}
-
-	/**
 	 * Return the index of the variation
 	 * 
 	 * @return The index of the variation
@@ -50,57 +94,15 @@ public abstract class Variation implements Transformation {
 		return this.index;
 	}
 
+	/**
+	 * Return the name of the variation
+	 * 
+	 * @return The name of the variation
+	 */
+	public String name() {
+		return this.name;
+	}
+
 	@Override
 	abstract public Point transformPoint(Point p);
-
-	/**
-	 * A list of all the variations
-	 */
-	public final static List<Variation>	ALL_VARIATIONS	= Arrays.asList(new Variation(0, "Linear") {
-									@Override
-									public Point transformPoint(Point p) {
-										return p;
-									}
-								}, new Variation(1, "Sinusoidal") {
-									@Override
-									public Point transformPoint(Point p) {
-										double x = Math.sin(p.x());
-										double y = Math.sin(p.y());
-										return new Point(x, y);
-									}
-								}, new Variation(2, "Spherical") {
-									@Override
-									public Point transformPoint(Point p) {
-										double x = p.x() / Math.pow(p.r(), 2);
-										double y = p.y() / Math.pow(p.r(), 2);
-										return new Point(x, y);
-									}
-								}, new Variation(3, "Swirl") {
-									@Override
-									public Point transformPoint(Point p) {
-										double r = Math.pow(p.r(), 2);
-										double x = p.x() * Math.sin(r) - p.y()
-												* Math.cos(r);
-										double y = p.x() * Math.cos(r) + p.y()
-												* Math.sin(r);
-										return new Point(x, y);
-									}
-								}, new Variation(4, "Horseshoe") {
-									@Override
-									public Point transformPoint(Point p) {
-										double x = (p.x() - p.y())
-												* (p.x() + p.y())
-												/ p.r();
-										double y = 2 * p.x() * p.y() / p.r();
-										return new Point(x, y);
-									}
-								}, new Variation(5, "Bubble") {
-									@Override
-									public Point transformPoint(Point p) {
-										double r = Math.pow(p.r(), 2) + 4;
-										double x = 4 * p.x() / (r);
-										double y = 4 * p.y() / (r);
-										return new Point(x, y);
-									}
-								});
 }

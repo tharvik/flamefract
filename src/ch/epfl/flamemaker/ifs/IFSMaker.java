@@ -27,62 +27,27 @@ public class IFSMaker {
 	public static void main(String[] args) {
 
 		try {
-			PrintStream file = new PrintStream("SierpinskiTriangle.bpm");
+			final PrintStream file = new PrintStream("SierpinskiTriangle.bpm");
 
-			writeToBPM(generateSierpinskiTriangle(), file);
+			IFSMaker.writeToBPM(IFSMaker.generateSierpinskiTriangle(), file);
 
 			file.close();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			System.out.println("Not able to open \"SierpinskiTriangle.bpm\"! " + "Abort..");
 			System.exit(1);
 		}
 
 		try {
-			PrintStream file = new PrintStream("BarnsleyFougere.bpm");
+			final PrintStream file = new PrintStream("BarnsleyFougere.bpm");
 
-			writeToBPM(generateBarnsleyFougere(), file);
+			IFSMaker.writeToBPM(IFSMaker.generateBarnsleyFougere(), file);
 
 			file.close();
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			System.out.println("Not able to open \"BarnsleyFougere.bpm\"! " + "Abort..");
 			System.exit(1);
 		}
 
-	}
-
-	/**
-	 * Generate the Sierpinski's triangle fractal
-	 * 
-	 * @return An accumulator containing the fractal
-	 */
-	private static IFSAccumulator generateSierpinskiTriangle() {
-		ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
-
-		transformations.add(new AffineTransformation(0.5, 0, 0, 0, 0.5, 0));
-		transformations.add(new AffineTransformation(0.5, 0, 0.5, 0, 0.5, 0));
-		transformations.add(new AffineTransformation(0.5, 0, 0.25, 0, 0.5, 0.5));
-
-		IFS ifs = new IFS(transformations);
-		Rectangle center = new Rectangle(new Point(0.5, 0.5), 1, 1);
-		return ifs.compute(center, 100, 100, 1);
-	}
-
-	/**
-	 * Generate the Barnsley fractal
-	 * 
-	 * @return An accumulator containing the fractal
-	 */
-	private static IFSAccumulator generateBarnsleyFougere() {
-		ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
-
-		transformations.add(new AffineTransformation(0, 0, 0, 0, 0.16, 0));
-		transformations.add(new AffineTransformation(0.2, -0.26, 0, 0.23, 0.22, 1.6));
-		transformations.add(new AffineTransformation(-0.15, 0.28, 0, 0.26, 0.24, 0.44));
-		transformations.add(new AffineTransformation(0.85, 0.04, 0, -0.04, 0.85, 1.6));
-
-		IFS ifs = new IFS(transformations);
-		Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
-		return ifs.compute(center, 120, 200, 150);
 	}
 
 	/**
@@ -105,5 +70,40 @@ public class IFSMaker {
 			}
 			stream.println(line);
 		}
+	}
+
+	/**
+	 * Generate the Barnsley fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
+	private static IFSAccumulator generateBarnsleyFougere() {
+		final ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
+
+		transformations.add(new AffineTransformation(0, 0, 0, 0, 0.16, 0));
+		transformations.add(new AffineTransformation(0.2, -0.26, 0, 0.23, 0.22, 1.6));
+		transformations.add(new AffineTransformation(-0.15, 0.28, 0, 0.26, 0.24, 0.44));
+		transformations.add(new AffineTransformation(0.85, 0.04, 0, -0.04, 0.85, 1.6));
+
+		final IFS ifs = new IFS(transformations);
+		final Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
+		return ifs.compute(center, 120, 200, 150);
+	}
+
+	/**
+	 * Generate the Sierpinski's triangle fractal
+	 * 
+	 * @return An accumulator containing the fractal
+	 */
+	private static IFSAccumulator generateSierpinskiTriangle() {
+		final ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
+
+		transformations.add(new AffineTransformation(0.5, 0, 0, 0, 0.5, 0));
+		transformations.add(new AffineTransformation(0.5, 0, 0.5, 0, 0.5, 0));
+		transformations.add(new AffineTransformation(0.5, 0, 0.25, 0, 0.5, 0.5));
+
+		final IFS ifs = new IFS(transformations);
+		final Rectangle center = new Rectangle(new Point(0.5, 0.5), 1, 1);
+		return ifs.compute(center, 100, 100, 1);
 	}
 }

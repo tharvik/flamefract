@@ -1,7 +1,6 @@
 package ch.epfl.flamemaker.tests;
 
-import static org.junit.Assert.*;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,31 +17,31 @@ public class VariationTest {
 	}
 
 	@Test
-	public void testVariation() {
-		assertEquals(6, Variation.ALL_VARIATIONS.size());
-	}
-
-	@Test
-	public void testName() {
-		for (Variation v : Variation.ALL_VARIATIONS) {
-			assertFalse(v.name().isEmpty());
+	public void testIndex() {
+		for (int i = 0; i < 6; i++) {
+			Assert.assertEquals(i, Variation.ALL_VARIATIONS.get(i).index());
 		}
 	}
 
 	@Test
-	public void testIndex() {
-		for (int i = 0; i < 6; i++) {
-			assertEquals(i, Variation.ALL_VARIATIONS.get(i).index());
+	public void testName() {
+		for (final Variation v : Variation.ALL_VARIATIONS) {
+			Assert.assertFalse(v.name().isEmpty());
 		}
 	}
 
 	@Test
 	public void testTransformPointLinear() {
-		Point p = Variation.ALL_VARIATIONS.get(0).transformPoint(this.point);
-		
-		assertTrue(this.point.equals(p));
+		final Point p = Variation.ALL_VARIATIONS.get(0).transformPoint(this.point);
+
+		Assert.assertTrue(this.point.equals(p));
 	}
-	
+
+	@Test
+	public void testVariation() {
+		Assert.assertEquals(6, Variation.ALL_VARIATIONS.size());
+	}
+
 	// Arrays.asList(new Variation(0, "Linear") {
 	// public Point transformPoint(Point p) {
 	// return p;

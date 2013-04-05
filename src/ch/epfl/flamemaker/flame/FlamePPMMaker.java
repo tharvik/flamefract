@@ -13,6 +13,10 @@ import ch.epfl.flamemaker.geometry2d.Rectangle;
 
 /**
  * Main class, will generate all the fractals with colors to PPM files
+ * <ol>
+ * <li>Turbulence</li>
+ * <li>Shark Fin</li>
+ * </ol>
  */
 public class FlamePPMMaker {
 
@@ -24,17 +28,17 @@ public class FlamePPMMaker {
 	 */
 	public static void main(String[] args) {
 
-		Runnable sharkfin = new Runnable() {
+		final Runnable sharkfin = new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					PrintStream file = new PrintStream("shark-fin.ppm");
+					final PrintStream file = new PrintStream("shark-fin.ppm");
 
-					writeToPPM(generateSharkFin(), file);
+					FlamePPMMaker.writeToPPM(FlamePPMMaker.generateSharkFin(), file);
 
 					file.close();
-				} catch (FileNotFoundException e) {
+				} catch (final FileNotFoundException e) {
 					System.out.println("Not able to open \"shark-fin.ppm\"! " + "Abort..");
 					System.exit(1);
 				}
@@ -42,26 +46,26 @@ public class FlamePPMMaker {
 			}
 		};
 
-		Runnable turbulence = new Runnable() {
+		final Runnable turbulence = new Runnable() {
 
 			@Override
 			public void run() {
 
 				try {
-					PrintStream file = new PrintStream("turbulence.ppm");
+					final PrintStream file = new PrintStream("turbulence.ppm");
 
-					writeToPPM(generateTurbulence(), file);
+					FlamePPMMaker.writeToPPM(FlamePPMMaker.generateTurbulence(), file);
 
 					file.close();
-				} catch (FileNotFoundException e) {
+				} catch (final FileNotFoundException e) {
 					System.out.println("Not able to open \"turbulence.ppm\"! " + "Abort..");
 					System.exit(1);
 				}
 			}
 		};
 
-		Thread sharkFinThread = new Thread(sharkfin);
-		Thread turbulenceThread = new Thread(turbulence);
+		final Thread sharkFinThread = new Thread(sharkfin);
+		final Thread turbulenceThread = new Thread(turbulence);
 
 		sharkFinThread.start();
 		turbulenceThread.start();
@@ -75,8 +79,8 @@ public class FlamePPMMaker {
 	private static FlameAccumulator generateSharkFin() {
 
 		// TODO use new Flame.Builder()
-		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
-		double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
+		final ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
+		final double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
 
 		AffineTransformation affine = new AffineTransformation(-0.4113504, -0.7124804, -0.4, 0.7124795,
 				-0.4113508, 0.8);
@@ -88,8 +92,8 @@ public class FlamePPMMaker {
 		affine = new AffineTransformation(0.4810169, 0, 1, 0, 0.4810169, 0.9);
 		transformations.add(new FlameTransformation(affine, array[2]));
 
-		Flame flame = new Flame(transformations);
-		Rectangle center = new Rectangle(new Point(-0.25, 0), 5, 4);
+		final Flame flame = new Flame(transformations);
+		final Rectangle center = new Rectangle(new Point(-0.25, 0), 5, 4);
 		return flame.compute(center, 500, 400, 50);
 	}
 
@@ -101,8 +105,8 @@ public class FlamePPMMaker {
 	private static FlameAccumulator generateTurbulence() {
 
 		// TODO use new Flame.Builder()
-		ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
-		double[][] array = { { 0.5, 0, 0, 0.4, 0, 0 }, { 1, 0, 0.1, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0 } };
+		final ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
+		final double[][] array = { { 0.5, 0, 0, 0.4, 0, 0 }, { 1, 0, 0.1, 0, 0, 0 }, { 1, 0, 0, 0, 0, 0 } };
 
 		AffineTransformation affine = new AffineTransformation(0.7124807, -0.4113509, -0.3, 0.4113513,
 				0.7124808, -0.7);
@@ -114,8 +118,8 @@ public class FlamePPMMaker {
 		affine = new AffineTransformation(0.0842641, -0.314478, -0.1, 0.314478, 0.0842641, 0.3);
 		transformations.add(new FlameTransformation(affine, array[2]));
 
-		Flame flame = new Flame(transformations);
-		Rectangle center = new Rectangle(new Point(0.1, 0.1), 3, 3);
+		final Flame flame = new Flame(transformations);
+		final Rectangle center = new Rectangle(new Point(0.1, 0.1), 3, 3);
 		return flame.compute(center, 500, 400, 50);
 	}
 
@@ -141,7 +145,7 @@ public class FlamePPMMaker {
 		for (int y = accu.height() - 1; y >= 0; y--) {
 			String line = new String();
 			for (int x = 0; x < accu.width(); x++) {
-				Color c = accu.color(palette, Color.BLACK, x, y);
+				final Color c = accu.color(palette, Color.BLACK, x, y);
 				line += (Color.sRGBEncode(c.red(), 100)) + " ";
 				line += (Color.sRGBEncode(c.green(), 100)) + " ";
 				line += (Color.sRGBEncode(c.blue(), 100)) + " ";

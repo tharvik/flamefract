@@ -49,18 +49,17 @@ public final class Point {
 	 * @return The angle between the vector r and the x axis
 	 */
 	public double theta() {
-		return Math.atan2(y, x);
+		return Math.atan2(this.y, this.x);
 	}
 
 	/**
 	 * Return a textual representation of our point
 	 * 
-	 * @return A textual representation of our point
-	 * of the form "(x, y)"
+	 * @return A textual representation of our point of the form "(x, y)"
 	 */
 	@Override
 	public String toString() {
-		return "(" + x + "," + y + ")";
+		return "(" + this.x + "," + this.y + ")";
 	}
 
 	/**

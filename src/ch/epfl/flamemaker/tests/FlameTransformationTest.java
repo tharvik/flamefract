@@ -1,7 +1,6 @@
 package ch.epfl.flamemaker.tests;
 
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import ch.epfl.flamemaker.flame.FlameTransformation;
@@ -10,19 +9,19 @@ public class FlameTransformationTest {
 
 	@Test
 	public void testFlameTransformation() {
-		double[] variationWeight = { 1, 1, 1, 1, 1, 1 };
-		new FlameTransformation(null, variationWeight);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testFlameTransformationArrayTooSmall() {
-		double[] variationWeight = { 1 };
+		final double[] variationWeight = { 1, 1, 1, 1, 1, 1 };
 		new FlameTransformation(null, variationWeight);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testFlameTransformationArrayTooBig() {
-		double[] variationWeight = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+		final double[] variationWeight = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+		new FlameTransformation(null, variationWeight);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testFlameTransformationArrayTooSmall() {
+		final double[] variationWeight = { 1 };
 		new FlameTransformation(null, variationWeight);
 	}
 
@@ -33,7 +32,7 @@ public class FlameTransformationTest {
 
 	@Test
 	public void testTransformPoint() {
-		fail("Not yet implemented");
+		Assert.fail("Not yet implemented");
 	}
 
 }

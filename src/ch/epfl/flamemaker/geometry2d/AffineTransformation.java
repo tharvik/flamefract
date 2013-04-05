@@ -19,6 +19,22 @@ package ch.epfl.flamemaker.geometry2d;
 public final class AffineTransformation implements Transformation {
 
 	/**
+	 * <p>
+	 * The identity matrix
+	 * </p>
+	 * 
+	 * <p>
+	 * If multiply a matrix M by the identity (or we multiply the identity
+	 * by M), the result will be M.
+	 * </p>
+	 * <br>
+	 * 1 0 0</br><br>
+	 * 0 1 0</br><br>
+	 * 0 0 1</br><br>
+	 * 
+	 */
+	public static final AffineTransformation	IDENTITY	= new AffineTransformation(1, 0, 0, 0, 1, 0);
+	/**
 	 * The 1,1 element of the matrix
 	 */
 	final private double				a;
@@ -38,67 +54,11 @@ public final class AffineTransformation implements Transformation {
 	 * The 2,2 element of the matrix
 	 */
 	final private double				e;
+
 	/**
 	 * The 2,3 element of the matrix
 	 */
 	final private double				f;
-
-	/**
-	 * <p>
-	 * The identity matrix
-	 * </p>
-	 * 
-	 * <p>
-	 * If multiply a matrix M by the identity (or we multiply the identity
-	 * by M), the result will be M.
-	 * </p>
-	 * <br>
-	 * 1 0 0</br><br>
-	 * 0 1 0</br><br>
-	 * 0 0 1</br><br>
-	 * 
-	 */
-	public static final AffineTransformation	IDENTITY	= new AffineTransformation(1, 0, 0, 0, 1, 0);
-
-	/**
-	 * Construct the matrix we need for the transformation
-	 * 
-	 * @param a
-	 *                The 1,1 element of the matrix
-	 * @param b
-	 *                The 1,2 element of the matrix
-	 * @param c
-	 *                The 1,3 element of the matrix
-	 * @param d
-	 *                The 2,1 element of the matrix
-	 * @param e
-	 *                The 2,2 element of the matrix
-	 * @param f
-	 *                The 2,3 element of the matrix
-	 */
-	public AffineTransformation(double a, double b, double c, double d, double e, double f) {
-		this.a = a;
-		this.b = b;
-		this.c = c;
-		this.d = d;
-		this.e = e;
-		this.f = f;
-	}
-
-	/**
-	 * The transformation we need to translate a vector
-	 * 
-	 * @param dX
-	 *                The delta between the actual vector and the
-	 *                transformed vector on the x-axis
-	 * @param dY
-	 *                The delta between the actual vector and the
-	 *                transformed vector on the y-axis
-	 * @return A matrix we use to translate a vector
-	 */
-	public static AffineTransformation newTranslation(double dX, double dY) {
-		return new AffineTransformation(1, 0, dX, 0, 1, dY);
-	}
 
 	/**
 	 * The transformation we need to rotate a vector
@@ -108,8 +68,8 @@ public final class AffineTransformation implements Transformation {
 	 * @return A matrix we use to rotate a vector
 	 */
 	public static AffineTransformation newRotation(double theta) {
-		double sin = Math.sin(theta);
-		double cos = Math.cos(theta);
+		final double sin = Math.sin(theta);
+		final double cos = Math.cos(theta);
 
 		return new AffineTransformation(cos, -sin, 0.0, sin, cos, 0.0);
 	}
@@ -149,30 +109,44 @@ public final class AffineTransformation implements Transformation {
 		return new AffineTransformation(1, 0, 0, sY, 1, 0);
 	}
 
-	@Override
-	public Point transformPoint(Point p) {
-		double newX = p.x() * a + p.y() * b + c;
-		double newY = p.x() * d + p.y() * e + f;
-
-		return new Point(newX, newY);
+	/**
+	 * The transformation we need to translate a vector
+	 * 
+	 * @param dX
+	 *                The delta between the actual vector and the
+	 *                transformed vector on the x-axis
+	 * @param dY
+	 *                The delta between the actual vector and the
+	 *                transformed vector on the y-axis
+	 * @return A matrix we use to translate a vector
+	 */
+	public static AffineTransformation newTranslation(double dX, double dY) {
+		return new AffineTransformation(1, 0, dX, 0, 1, dY);
 	}
 
 	/**
-	 * Returns the horizontal component of the translation
+	 * Construct the matrix we need for the transformation
 	 * 
-	 * @return The horizontal component of the translation
+	 * @param a
+	 *                The 1,1 element of the matrix
+	 * @param b
+	 *                The 1,2 element of the matrix
+	 * @param c
+	 *                The 1,3 element of the matrix
+	 * @param d
+	 *                The 2,1 element of the matrix
+	 * @param e
+	 *                The 2,2 element of the matrix
+	 * @param f
+	 *                The 2,3 element of the matrix
 	 */
-	public double translationX() {
-		return c;
-	}
-
-	/**
-	 * Returns the vertical component of the translation
-	 * 
-	 * @return The vertical component of the translation
-	 */
-	public double translationY() {
-		return f;
+	public AffineTransformation(double a, double b, double c, double d, double e, double f) {
+		this.a = a;
+		this.b = b;
+		this.c = c;
+		this.d = d;
+		this.e = e;
+		this.f = f;
 	}
 
 	/**
@@ -185,13 +159,39 @@ public final class AffineTransformation implements Transformation {
 	 *         transformation
 	 */
 	public AffineTransformation composeWith(AffineTransformation that) {
-		double newA = this.a * that.a + this.b * that.d;
-		double newB = this.a * that.b + this.b * that.e;
-		double newC = this.a * that.c + this.b * that.f + this.c;
-		double newD = this.d * that.a + this.e * that.d;
-		double newE = this.d * that.b + this.e * that.e;
-		double newF = this.d * that.c + this.e * that.f + this.f;
+		final double newA = this.a * that.a + this.b * that.d;
+		final double newB = this.a * that.b + this.b * that.e;
+		final double newC = this.a * that.c + this.b * that.f + this.c;
+		final double newD = this.d * that.a + this.e * that.d;
+		final double newE = this.d * that.b + this.e * that.e;
+		final double newF = this.d * that.c + this.e * that.f + this.f;
 
 		return new AffineTransformation(newA, newB, newC, newD, newE, newF);
+	}
+
+	@Override
+	public Point transformPoint(Point p) {
+		final double newX = p.x() * this.a + p.y() * this.b + this.c;
+		final double newY = p.x() * this.d + p.y() * this.e + this.f;
+
+		return new Point(newX, newY);
+	}
+
+	/**
+	 * Returns the horizontal component of the translation
+	 * 
+	 * @return The horizontal component of the translation
+	 */
+	public double translationX() {
+		return this.c;
+	}
+
+	/**
+	 * Returns the vertical component of the translation
+	 * 
+	 * @return The vertical component of the translation
+	 */
+	public double translationY() {
+		return this.f;
 	}
 }

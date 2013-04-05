@@ -1,16 +1,16 @@
 package ch.epfl.flamemaker.color;
 
 /**
- * Model of a Palette which contains some colors and a way to retrieved these
- * based on index
+ * Model of a Palette which contains some {@link Color} and a way to retrieved
+ * these based on index
  */
 public interface Palette {
 	/**
-	 * Return a Color for the given index
+	 * Return a {@link Color} for the given index
 	 * 
 	 * @param index
-	 *                The index for the wanted Color
-	 * @return a Color for the given index
+	 *                The index for the wanted {@link Color}
+	 * @return a {@link Color} for the given index
 	 * @throws IllegalArgumentException
 	 *                 if the index is not between 0 and 1 (both included)
 	 */

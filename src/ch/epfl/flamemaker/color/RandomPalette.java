@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * A {@link Palette} with a random set of color
+ * A {@link Palette} with a random set of {@link Color}
  */
 public class RandomPalette implements Palette {
 
 	/**
 	 * {@link InterpolatedPalette} used in internal
 	 */
-	private Palette	palette;
+	private final Palette	palette;
 
 	/**
 	 * Construct a {@link RandomPalette} with the given number of wanted
@@ -21,8 +21,8 @@ public class RandomPalette implements Palette {
 	 *                Total number of wanted {@link Color}
 	 */
 	public RandomPalette(int numberOfRandomColor) {
-		Random random = new Random();
-		ArrayList<Color> list = new ArrayList<Color>();
+		final Random random = new Random();
+		final ArrayList<Color> list = new ArrayList<Color>();
 		for (int i = 0; i < numberOfRandomColor; i++) {
 			// move the range of the random from [0,1[ to [0,1] (not
 			// yet accepted)

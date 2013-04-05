@@ -7,11 +7,13 @@ public final class IFSAccumulator {
 	/**
 	 * Bidimensional array of booleans that <i>is</i> the Accumulator
 	 */
-	private final boolean[][] isHit;
+	private final boolean[][]	isHit;
 
 	/**
 	 * Creates an accumulator
-	 * @param isHit bidimensional array of booleans
+	 * 
+	 * @param isHit
+	 *                bidimensional array of booleans
 	 */
 	public IFSAccumulator(boolean[][] isHit) {
 		this.isHit = new boolean[isHit.length][isHit[0].length];
@@ -25,25 +27,21 @@ public final class IFSAccumulator {
 	}
 
 	/**
-	 * Returns the width of the accumulator
-	 * @return The width of the accumulator
-	 */
-	public int width() {
-		return isHit.length;
-	}
-
-	/**
 	 * Returns the height of the accumulator
+	 * 
 	 * @return The height of the accumulator
 	 */
 	public int height() {
-		return isHit[0].length;
+		return this.isHit[0].length;
 	}
 
 	/**
 	 * Return true if the point at the given coordinates is hit
-	 * @param x The x coordinate
-	 * @param y The y coordinate
+	 * 
+	 * @param x
+	 *                The x coordinate
+	 * @param y
+	 *                The y coordinate
 	 * @return True if the point at the given coordinates is hit
 	 */
 	public boolean isHit(int x, int y) {
@@ -52,6 +50,15 @@ public final class IFSAccumulator {
 		}
 
 		return (this.isHit[x][y]);
+	}
+
+	/**
+	 * Returns the width of the accumulator
+	 * 
+	 * @return The width of the accumulator
+	 */
+	public int width() {
+		return this.isHit.length;
 	}
 
 }

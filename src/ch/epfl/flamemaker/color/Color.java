@@ -6,38 +6,53 @@ package ch.epfl.flamemaker.color;
 public final class Color {
 
 	/**
-	 * The red value of the color
-	 */
-	private final double		r;
-	/**
-	 * The green value of the color
-	 */
-	private final double		g;
-	/**
-	 * The blue value of the color
-	 */
-	private final double		b;
-
-	/**
 	 * A Color with the value representing black
 	 */
 	public static final Color	BLACK	= new Color(0, 0, 0);
 	/**
-	 * A Color with the value representing white
+	 * A Color with the value representing blue
 	 */
-	public static final Color	WHITE	= new Color(1, 1, 1);
-	/**
-	 * A Color with the value representing red
-	 */
-	public static final Color	RED	= new Color(1, 0, 0);
+	public static final Color	BLUE	= new Color(0, 0, 1);
 	/**
 	 * A Color with the value representing green
 	 */
 	public static final Color	GREEN	= new Color(0, 1, 0);
 	/**
-	 * A Color with the value representing blue
+	 * A Color with the value representing red
 	 */
-	public static final Color	BLUE	= new Color(0, 0, 1);
+	public static final Color	RED	= new Color(1, 0, 0);
+	/**
+	 * A Color with the value representing white
+	 */
+	public static final Color	WHITE	= new Color(1, 1, 1);
+
+	/**
+	 * The blue value of the color
+	 */
+	private final double		b;
+	/**
+	 * The green value of the color
+	 */
+	private final double		g;
+	/**
+	 * The red value of the color
+	 */
+	private final double		r;
+
+	/**
+	 * @param v
+	 *                Value to encode in sRGB
+	 * @param max
+	 *                The maximum value to return
+	 * 
+	 * @return The value encode in sRGB multiplied by max
+	 */
+	public static int sRGBEncode(double v, int max) {
+		if (v <= 0.0031308) {
+			return (int) (12.92 * v * max);
+		}
+		return (int) ((1.055 * Math.pow(v, 1 / 2.4) - 0.055) * max);
+	}
 
 	/**
 	 * Construct a color with the three value given
@@ -65,21 +80,19 @@ public final class Color {
 	}
 
 	/**
-	 * Return the red value
+	 * Return the colors value as an int, a value by byte, in red, green,
+	 * blue order
 	 * 
-	 * @return The red value
+	 * @return Colors as an int, a value by byte in red, green, blue order
 	 */
-	public double red() {
-		return this.r;
-	}
+	public int asPackedRGB() {
+		int color = (int) Math.round((this.red() * 255));
+		color = color << 8;
+		color += (int) Math.round((this.green() * 255));
+		color = color << 8;
+		color += (int) Math.round((this.blue() * 255));
 
-	/**
-	 * Return the green value
-	 * 
-	 * @return The green value
-	 */
-	public double green() {
-		return this.g;
+		return color;
 	}
 
 	/**
@@ -89,6 +102,15 @@ public final class Color {
 	 */
 	public double blue() {
 		return this.b;
+	}
+
+	/**
+	 * Return the green value
+	 * 
+	 * @return The green value
+	 */
+	public double green() {
+		return this.g;
 	}
 
 	/**
@@ -122,34 +144,12 @@ public final class Color {
 	}
 
 	/**
-	 * Return the colors value as an int, a value by byte, in red, green,
-	 * blue order
+	 * Return the red value
 	 * 
-	 * @return Colors as an int, a value by byte in red, green, blue order
+	 * @return The red value
 	 */
-	public int asPackedRGB() {
-		int color = (int) Math.round((this.red() * 255));
-		color = color << 8;
-		color += (int) Math.round((this.green() * 255));
-		color = color << 8;
-		color += (int) Math.round((this.blue() * 255));
-
-		return color;
-	}
-
-	/**
-	 * @param v
-	 *                Value to encode in sRGB
-	 * @param max
-	 *                The maximum value to return
-	 * 
-	 * @return The value encode in sRGB multiplied by max
-	 */
-	public static int sRGBEncode(double v, int max) {
-		if (v <= 0.0031308) {
-			return (int) (12.92 * v * max);
-		}
-		return (int) ((1.055 * Math.pow(v, 1 / 2.4) - 0.055) * max);
+	public double red() {
+		return this.r;
 	}
 
 	// "(0,0,0)"
