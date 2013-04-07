@@ -58,36 +58,6 @@ public final class Rectangle {
 	}
 
 	/**
-	 * Return the height (y) of the bottom of the rectangle
-	 * 
-	 * @return The height (y) of the bottom of the rectangle
-	 */
-	public double bottom() {
-		return this.center.y() - this.height() / 2;
-	}
-
-	/**
-	 * Return the center of the rectangle
-	 * 
-	 * @return The center of the rectangle
-	 */
-	public Point center() {
-		return this.center;
-	}
-
-	/**
-	 * Return true if the given point is in the rectangle
-	 * 
-	 * @param p
-	 *                The point to check
-	 * 
-	 * @return True if the given point is in the rectangle
-	 */
-	public boolean contains(Point p) {
-		return (p.x() >= this.left() && p.x() < this.right() && p.y() >= this.bottom() && p.y() < this.top());
-	}
-
-	/**
 	 * Return a new Rectangle expanded to have to correct ratio
 	 * 
 	 * @param aspectRatio
@@ -102,7 +72,7 @@ public final class Rectangle {
 		if (aspectRatio <= 0) {
 			throw new IllegalArgumentException();
 		}
-
+	
 		if (aspectRatio < this.aspectRatio()) {
 			return new Rectangle(this.center, this.width(), this.height / aspectRatio);
 		} else if (aspectRatio > this.aspectRatio()) {
@@ -110,6 +80,15 @@ public final class Rectangle {
 		} else {
 			return new Rectangle(this.center, this.width(), this.height);
 		}
+	}
+
+	/**
+	 * Return the width of the rectangle
+	 * 
+	 * @return The width of the rectangle
+	 */
+	public double width() {
+		return this.width;
 	}
 
 	/**
@@ -143,12 +122,42 @@ public final class Rectangle {
 	}
 
 	/**
+	 * Return the height (y) of the bottom of the rectangle
+	 * 
+	 * @return The height (y) of the bottom of the rectangle
+	 */
+	public double bottom() {
+		return this.center.y() - this.height() / 2;
+	}
+
+	/**
 	 * Return the height (y) of the top of the rectangle
 	 * 
 	 * @return The height (y) of the top of the rectangle
 	 */
 	public double top() {
 		return this.center.y() + this.height() / 2;
+	}
+
+	/**
+	 * Return the center of the rectangle
+	 * 
+	 * @return The center of the rectangle
+	 */
+	public Point center() {
+		return this.center;
+	}
+
+	/**
+	 * Return true if the given point is in the rectangle
+	 * 
+	 * @param p
+	 *                The point to check
+	 * 
+	 * @return True if the given point is in the rectangle
+	 */
+	public boolean contains(Point p) {
+		return (p.x() >= this.left() && p.x() < this.right() && p.y() >= this.bottom() && p.y() < this.top());
 	}
 
 	/**
@@ -160,14 +169,5 @@ public final class Rectangle {
 	@Override
 	public String toString() {
 		return ("(" + this.center().toString() + "," + this.width() + "," + this.height + ")");
-	}
-
-	/**
-	 * Return the width of the rectangle
-	 * 
-	 * @return The width of the rectangle
-	 */
-	public double width() {
-		return this.width;
 	}
 }

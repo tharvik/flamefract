@@ -90,7 +90,7 @@ public class FlamePGMMaker {
 	/**
 	 * Generate the Barnsley fractal
 	 * 
-	 * @return An accumulator containing the fractal
+	 * @return A {@link FlameAccumulator} containing the fractal
 	 */
 	private static FlameAccumulator generateBarnsleyFougere() {
 
@@ -116,7 +116,7 @@ public class FlamePGMMaker {
 	/**
 	 * Generate the Shark Fin fractal
 	 * 
-	 * @return An accumulator containing the fractal
+	 * @return A {@link FlameAccumulator} containing the fractal
 	 */
 	private static FlameAccumulator generateSharkFin() {
 		final Flame.Builder builder = new Flame.Builder(new Flame(new ArrayList<FlameTransformation>()));
@@ -139,7 +139,7 @@ public class FlamePGMMaker {
 	/**
 	 * Generate the Turbulence fractal
 	 * 
-	 * @return An accumulator containing the fractal
+	 * @return A {@link FlameAccumulator} containing the fractal
 	 */
 	private static FlameAccumulator generateTurbulence() {
 		final Flame.Builder builder = new Flame.Builder(new Flame(new ArrayList<FlameTransformation>()));
@@ -160,10 +160,10 @@ public class FlamePGMMaker {
 	}
 
 	/**
-	 * Write an accumulator to a stream
+	 * Write a {@link FlameAccumulator} to a stream
 	 * 
 	 * @param accu
-	 *                The accumulator containing a fractal
+	 *                The {@link FlameAccumulator} containing to write
 	 * @param stream
 	 *                The stream to write the fractal to
 	 */

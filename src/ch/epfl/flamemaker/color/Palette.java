@@ -10,7 +10,9 @@ public interface Palette {
 	 * 
 	 * @param index
 	 *                The index for the wanted {@link Color}
+	 * 
 	 * @return a {@link Color} for the given index
+	 * 
 	 * @throws IllegalArgumentException
 	 *                 if the index is not between 0 and 1 (both included)
 	 */

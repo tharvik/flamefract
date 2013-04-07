@@ -35,6 +35,24 @@ public final class Point {
 	}
 
 	/**
+	 * Return the x value
+	 * 
+	 * @return The x value
+	 */
+	public double x() {
+		return this.x;
+	}
+
+	/**
+	 * Return the y value
+	 * 
+	 * @return The y value
+	 */
+	public double y() {
+		return this.y;
+	}
+
+	/**
 	 * Return the length of the vector from the origin to the point (x, y)
 	 * 
 	 * @return The length of the vector from the origin to the point (x, y)
@@ -60,23 +78,5 @@ public final class Point {
 	@Override
 	public String toString() {
 		return "(" + this.x + "," + this.y + ")";
-	}
-
-	/**
-	 * Return the x value
-	 * 
-	 * @return The x value
-	 */
-	public double x() {
-		return this.x;
-	}
-
-	/**
-	 * Return the y value
-	 * 
-	 * @return The y value
-	 */
-	public double y() {
-		return this.y;
 	}
 }

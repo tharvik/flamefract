@@ -48,9 +48,9 @@ public final class IFS {
 	 * @param height
 	 *                The height of the {@link IFSAccumulator}
 	 * @param density
-	 *                A constant representing the number of wanted iteration
-	 *                (the more, the better the fractal will be but the
-	 *                longer it will take to generate)
+	 *                A constant representing the <i>accuracy</i> (the more,
+	 *                the more accurate the fractal will be but the longer
+	 *                it will take to generate)
 	 * 
 	 * @return A {@link IFSAccumulator} with the generate fractal
 	 */
@@ -61,15 +61,18 @@ public final class IFS {
 		final int m = density * width * height;
 		final IFSAccumulatorBuilder image = new IFSAccumulatorBuilder(frame, width, height);
 
+		// Speed up if we do not have any transformation
 		if (this.transformations.size() == 0) {
 			return image.build();
 		}
 
+		// Randomize the point
 		for (int j = 0; j < 20; j++) {
 			final int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
 		}
 
+		// Do the actual computation and hit the accumulator
 		for (int j = 0; j < m; j++) {
 			final int i = random.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);

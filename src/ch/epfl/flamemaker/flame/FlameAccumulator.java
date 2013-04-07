@@ -105,14 +105,14 @@ public class FlameAccumulator {
 	private final double[][]	colorIndexSum;
 
 	/**
-	 * Used to increase speed of intensity() method
-	 */
-	private final double		denominator;
-
-	/**
 	 * Array containing the hit count of every pixel from the fractal
 	 */
 	private final int[][]		hitCount;
+
+	/**
+	 * Used to increase speed of intensity() method
+	 */
+	private final double		denominator;
 
 	/**
 	 * Construct a FlameAccumulator with the given array of hit count and
@@ -122,6 +122,9 @@ public class FlameAccumulator {
 	 *                Array of hit count per pixel
 	 * @param colorIndexSum
 	 *                Array of the sum of index of color per pixel
+	 * 
+	 * @throws IllegalArgumentException
+	 *                 if the given arrays have not the same size
 	 */
 	private FlameAccumulator(int[][] hitCount, double[][] colorIndexSum) {
 		this.hitCount = new int[hitCount.length][hitCount[0].length];
@@ -150,7 +153,6 @@ public class FlameAccumulator {
 				}
 			}
 		}
-
 		this.denominator = Math.log(max + 1);
 	}
 
@@ -159,14 +161,17 @@ public class FlameAccumulator {
 	 * depending of the intensity
 	 * 
 	 * @param palette
-	 *                The palette where to retrieve the color to mix with
+	 *                The {@link Palette} where to retrieve the
+	 *                {@link Color} to mix with
 	 * @param background
-	 *                The color of the background
+	 *                The {@link Color} of the background
 	 * @param x
 	 *                The x value of the wanted pixel
 	 * @param y
 	 *                The y value of the wanted pixel
+	 * 
 	 * @return The color of the wanted pixel
+	 * 
 	 * @throws IndexOutOfBoundsException
 	 *                 if x or y are not in the accumulator
 	 */
@@ -204,7 +209,9 @@ public class FlameAccumulator {
 	 *                The x value of the wanted pixel
 	 * @param y
 	 *                The y value of the given pixel
+	 * 
 	 * @return The intensity at the given pixel
+	 * 
 	 * @throws IndexOutOfBoundsException
 	 *                 if x or y are not in the accumulator
 	 */

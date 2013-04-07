@@ -75,7 +75,7 @@ public class IFSMaker {
 	/**
 	 * Generate the Barnsley fractal
 	 * 
-	 * @return An accumulator containing the fractal
+	 * @return An {@link IFSAccumulator} containing the fractal
 	 */
 	private static IFSAccumulator generateBarnsleyFougere() {
 		final ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();
@@ -93,7 +93,7 @@ public class IFSMaker {
 	/**
 	 * Generate the Sierpinski's triangle fractal
 	 * 
-	 * @return An accumulator containing the fractal
+	 * @return An {@link IFSAccumulator} containing the fractal
 	 */
 	private static IFSAccumulator generateSierpinskiTriangle() {
 		final ArrayList<AffineTransformation> transformations = new ArrayList<AffineTransformation>();

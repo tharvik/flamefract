@@ -11,10 +11,9 @@ import ch.epfl.flamemaker.geometry2d.Transformation;
 import ch.epfl.flamemaker.ifs.IFS;
 
 /**
- * Represent a colored fractal of type flame
- * </br>
- * Very similar to {@link IFS}, but with a {@link List} of
- * {@link FlameTransformation} in place of {@link AffineTransformation}
+ * Represent a colored fractal of type flame </br> Very similar to {@link IFS},
+ * but with a {@link List} of {@link FlameTransformation} in place of
+ * {@link AffineTransformation}
  */
 public class Flame {
 	/**
@@ -34,10 +33,20 @@ public class Flame {
 		 *                The {@link Flame} to take as base
 		 */
 		public Builder(Flame flame) {
+			// deep copy of the list of the given Flame
 			this.list = new ArrayList<FlameTransformation.Builder>();
 			for (final FlameTransformation flameTransformation : flame.transformations) {
 				this.list.add(new FlameTransformation.Builder(flameTransformation));
 			}
+		}
+
+		/**
+		 * Return the size of the list
+		 * 
+		 * @return The size of the list
+		 */
+		public int transformationCount() {
+			return this.list.size();
 		}
 
 		/**
@@ -49,6 +58,37 @@ public class Flame {
 		 */
 		public void addTransformation(FlameTransformation transformation) {
 			this.list.add(new FlameTransformation.Builder(transformation));
+		}
+
+		/**
+		 * Check if an index is in the {@link List}
+		 * 
+		 * @param index
+		 *                The index to check
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
+		 */
+		private void checkIndex(int index) {
+			if (index < 0 || index > this.transformationCount()) {
+				throw new IndexOutOfBoundsException();
+			}
+		}
+
+		/**
+		 * Remove the {@link FlameTransformation} at the given index
+		 * 
+		 * @param index
+		 *                The index in the list to remove
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
+		 */
+		public void removeTransformation(int index) {
+			this.checkIndex(index);
+			this.list.remove(index);
 		}
 
 		/**
@@ -69,35 +109,6 @@ public class Flame {
 		public AffineTransformation affineTransformation(int index) {
 			this.checkIndex(index);
 			return this.list.get(index).getAffineTransformation();
-		}
-
-		/**
-		 * Return a {@link Flame} with the actual state of the Builder
-		 * 
-		 * @return A {@link Flame} with the actual state of the Builder
-		 */
-		public Flame build() {
-			final ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
-			for (final FlameTransformation.Builder builder : this.list) {
-				transformations.add(builder.build());
-			}
-
-			return new Flame(transformations);
-		}
-
-		/**
-		 * Remove the {@link FlameTransformation} at the given index
-		 * 
-		 * @param index
-		 *                The index in the list to remove
-		 * 
-		 * @throws IndexOutOfBoundsException
-		 *                 If the index is less than zero of greater
-		 *                 than the max index of the list
-		 */
-		public void removeTransformation(int index) {
-			this.checkIndex(index);
-			this.list.remove(index);
 		}
 
 		/**
@@ -141,28 +152,20 @@ public class Flame {
 		}
 
 		/**
-		 * Return the size of the list
+		 * Return a {@link Flame} with the actual state of the Builder
 		 * 
-		 * @return The size of the list
+		 * @return A {@link Flame} with the actual state of the Builder
 		 */
-		public int transformationCount() {
-			return this.list.size();
-		}
+		public Flame build() {
 
-		/**
-		 * Check if an index is in the {@link List}
-		 * 
-		 * @param index
-		 *                The index to check
-		 * 
-		 * @throws IndexOutOfBoundsException
-		 *                 If the index is less than zero of greater
-		 *                 than the max index of the list
-		 */
-		private void checkIndex(int index) {
-			if (index < 0 || index > this.transformationCount()) {
-				throw new IndexOutOfBoundsException();
+			// build every FlameTransformation.Builder of the list
+			// and add it to the return list
+			final ArrayList<FlameTransformation> transformations = new ArrayList<FlameTransformation>();
+			for (final FlameTransformation.Builder builder : this.list) {
+				transformations.add(builder.build());
 			}
+
+			return new Flame(transformations);
 		}
 	}
 

@@ -19,6 +19,7 @@ public class InterpolatedPalette implements Palette {
 	 * 
 	 * @param colors
 	 *                List of {@link Color} to interpolate
+	 * 
 	 * @throws IllegalArgumentException
 	 *                 if the size of the given {@link List} is less than
 	 *                 two

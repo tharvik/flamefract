@@ -74,7 +74,7 @@ public class FlamePPMMaker {
 	/**
 	 * Generate the Shark Fin fractal
 	 * 
-	 * @return An accumulator containing the fractal
+	 * @return A {@link FlameAccumulator} containing the fractal
 	 */
 	private static FlameAccumulator generateSharkFin() {
 		final Flame.Builder builder = new Flame.Builder(new Flame(new ArrayList<FlameTransformation>()));
@@ -97,7 +97,7 @@ public class FlamePPMMaker {
 	/**
 	 * Generate the Turbulence fractal
 	 * 
-	 * @return An accumulator containing the fractal
+	 * @return A {@link FlameAccumulator} containing the fractal
 	 */
 	private static FlameAccumulator generateTurbulence() {
 		final Flame.Builder builder = new Flame.Builder(new Flame(new ArrayList<FlameTransformation>()));
@@ -118,7 +118,7 @@ public class FlamePPMMaker {
 	}
 
 	/**
-	 * Write an accumulator to a stream
+	 * Write a {@link FlameAccumulator} to a stream
 	 * 
 	 * @param accu
 	 *                The accumulator containing a fractal
@@ -130,6 +130,7 @@ public class FlamePPMMaker {
 		stream.println(accu.width() + " " + accu.height());
 		stream.println(100);
 
+		// the default palette
 		final ArrayList<Color> list = new ArrayList<Color>(3);
 		list.add(Color.RED);
 		list.add(Color.GREEN);

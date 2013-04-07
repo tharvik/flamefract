@@ -1,7 +1,7 @@
 package ch.epfl.flamemaker.ifs;
 
 /**
- * Accumulator contains the pseudo-image of a IFS fractal, with colors
+ * Accumulator contains the pseudo-image of a IFS fractal
  */
 public final class IFSAccumulator {
 	/**
@@ -10,7 +10,7 @@ public final class IFSAccumulator {
 	private final boolean[][]	isHit;
 
 	/**
-	 * Creates an accumulator
+	 * Creates an {@link IFSAccumulator}
 	 * 
 	 * @param isHit
 	 *                bidimensional array of booleans
@@ -36,23 +36,6 @@ public final class IFSAccumulator {
 	}
 
 	/**
-	 * Return true if the point at the given coordinates is hit
-	 * 
-	 * @param x
-	 *                The x coordinate
-	 * @param y
-	 *                The y coordinate
-	 * @return True if the point at the given coordinates is hit
-	 */
-	public boolean isHit(int x, int y) {
-		if (x > this.width() || x < 0 || y > this.height() || y < 0) {
-			throw new IndexOutOfBoundsException();
-		}
-
-		return (this.isHit[x][y]);
-	}
-
-	/**
 	 * Returns the width of the accumulator
 	 * 
 	 * @return The width of the accumulator
@@ -61,4 +44,25 @@ public final class IFSAccumulator {
 		return this.isHit.length;
 	}
 
+	/**
+	 * Return true if the point at the given coordinates is hit
+	 * 
+	 * @param x
+	 *                The x coordinate
+	 * @param y
+	 *                The y coordinate
+	 * 
+	 * @return True if the point at the given coordinates is hit
+	 * 
+	 * @throws IndexOutOfBoundsException
+	 *                 if x or y are less than zero or if x is greater than
+	 *                 the width or y is greater than the height
+	 */
+	public boolean isHit(int x, int y) {
+		if (x > this.width() || x < 0 || y > this.height() || y < 0) {
+			throw new IndexOutOfBoundsException();
+		}
+
+		return (this.isHit[x][y]);
+	}
 }
