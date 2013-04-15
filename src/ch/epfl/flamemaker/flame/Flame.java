@@ -239,10 +239,12 @@ public class Flame {
 		final int m = density * width * height;
 		final FlameAccumulator.Builder image = new FlameAccumulator.Builder(frame, width, height);
 
+		// If we do not have list, just return the image.build()
 		if (this.transformations.size() == 0) {
 			return image.build();
 		}
 
+		// Randomize the point 20 times
 		double lastColor = 0;
 		for (int j = 0; j < 20; j++) {
 			final int i = rand.nextInt(this.transformations.size());
@@ -250,6 +252,7 @@ public class Flame {
 			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
 		}
 
+		// Actually hit the accumulator
 		for (int j = 0; j < m; j++) {
 			final int i = rand.nextInt(this.transformations.size());
 			p = this.transformations.get(i).transformPoint(p);
