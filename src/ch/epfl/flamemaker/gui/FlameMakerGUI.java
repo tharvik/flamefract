@@ -26,6 +26,7 @@ import ch.epfl.flamemaker.flame.FlameTransformation;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
+import ch.epfl.flamemaker.geometry2d.Transformation;
 
 /**
  * The GUI, use much of {@link Flame} in internal
@@ -76,10 +77,9 @@ public class FlameMakerGUI {
 
 		JPanel panelFract = new JPanel();
 		panelFract.setLayout(new BorderLayout());
-		// FlameBuilderPreviewComponent fractal = new
-		// FlameBuilderPreviewComponent(this.builder, this.background,
-		// this.palette, this.frame, this.density);
-		// panelFract.add(fractal, BorderLayout.CENTER);
+		FlameBuilderPreviewComponent fractal = new FlameBuilderPreviewComponent(this.builder, this.background,
+				this.palette, this.frame, this.density);
+		panelFract.add(fractal, BorderLayout.CENTER);
 		panelFract.setBorder(BorderFactory.createTitledBorder("Fractale"));
 
 		JPanel panelAffine = new JPanel();
@@ -182,17 +182,40 @@ public class FlameMakerGUI {
 		}
 	}
 
+	/**
+	 * The part of the GUI showing the {@link AffineTransformation} of the
+	 * fractal {@link Flame}
+	 */
 	static class AffineTransformationsComponent extends JComponent {
 		private Flame.Builder		builder;
 		private Rectangle		frame;
+		/**
+		 * The selected transformation (draw in red in the component)
+		 */
 		private int			highlightedTransformationIndex;
+		/**
+		 * A {@link AffineTransformation} used to move a point in the
+		 * frame to the {@link JComponent}
+		 */
 		private AffineTransformation	transformation;
 
+		/**
+		 * Construct an {@link AffineTransformationsComponent} with the
+		 * given {@link Builder} to retrieve the needed
+		 * {@link AffineTransformation} and the frame to have a correct sized graph
+		 * 
+		 * @param builder Used to retrieve the needed {@link AffineTransformation}
+		 * @param frame Used to have a correct sized graph
+		 */
 		public AffineTransformationsComponent(Builder builder, Rectangle frame) {
 			this.builder = builder;
 			this.frame = frame;
 		}
 
+		/**
+		 * Return the index of the highlighted {@link AffineTransformation}
+		 * @return The index of the highlighted {@link AffineTransformation}
+		 */
 		public int getHighlightedTransformationIndex() {
 			return highlightedTransformationIndex;
 		}
@@ -229,7 +252,7 @@ public class FlameMakerGUI {
 				Line2D.Double line = new Line2D.Double(down.x(), down.y(), up.x(), up.y());
 				g.draw(line);
 			}
-			
+
 			for (int y = (int) this.frame.bottom(); y < this.frame.top(); y++) {
 
 				// Only the y=0 line is white
@@ -250,6 +273,47 @@ public class FlameMakerGUI {
 			}
 		}
 
+		private void drawTransformation(Graphics2D g, int index) {
+			// set some points
+			Point xDown = this.builder.affineTransformation(index).transformPoint(new Point(-1, 0));
+			Point xUp = this.builder.affineTransformation(index).transformPoint(new Point(1, 0));
+			Point xArrowLeft = this.builder.affineTransformation(index).transformPoint(new Point(0.9, 0.1));
+			Point xArrowRight = this.builder.affineTransformation(index).transformPoint(
+					new Point(0.9, -0.1));
+
+			Point yDown = this.builder.affineTransformation(index).transformPoint(new Point(0, -1));
+			Point yUp = this.builder.affineTransformation(index).transformPoint(new Point(0, 1));
+			Point yArrowLeft = this.builder.affineTransformation(index)
+					.transformPoint(new Point(-0.1, 0.9));
+			Point yArrowRight = this.builder.affineTransformation(index)
+					.transformPoint(new Point(0.1, 0.9));
+
+			// Change the points in our system
+			xDown = this.transformation.transformPoint(xDown);
+			xUp = this.transformation.transformPoint(xUp);
+			xArrowLeft = this.transformation.transformPoint(xArrowLeft);
+			xArrowRight = this.transformation.transformPoint(xArrowRight);
+
+			yDown = this.transformation.transformPoint(yDown);
+			yUp = this.transformation.transformPoint(yUp);
+			yArrowLeft = this.transformation.transformPoint(yArrowLeft);
+			yArrowRight = this.transformation.transformPoint(yArrowRight);
+
+			Line2D.Double line = new Line2D.Double(xDown.x(), xDown.y(), xUp.x(), xUp.y());
+			g.draw(line);
+			line = new Line2D.Double(xUp.x(), xUp.y(), xArrowLeft.x(), xArrowLeft.y());
+			g.draw(line);
+			line = new Line2D.Double(xUp.x(), xUp.y(), xArrowRight.x(), xArrowRight.y());
+			g.draw(line);
+
+			line = new Line2D.Double(yDown.x(), yDown.y(), yUp.x(), yUp.y());
+			g.draw(line);
+			line = new Line2D.Double(yUp.x(), yUp.y(), yArrowLeft.x(), yArrowLeft.y());
+			g.draw(line);
+			line = new Line2D.Double(yUp.x(), yUp.y(), yArrowRight.x(), yArrowRight.y());
+			g.draw(line);
+		}
+
 		@Override
 		protected void paintComponent(Graphics g0) {
 			Graphics2D g = (Graphics2D) g0;
@@ -260,29 +324,25 @@ public class FlameMakerGUI {
 					this.frame.center().x() + this.getWidth() / 2.0,
 					this.frame.center().y() + this.getHeight() / 2.0);
 			this.transformation = this.transformation.composeWith(AffineTransformation.newScaling(
-					this.getWidth() / this.frame.width(), this.getHeight() / this.frame.height()));
+					this.getWidth() / this.frame.width(), -this.getHeight() / this.frame.height()));
 
+			// setup the grid first
 			this.paintGrid(g);
-
-			AffineTransformation transformation = AffineTransformation.newTranslation(
-					this.getWidth() / 2.0, -this.getHeight() / 2.0);
-			Point origin = transformation.transformPoint(Point.ORIGIN);
-
-			Rectangle actualFrame = frame.expandToAspectRatio(this.getWidth() / (double) this.getHeight());
+			g.setColor(java.awt.Color.BLACK);
 
 			for (int i = 0; i < this.builder.transformationCount(); i++) {
+
+				// we skip the highlighted, because we want to
+				// be draw at the end
 				if (i == this.highlightedTransformationIndex) {
-					g.setColor(java.awt.Color.RED);
-				} else {
-					g.setColor(java.awt.Color.BLACK);
+					continue;
 				}
 
-				Point p = origin;
-				p = this.builder.affineTransformation(i).transformPoint(p);
-
-				Line2D.Double asd = new Line2D.Double(origin.x(), origin.y(), (int) p.x(), (int) p.y());
-				g.draw(asd);
+				this.drawTransformation(g, i);
 			}
+
+			g.setColor(java.awt.Color.RED);
+			this.drawTransformation(g, this.highlightedTransformationIndex);
 		}
 	}
 }
