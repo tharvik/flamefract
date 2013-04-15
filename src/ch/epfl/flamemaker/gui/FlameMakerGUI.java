@@ -183,9 +183,10 @@ public class FlameMakerGUI {
 	}
 
 	static class AffineTransformationsComponent extends JComponent {
-		private Flame.Builder	builder;
-		private Rectangle	frame;
-		private int		highlightedTransformationIndex;
+		private Flame.Builder		builder;
+		private Rectangle		frame;
+		private int			highlightedTransformationIndex;
+		private AffineTransformation	transformation;
 
 		public AffineTransformationsComponent(Builder builder, Rectangle frame) {
 			this.builder = builder;
@@ -210,34 +211,41 @@ public class FlameMakerGUI {
 		}
 
 		private void paintGrid(Graphics2D g) {
-			AffineTransformation transformation = AffineTransformation.newTranslation(this.frame.left()
-					+ (this.getWidth() / 2.0), 2 + this.frame.bottom() + (this.getHeight() / 2.0));
-//			transformation = transformation.composeWith(AffineTransformation.newScaling(this.getWidth()
-//					/ this.frame.width(), this.getHeight() / this.frame.height()));
-
-			System.out.println(this.frame);
-			System.out.println(this.getWidth() + "," + this.getHeight());
-			System.out.println(transformation.transformPoint(new Point(this.frame.left(), this.frame.bottom())));
-			System.out.println(transformation.transformPoint(new Point(this.frame.right(), this.frame.top())));
-
-			// wrong color TODO
-			g.setColor(java.awt.Color.GRAY);
-
 			for (int x = (int) this.frame.left(); x < this.frame.right(); x++) {
 
-				System.out.println(x);
+				// Only the x=0 line is white
+				if (x == 0) {
+					g.setColor(java.awt.Color.WHITE);
+				} else {
+					g.setColor(new java.awt.Color(new Color(0.9, 0.9, 0.9).asPackedRGB()));
+				}
 
 				Point up = new Point(x, this.frame.top());
 				Point down = new Point(x, this.frame.bottom());
 
-				System.out.println(up + "|" + down);
-
-				up = transformation.transformPoint(up);
-				down = transformation.transformPoint(down);
-
-				System.out.println(up + "|" + down);
+				up = this.transformation.transformPoint(up);
+				down = this.transformation.transformPoint(down);
 
 				Line2D.Double line = new Line2D.Double(down.x(), down.y(), up.x(), up.y());
+				g.draw(line);
+			}
+			
+			for (int y = (int) this.frame.bottom(); y < this.frame.top(); y++) {
+
+				// Only the y=0 line is white
+				if (y == 0) {
+					g.setColor(java.awt.Color.WHITE);
+				} else {
+					g.setColor(new java.awt.Color(new Color(0.9, 0.9, 0.9).asPackedRGB()));
+				}
+
+				Point left = new Point(this.frame.left(), y);
+				Point right = new Point(this.frame.right(), y);
+
+				left = this.transformation.transformPoint(left);
+				right = this.transformation.transformPoint(right);
+
+				Line2D.Double line = new Line2D.Double(left.x(), left.y(), right.x(), right.y());
 				g.draw(line);
 			}
 		}
@@ -245,6 +253,14 @@ public class FlameMakerGUI {
 		@Override
 		protected void paintComponent(Graphics g0) {
 			Graphics2D g = (Graphics2D) g0;
+
+			// TODO wrong! doesn't gave the right values (but more
+			// or less right)
+			this.transformation = AffineTransformation.newTranslation(
+					this.frame.center().x() + this.getWidth() / 2.0,
+					this.frame.center().y() + this.getHeight() / 2.0);
+			this.transformation = this.transformation.composeWith(AffineTransformation.newScaling(
+					this.getWidth() / this.frame.width(), this.getHeight() / this.frame.height()));
 
 			this.paintGrid(g);
 
