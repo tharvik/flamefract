@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.color.InterpolatedPalette;
@@ -70,11 +72,13 @@ public class FlameMakerGUI {
 	 * Generate the GUI, used by {@link FlameMaker}
 	 */
 	public void start() {
+		// the window
 		JFrame frame = new JFrame("Flame Maker");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.setVisible(true);
 
+		// fractal
 		JPanel panelFract = new JPanel();
 		panelFract.setLayout(new BorderLayout());
 		FlameBuilderPreviewComponent fractal = new FlameBuilderPreviewComponent(this.builder, this.background,
@@ -82,6 +86,7 @@ public class FlameMakerGUI {
 		panelFract.add(fractal, BorderLayout.CENTER);
 		panelFract.setBorder(BorderFactory.createTitledBorder("Fractale"));
 
+		// affine transformation
 		JPanel panelAffine = new JPanel();
 		panelAffine.setLayout(new BorderLayout());
 		AffineTransformationsComponent transformations = new AffineTransformationsComponent(this.builder,
@@ -89,13 +94,31 @@ public class FlameMakerGUI {
 		panelAffine.add(transformations, BorderLayout.CENTER);
 		panelAffine.setBorder(BorderFactory.createTitledBorder("Transformations affines"));
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout());
-		panel.add(panelAffine);
-		panel.add(panelFract);
+		// transformation list
+		JScrollPane transList = new JScrollPane();
+		
+		// buttons
+		JPanel buttons = new JPanel();
+		buttons.setLayout(new GridLayout(1, 2));
+		
+		// settings
+		JPanel settings = new JPanel();
+		settings.setLayout(new BorderLayout());
+		settings.add(transList);
+		settings.add(buttons);
+		
+		// layout
+		JPanel upPanel = new JPanel();
+		upPanel.setLayout(new GridLayout(1, 2));
+		upPanel.add(panelAffine);
+		upPanel.add(panelFract);
 
-		frame.getContentPane().add(panel, BorderLayout.CENTER);
-
+		JPanel downPanel = new JPanel();
+		downPanel.setLayout(new BoxLayout(downPanel, BoxLayout.LINE_AXIS));
+		downPanel.add(settings);
+		
+		frame.getContentPane().add(upPanel, BorderLayout.CENTER);
+		frame.getContentPane().add(downPanel, BorderLayout.PAGE_END);
 		frame.pack();
 	}
 
@@ -163,6 +186,7 @@ public class FlameMakerGUI {
 
 		@Override
 		protected void paintComponent(Graphics g0) {
+			// TODO seem to be wrong (stretched)
 			BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(),
 					BufferedImage.TYPE_INT_RGB);
 
@@ -202,10 +226,14 @@ public class FlameMakerGUI {
 		/**
 		 * Construct an {@link AffineTransformationsComponent} with the
 		 * given {@link Builder} to retrieve the needed
-		 * {@link AffineTransformation} and the frame to have a correct sized graph
+		 * {@link AffineTransformation} and the frame to have a correct
+		 * sized graph
 		 * 
-		 * @param builder Used to retrieve the needed {@link AffineTransformation}
-		 * @param frame Used to have a correct sized graph
+		 * @param builder
+		 *                Used to retrieve the needed
+		 *                {@link AffineTransformation}
+		 * @param frame
+		 *                Used to have a correct sized graph
 		 */
 		public AffineTransformationsComponent(Builder builder, Rectangle frame) {
 			this.builder = builder;
@@ -213,8 +241,11 @@ public class FlameMakerGUI {
 		}
 
 		/**
-		 * Return the index of the highlighted {@link AffineTransformation}
-		 * @return The index of the highlighted {@link AffineTransformation}
+		 * Return the index of the highlighted
+		 * {@link AffineTransformation}
+		 * 
+		 * @return The index of the highlighted
+		 *         {@link AffineTransformation}
 		 */
 		public int getHighlightedTransformationIndex() {
 			return highlightedTransformationIndex;
