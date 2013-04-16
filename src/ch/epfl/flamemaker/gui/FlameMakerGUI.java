@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
+import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -96,17 +98,17 @@ public class FlameMakerGUI {
 
 		// transformation list
 		JScrollPane transList = new JScrollPane();
-		
+
 		// buttons
 		JPanel buttons = new JPanel();
 		buttons.setLayout(new GridLayout(1, 2));
-		
+
 		// settings
 		JPanel settings = new JPanel();
 		settings.setLayout(new BorderLayout());
 		settings.add(transList);
 		settings.add(buttons);
-		
+
 		// layout
 		JPanel upPanel = new JPanel();
 		upPanel.setLayout(new GridLayout(1, 2));
@@ -116,7 +118,7 @@ public class FlameMakerGUI {
 		JPanel downPanel = new JPanel();
 		downPanel.setLayout(new BoxLayout(downPanel, BoxLayout.LINE_AXIS));
 		downPanel.add(settings);
-		
+
 		frame.getContentPane().add(upPanel, BorderLayout.CENTER);
 		frame.getContentPane().add(downPanel, BorderLayout.PAGE_END);
 		frame.pack();
@@ -257,6 +259,7 @@ public class FlameMakerGUI {
 				throw new NoSuchElementException();
 			}
 			this.highlightedTransformationIndex = highlightedTransformationIndex;
+			this.repaint();
 		}
 
 		@Override
@@ -372,8 +375,66 @@ public class FlameMakerGUI {
 				this.drawTransformation(g, i);
 			}
 
+			// draw the last arrow (should be on top)
 			g.setColor(java.awt.Color.RED);
 			this.drawTransformation(g, this.highlightedTransformationIndex);
+		}
+	}
+
+	/**
+	 * List of transformation used by the scroll bar
+	 */
+	class TransformationsListModel extends AbstractListModel {
+
+		/**
+		 * Used as a prefix to each {@link FlameTransformation}
+		 */
+		String	text;
+
+		/**
+		 * Construct a {@link TransformationsListModel} with the given
+		 * text as a prefix to {@link FlameTransformation}
+		 * 
+		 * @param text
+		 *                Used as a prefix to each
+		 *                {@link FlameTransformation}
+		 */
+		public TransformationsListModel(String text) {
+			this.text = text;
+		}
+
+		@Override
+		public Object getElementAt(int index) {
+			return text + index;
+		}
+
+		@Override
+		public int getSize() {
+			return FlameMakerGUI.this.builder.transformationCount();
+		}
+
+		/**
+		 * Add a new identity {@link FlameTransformation} to the
+		 * builder, bubble
+		 */
+		public void addTransformation() {
+			double[] array = { 1, 0, 0, 0, 0, 0 };
+			FlameTransformation t = new FlameTransformation(AffineTransformation.IDENTITY, array);
+			FlameMakerGUI.this.builder.addTransformation(t);
+			this.fireIntervalAdded(this, this.getSize() - 1, this.getSize());
+		}
+
+		/**
+		 * Remove the {@link FlameTransformation} at the given index,
+		 * bubble
+		 * 
+		 * @param i
+		 *                The index of the {@link FlameTransformation}
+		 *                to remove
+		 */
+		public void removeTransformation(int i) {
+			FlameMakerGUI.this.builder.removeTransformation(i);
+			this.fireIntervalAdded(this, this.getSize(), this.getSize() + 1);
 		}
 	}
 }
