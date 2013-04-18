@@ -9,16 +9,21 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.color.InterpolatedPalette;
@@ -60,6 +65,18 @@ public class FlameMakerGUI {
 	private int		density;
 
 	/**
+	 * The {@link FlameTransformation} actually selected in the list of
+	 * {@link Transformation}
+	 */
+	private int		selectedTransformationIndex;
+
+	/**
+	 * {@link Set} of the {@link Observer} of the
+	 * selectedTransformationIndex
+	 */
+	private Set<Observer>	observers;
+
+	/**
 	 * Construct a {@link FlameMakerGUI} with the default value
 	 */
 	public FlameMakerGUI() {
@@ -68,6 +85,8 @@ public class FlameMakerGUI {
 		this.palette = new InterpolatedPalette(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE));
 		this.frame = new Rectangle(new Point(-0.25, 0), 5, 4);
 		this.density = 50;
+		this.selectedTransformationIndex = 0;
+		this.observers = new HashSet<FlameMakerGUI.Observer>();
 	}
 
 	/**
@@ -95,9 +114,24 @@ public class FlameMakerGUI {
 				this.frame);
 		panelAffine.add(transformations, BorderLayout.CENTER);
 		panelAffine.setBorder(BorderFactory.createTitledBorder("Transformations affines"));
+		this.addObserver(transformations);
 
 		// transformation list
-		JScrollPane transList = new JScrollPane();
+		final JList list = new JList(new TransformationsListModel("Transformation n° "));
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setVisibleRowCount(3);
+		list.setSelectedIndex(this.selectedTransformationIndex);
+		// TODO arf, this seem so wrong, so ugly to write, why Java?
+		list.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				FlameMakerGUI.this.setSelectedTransformationIndex(list.getSelectedIndex());
+			}
+		});
+
+		// transformation scroll
+		JScrollPane transList = new JScrollPane(list);
 
 		// buttons
 		JPanel buttons = new JPanel();
@@ -106,8 +140,8 @@ public class FlameMakerGUI {
 		// settings
 		JPanel settings = new JPanel();
 		settings.setLayout(new BorderLayout());
-		settings.add(transList);
-		settings.add(buttons);
+		settings.add(transList, BorderLayout.CENTER);
+		settings.add(buttons, BorderLayout.PAGE_END);
 
 		// layout
 		JPanel upPanel = new JPanel();
@@ -145,11 +179,66 @@ public class FlameMakerGUI {
 
 		return builder;
 	}
-	
+
+	/**
+	 * Return the index of the selected {@link FlameTransformation}
+	 * 
+	 * @return return The index of the selected {@link FlameTransformation}
+	 */
+	public int getSelectedTransformationIndex() {
+		return selectedTransformationIndex;
+	}
+
+	/**
+	 * Select a new {@link FlameTransformation}
+	 * 
+	 * @param selectedTransformationIndex
+	 *                The index of the wanted {@link FlameTransformation} as
+	 *                in the {@link Builder} we got at construction
+	 * 
+	 * @throws NoSuchElementException
+	 *                 if the index is less than zero or larger than the max
+	 *                 index
+	 */
+	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
+		if (selectedTransformationIndex < 0
+				|| selectedTransformationIndex >= this.builder.transformationCount()) {
+			throw new NoSuchElementException();
+		}
+		this.selectedTransformationIndex = selectedTransformationIndex;
+
+		// warn the observers
+		for (Observer observer : this.observers) {
+			observer.changedObservedValue();
+		}
+	}
+
+	/**
+	 * Add a new {@link Observer}
+	 * 
+	 * @param observer
+	 *                An {@link Observer} to add to set of known
+	 *                {@link Observer}
+	 */
+	public void addObserver(Observer observer) {
+		this.observers.add(observer);
+	}
+
+	/**
+	 * Remove the given {@link Observer}
+	 * 
+	 * @param observer
+	 *                An {@link Observer} to remove from the set of known
+	 *                {@link Observer}
+	 */
+	public void removeObserver(Observer observer) {
+		this.observers.remove(observer);
+	}
+
 	/**
 	 * The fractal part of the GUI
 	 */
-	static class FlameBuilderPreviewComponent extends JComponent {
+	class FlameBuilderPreviewComponent extends JComponent {
 
 		/**
 		 * The {@link Builder} we are currently working on
@@ -192,7 +281,8 @@ public class FlameMakerGUI {
 			BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(),
 					BufferedImage.TYPE_INT_RGB);
 
-			Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth() / (double) this.getHeight());
+			Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth()
+					/ (double) this.getHeight());
 			FlameAccumulator accu = this.builder.build().compute(actualFrame, this.getWidth(),
 					this.getHeight(), this.density);
 
@@ -212,8 +302,16 @@ public class FlameMakerGUI {
 	 * The part of the GUI showing the {@link AffineTransformation} of the
 	 * fractal {@link Flame}
 	 */
-	static class AffineTransformationsComponent extends JComponent {
+	class AffineTransformationsComponent extends JComponent implements Observer {
+		/**
+		 * The {@link Builder} used to get the needed
+		 * {@link AffineTransformation}
+		 */
 		private Flame.Builder		builder;
+		/**
+		 * The scope of the fractale, used to have the same aspect ratio
+		 * as the {@link FlameBuilderPreviewComponent}
+		 */
 		private Rectangle		frame;
 		/**
 		 * The selected transformation (draw in red in the component)
@@ -253,6 +351,18 @@ public class FlameMakerGUI {
 			return highlightedTransformationIndex;
 		}
 
+		/**
+		 * Set the index of the highlighted {@link AffineTransformation}
+		 * 
+		 * @param highlightedTransformationIndex
+		 *                The index of the newly selected
+		 *                {@link AffineTransformation}, as given in the
+		 *                {@link Builder} as construction
+		 * 
+		 * @throws NoSuchElementException
+		 *                 if the highlightedTransformationIndex is less
+		 *                 than zero or bigger than the max index
+		 */
 		public void setHighlightedTransformationIndex(int highlightedTransformationIndex) {
 			if (highlightedTransformationIndex < 0
 					|| highlightedTransformationIndex >= this.builder.transformationCount()) {
@@ -351,8 +461,9 @@ public class FlameMakerGUI {
 		@Override
 		protected void paintComponent(Graphics g0) {
 			Graphics2D g = (Graphics2D) g0;
-			Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth() / (double) this.getHeight());
-			
+			Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth()
+					/ (double) this.getHeight());
+
 			// TODO wrong! doesn't gave the right values (but more
 			// or less right)
 			// this.transformation =
@@ -364,10 +475,12 @@ public class FlameMakerGUI {
 			// this.getWidth() / this.frame.width(),
 			// -this.getHeight() / this.frame.height()));
 			this.transformation = AffineTransformation.newTranslation(
-					actualFrame.center().x() + this.getWidth() / 2.0,
-					actualFrame.center().y() + this.getHeight() / 2.0);
-			this.transformation = this.transformation.composeWith(AffineTransformation.newScaling(
-					this.getWidth() / actualFrame.width(), -this.getHeight() / actualFrame.height()));
+					actualFrame.center().x() + this.getWidth() / 2.0, actualFrame.center().y()
+							+ this.getHeight() / 2.0);
+			this.transformation = this.transformation
+					.composeWith(AffineTransformation.newScaling(
+							this.getWidth() / actualFrame.width(), -this.getHeight()
+									/ actualFrame.height()));
 
 			// setup the grid first
 			this.paintGrid(g);
@@ -387,6 +500,12 @@ public class FlameMakerGUI {
 			// draw the last arrow (should be on top)
 			g.setColor(java.awt.Color.RED);
 			this.drawTransformation(g, this.highlightedTransformationIndex);
+		}
+
+		@Override
+		public void changedObservedValue() {
+			this.setHighlightedTransformationIndex(FlameMakerGUI.this.getSelectedTransformationIndex());
+			this.repaint();
 		}
 	}
 
@@ -414,7 +533,7 @@ public class FlameMakerGUI {
 
 		@Override
 		public Object getElementAt(int index) {
-			return text + index;
+			return (text + (index + 1));
 		}
 
 		@Override
@@ -445,5 +564,18 @@ public class FlameMakerGUI {
 			FlameMakerGUI.this.builder.removeTransformation(i);
 			this.fireIntervalAdded(this, this.getSize(), this.getSize() + 1);
 		}
+	}
+
+	/**
+	 * Define the concept of observer: the changedObservedValue function in
+	 * every {@link Observer} will be fired by the target every time the
+	 * value (given by the context) inside the target is changed
+	 */
+	static interface Observer {
+		/**
+		 * Will be fired by the target every time the value (given by
+		 * the context) inside the target is changed
+		 */
+		void changedObservedValue();
 	}
 }
