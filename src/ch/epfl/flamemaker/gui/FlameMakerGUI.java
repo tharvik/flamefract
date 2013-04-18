@@ -145,7 +145,7 @@ public class FlameMakerGUI {
 
 		return builder;
 	}
-
+	
 	/**
 	 * The fractal part of the GUI
 	 */
@@ -192,7 +192,7 @@ public class FlameMakerGUI {
 			BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(),
 					BufferedImage.TYPE_INT_RGB);
 
-			Rectangle actualFrame = frame.expandToAspectRatio(this.getWidth() / (double) this.getHeight());
+			Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth() / (double) this.getHeight());
 			FlameAccumulator accu = this.builder.build().compute(actualFrame, this.getWidth(),
 					this.getHeight(), this.density);
 
@@ -277,11 +277,8 @@ public class FlameMakerGUI {
 					g.setColor(new java.awt.Color(new Color(0.9, 0.9, 0.9).asPackedRGB()));
 				}
 
-				Point up = new Point(x, this.frame.top());
-				Point down = new Point(x, this.frame.bottom());
-
-				up = this.transformation.transformPoint(up);
-				down = this.transformation.transformPoint(down);
+				Point up = this.transformation.transformPoint(new Point(x, this.frame.top()));
+				Point down = this.transformation.transformPoint(new Point(x, this.frame.bottom()));
 
 				Line2D.Double line = new Line2D.Double(down.x(), down.y(), up.x(), up.y());
 				g.draw(line);
@@ -308,57 +305,69 @@ public class FlameMakerGUI {
 		}
 
 		private void drawTransformation(Graphics2D g, int index) {
-			// set some points
-			Point xDown = this.builder.affineTransformation(index).transformPoint(new Point(-1, 0));
-			Point xUp = this.builder.affineTransformation(index).transformPoint(new Point(1, 0));
-			Point xArrowLeft = this.builder.affineTransformation(index).transformPoint(new Point(0.9, 0.1));
-			Point xArrowRight = this.builder.affineTransformation(index).transformPoint(
-					new Point(0.9, -0.1));
+			final AffineTransformation buildAffine = this.builder.affineTransformation(index);
+			final AffineTransformation rotate = AffineTransformation.newRotation(Math.PI / 2);
 
-			Point yDown = this.builder.affineTransformation(index).transformPoint(new Point(0, -1));
-			Point yUp = this.builder.affineTransformation(index).transformPoint(new Point(0, 1));
-			Point yArrowLeft = this.builder.affineTransformation(index)
-					.transformPoint(new Point(-0.1, 0.9));
-			Point yArrowRight = this.builder.affineTransformation(index)
-					.transformPoint(new Point(0.1, 0.9));
+			for (int i = 0; i < 2; i++) {
 
-			// Change the points in our system
-			xDown = this.transformation.transformPoint(xDown);
-			xUp = this.transformation.transformPoint(xUp);
-			xArrowLeft = this.transformation.transformPoint(xArrowLeft);
-			xArrowRight = this.transformation.transformPoint(xArrowRight);
+				// [0] = bottom of arrow
+				// [1] = top of arrow
+				// [2] = left of arrow
+				// [3] = right of arrow
+				Point[] points = new Point[4];
+				points[0] = new Point(-1, 0);
+				points[1] = new Point(1, 0);
+				points[2] = new Point(0.9, -0.1);
+				points[3] = new Point(0.9, 0.1);
 
-			yDown = this.transformation.transformPoint(yDown);
-			yUp = this.transformation.transformPoint(yUp);
-			yArrowLeft = this.transformation.transformPoint(yArrowLeft);
-			yArrowRight = this.transformation.transformPoint(yArrowRight);
+				// rotate the points
+				for (int j = 0; j < i; j++) {
+					for (int k = 0; k < points.length; k++) {
+						points[k] = rotate.transformPoint(points[k]);
+					}
+				}
 
-			Line2D.Double line = new Line2D.Double(xDown.x(), xDown.y(), xUp.x(), xUp.y());
-			g.draw(line);
-			line = new Line2D.Double(xUp.x(), xUp.y(), xArrowLeft.x(), xArrowLeft.y());
-			g.draw(line);
-			line = new Line2D.Double(xUp.x(), xUp.y(), xArrowRight.x(), xArrowRight.y());
-			g.draw(line);
+				// actually transform the points to look as the
+				// should be
+				for (int j = 0; j < points.length; j++) {
+					points[j] = buildAffine.transformPoint(points[j]);
+				}
 
-			line = new Line2D.Double(yDown.x(), yDown.y(), yUp.x(), yUp.y());
-			g.draw(line);
-			line = new Line2D.Double(yUp.x(), yUp.y(), yArrowLeft.x(), yArrowLeft.y());
-			g.draw(line);
-			line = new Line2D.Double(yUp.x(), yUp.y(), yArrowRight.x(), yArrowRight.y());
-			g.draw(line);
+				// change the points in our system
+				for (int j = 0; j < points.length; j++) {
+					points[j] = this.transformation.transformPoint(points[j]);
+				}
+
+				for (int j = 0, k = 1; k < points.length; k++) {
+					final Line2D.Double line = new Line2D.Double(points[j].x(), points[j].y(),
+							points[k].x(), points[k].y());
+					g.draw(line);
+					j = 1;
+				}
+
+			}
 		}
 
 		@Override
 		protected void paintComponent(Graphics g0) {
 			Graphics2D g = (Graphics2D) g0;
-
+			Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth() / (double) this.getHeight());
+			
 			// TODO wrong! doesn't gave the right values (but more
 			// or less right)
+			// this.transformation =
+			// AffineTransformation.newTranslation(
+			// this.frame.center().x() + this.getWidth() / 2.0,
+			// this.frame.center().y() + this.getHeight() / 2.0);
+			// this.transformation =
+			// this.transformation.composeWith(AffineTransformation.newScaling(
+			// this.getWidth() / this.frame.width(),
+			// -this.getHeight() / this.frame.height()));
 			this.transformation = AffineTransformation.newTranslation(
-					this.frame.center().x() + this.getWidth() / 2.0,
-					this.frame.center().y() + this.getHeight() / 2.0);
+					actualFrame.center().x() + this.getWidth() / 2.0,
+					actualFrame.center().y() + this.getHeight() / 2.0);
 			this.transformation = this.transformation.composeWith(AffineTransformation.newScaling(
-					this.getWidth() / this.frame.width(), -this.getHeight() / this.frame.height()));
+					this.getWidth() / actualFrame.width(), -this.getHeight() / actualFrame.height()));
 
 			// setup the grid first
 			this.paintGrid(g);
