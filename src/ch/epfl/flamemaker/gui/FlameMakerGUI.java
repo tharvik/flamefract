@@ -25,6 +25,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -50,6 +52,7 @@ public class FlameMakerGUI {
 	 * The part of the GUI showing the {@link AffineTransformation} of the
 	 * fractal {@link Flame}
 	 */
+	@SuppressWarnings("serial")
 	class AffineTransformationsComponent extends JComponent implements Observer {
 		/**
 		 * The {@link Builder} used to get the needed
@@ -282,6 +285,7 @@ public class FlameMakerGUI {
 	/**
 	 * The fractal part of the GUI
 	 */
+	@SuppressWarnings("serial")
 	class FlameBuilderPreviewComponent extends JComponent {
 
 		/**
@@ -376,7 +380,8 @@ public class FlameMakerGUI {
 	/**
 	 * List of transformation used by the scroll bar
 	 */
-	class TransformationsListModel extends AbstractListModel {
+	@SuppressWarnings("serial")
+	class TransformationsListModel extends AbstractListModel<String> {
 
 		/**
 		 * Used as a prefix to each {@link FlameTransformation}
@@ -403,11 +408,11 @@ public class FlameMakerGUI {
 			final double[] array = { 1, 0, 0, 0, 0, 0 };
 			final FlameTransformation t = new FlameTransformation(AffineTransformation.IDENTITY, array);
 			FlameMakerGUI.this.builder.addTransformation(t);
-			this.fireIntervalAdded(this, this.getSize() - 1, this.getSize());
+			this.fireIntervalAdded(this, this.getSize() - 2, this.getSize() - 1);
 		}
 
 		@Override
-		public Object getElementAt(int index) {
+		public String getElementAt(int index) {
 			return (this.text + (index + 1));
 		}
 
@@ -545,8 +550,6 @@ public class FlameMakerGUI {
 	 *                 index
 	 */
 	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
-		System.out.println("-- " + selectedTransformationIndex);
-		System.out.println("count: " + this.builder.transformationCount());
 		if (selectedTransformationIndex < 0
 				|| selectedTransformationIndex >= this.builder.transformationCount()) {
 			throw new NoSuchElementException();
@@ -588,7 +591,7 @@ public class FlameMakerGUI {
 
 		// transformation list
 		final TransformationsListModel listModel = new TransformationsListModel("Transformation n° ");
-		final JList list = new JList(listModel);
+		final JList<String> list = new JList<String>(listModel);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setVisibleRowCount(3);
 		list.setSelectedIndex(this.selectedTransformationIndex);
@@ -614,10 +617,9 @@ public class FlameMakerGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
-				System.out.println(index);
 				listModel.removeTransformation(index);
-				list.setSelectedIndex(index + 1 == listModel.getSize() ? index : index + 1);
-
+				list.setSelectedIndex(index == listModel.getSize() ? index - 1 : index);
+				
 				if (listModel.getSize() == 1) {
 					remove.setEnabled(false);
 				}
