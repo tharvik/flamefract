@@ -18,14 +18,19 @@ import java.util.Set;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -52,26 +57,27 @@ public class FlameMakerGUI {
 	 * fractal {@link Flame}
 	 */
 	@SuppressWarnings("serial")
-	class AffineTransformationsComponent extends JComponent implements Observer {
+	class AffineTransformationsComponent extends JComponent implements Observer,
+			ch.epfl.flamemaker.gui.ObservableFlameBuilder.Observer {
 		/**
 		 * The {@link Builder} used to get the needed
 		 * {@link AffineTransformation}
 		 */
-		private final Flame.Builder	builder;
+		private final ObservableFlameBuilder	builder;
 		/**
 		 * The scope of the fractale, used to have the same aspect ratio
 		 * as the {@link FlameBuilderPreviewComponent}
 		 */
-		private final Rectangle		frame;
+		private final Rectangle			frame;
 		/**
 		 * The selected transformation (draw in red in the component)
 		 */
-		private int			highlightedTransformationIndex;
+		private int				highlightedTransformationIndex;
 		/**
 		 * A {@link AffineTransformation} used to move a point in the
 		 * frame to the {@link JComponent}
 		 */
-		private AffineTransformation	transformation;
+		private AffineTransformation		transformation;
 
 		/**
 		 * Construct an {@link AffineTransformationsComponent} with the
@@ -85,7 +91,7 @@ public class FlameMakerGUI {
 		 * @param frame
 		 *                Used to have a correct sized graph
 		 */
-		public AffineTransformationsComponent(Builder builder, Rectangle frame) {
+		public AffineTransformationsComponent(ObservableFlameBuilder builder, Rectangle frame) {
 			this.builder = builder;
 			this.frame = frame;
 		}
@@ -276,34 +282,45 @@ public class FlameMakerGUI {
 				}
 			}
 		}
+
+		@Override
+		public void changedBuilder() {
+			this.repaint();
+		}
 	}
 
 	/**
 	 * The fractal part of the GUI
 	 */
 	@SuppressWarnings("serial")
-	class FlameBuilderPreviewComponent extends JComponent {
+	class FlameBuilderPreviewComponent extends JComponent implements
+			ch.epfl.flamemaker.gui.ObservableFlameBuilder.Observer {
+
+		@Override
+		public void changedBuilder() {
+			this.repaint();
+		}
 
 		/**
 		 * The {@link Color} of the background we use to build the image
 		 */
-		private final Color		background;
+		private final Color			background;
 		/**
 		 * The {@link Builder} we are currently working on
 		 */
-		private final Flame.Builder	builder;
+		private final ObservableFlameBuilder	builder;
 		/**
 		 * The number of iteration
 		 */
-		private final int		density;
+		private final int			density;
 		/**
 		 * The scope of the fractal
 		 */
-		private final Rectangle		frame;
+		private final Rectangle			frame;
 		/**
 		 * The {@link Palette} we use to build the image
 		 */
-		private final Palette		palette;
+		private final Palette			palette;
 
 		/**
 		 * Construct a new {@link FlameBuilderPreviewComponent} with the
@@ -323,7 +340,7 @@ public class FlameMakerGUI {
 		 * @param density
 		 *                The density of computation for the fractal
 		 */
-		public FlameBuilderPreviewComponent(Flame.Builder builder, Color background, Palette palette,
+		public FlameBuilderPreviewComponent(ObservableFlameBuilder builder, Color background, Palette palette,
 				Rectangle frame, int density) {
 			this.builder = builder;
 			this.background = background;
@@ -434,47 +451,48 @@ public class FlameMakerGUI {
 	/**
 	 * The {@link Color} of the background we use to build the image
 	 */
-	private final Color		background;
+	private final Color			background;
 
 	/**
 	 * The {@link Builder} we are currently working on
 	 */
-	private final Flame.Builder	builder;
+	private final ObservableFlameBuilder	builder;
 
 	/**
 	 * The number of iteration
 	 */
-	private final int		density;
+	private final int			density;
 
 	/**
 	 * The scope of the fractal
 	 */
-	private final Rectangle		frame;
+	private final Rectangle			frame;
 
 	/**
 	 * {@link Set} of the {@link Observer} of the
 	 * selectedTransformationIndex
 	 */
-	private final Set<Observer>	observers;
+	private final Set<Observer>		observers;
 
 	/**
 	 * The {@link Palette} we use to build the image
 	 */
-	private final Palette		palette;
+	private final Palette			palette;
 
 	/**
 	 * The {@link FlameTransformation} actually selected in the list of
 	 * {@link Transformation}
 	 */
-	private int			selectedTransformationIndex;
+	private int				selectedTransformationIndex;
 
 	/**
 	 * Generate the Shark Fin fractal
 	 * 
 	 * @return A {@link Flame} containing the fractal
 	 */
-	private static Flame.Builder generateSharkFin() {
-		final Flame.Builder builder = new Flame.Builder(new Flame(new ArrayList<FlameTransformation>()));
+	private static ObservableFlameBuilder generateSharkFin() {
+		final ObservableFlameBuilder builder = new ObservableFlameBuilder(new Flame(
+				new ArrayList<FlameTransformation>()));
 		final double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
 
 		AffineTransformation affine = new AffineTransformation(-0.4113504, -0.7124804, -0.4, 0.7124795,
@@ -559,66 +577,21 @@ public class FlameMakerGUI {
 	}
 
 	/**
-	 * Return a {@link JPanel} with the representation of the
-	 * {@link Transformation}
-	 * 
-	 * @return The {@link JPanel} with the representation of the
-	 *         {@link Transformation}
+	 * Generate the GUI, used by {@link FlameMaker}
 	 */
-	private JPanel getPanelAffine() {
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		final AffineTransformationsComponent transformations = new AffineTransformationsComponent(this.builder,
-				this.frame);
-		panel.add(transformations, BorderLayout.CENTER);
-		panel.setBorder(BorderFactory.createTitledBorder("Transformations affines"));
-		this.addObserver(transformations);
+	public void start() {
+		final JFrame frame = new JFrame("Flame Maker");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(new BorderLayout());
 
-		return panel;
-	}
+		final JPanel upPanel = this.getUpPanel();
+		final JPanel downPanel = this.getDownPanel();
 
-	/**
-	 * Build a fractal and return the {@link JPanel} containing it
-	 * 
-	 * @return A {@link JPanel} with the fractal
-	 */
-	private JPanel getPanelFractal() {
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		final FlameBuilderPreviewComponent fractal = new FlameBuilderPreviewComponent(this.builder,
-				this.background, this.palette, this.frame, this.density);
-		panel.add(fractal, BorderLayout.CENTER);
-		panel.setBorder(BorderFactory.createTitledBorder("Fractale"));
+		frame.getContentPane().add(upPanel, BorderLayout.CENTER);
+		frame.getContentPane().add(downPanel, BorderLayout.PAGE_END);
 
-		return panel;
-	}
-
-	/**
-	 * Return a {@link JList} build with the given
-	 * {@link TransformationsListModel}
-	 * 
-	 * @param model
-	 *                The {@link TransformationsListModel} to use to
-	 *                construct the {@link JList}
-	 * 
-	 * @return A {@link JList} build with the given
-	 *         {@link TransformationsListModel}
-	 */
-	private JList<String> getList(TransformationsListModel model) {
-		final JList<String> list = new JList<String>(model);
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setVisibleRowCount(3);
-		list.setSelectedIndex(this.selectedTransformationIndex);
-		list.addListSelectionListener(new ListSelectionListener() {
-
-			@SuppressWarnings("unused")
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				FlameMakerGUI.this.setSelectedTransformationIndex(list.getSelectedIndex());
-			}
-		});
-
-		return list;
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -675,11 +648,90 @@ public class FlameMakerGUI {
 	}
 
 	/**
+	 * Return the {@link JPanel} containing mainly the settings
+	 * 
+	 * @return The {@link JPanel} containing mainly the settings
+	 */
+	private JPanel getDownPanel() {
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+		panel.add(this.getAffineChoice());
+		panel.add(this.getEdition());
+
+		return panel;
+	}
+
+	/**
+	 * Return a {@link JList} build with the given
+	 * {@link TransformationsListModel}
+	 * 
+	 * @param model
+	 *                The {@link TransformationsListModel} to use to
+	 *                construct the {@link JList}
+	 * 
+	 * @return A {@link JList} build with the given
+	 *         {@link TransformationsListModel}
+	 */
+	private JList<String> getList(TransformationsListModel model) {
+		final JList<String> list = new JList<String>(model);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setVisibleRowCount(3);
+		list.setSelectedIndex(this.selectedTransformationIndex);
+		list.addListSelectionListener(new ListSelectionListener() {
+
+			@SuppressWarnings("unused")
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				FlameMakerGUI.this.setSelectedTransformationIndex(list.getSelectedIndex());
+			}
+		});
+
+		return list;
+	}
+
+	/**
+	 * Return a {@link JPanel} with the representation of the
+	 * {@link Transformation}
+	 * 
+	 * @return The {@link JPanel} with the representation of the
+	 *         {@link Transformation}
+	 */
+	private JPanel getPanelAffine() {
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		final AffineTransformationsComponent transformations = new AffineTransformationsComponent(this.builder,
+				this.frame);
+		panel.add(transformations, BorderLayout.CENTER);
+		panel.setBorder(BorderFactory.createTitledBorder("Transformations affines"));
+		this.addObserver(transformations);
+		this.builder.addObserver(transformations);
+
+		return panel;
+	}
+
+	/**
+	 * Build a fractal and return the {@link JPanel} containing it
+	 * 
+	 * @return A {@link JPanel} with the fractal
+	 */
+	private JPanel getPanelFractal() {
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		final FlameBuilderPreviewComponent fractal = new FlameBuilderPreviewComponent(this.builder,
+				this.background, this.palette, this.frame, this.density);
+		panel.add(fractal, BorderLayout.CENTER);
+		panel.setBorder(BorderFactory.createTitledBorder("Fractale"));
+		this.builder.addObserver(fractal);
+
+		return panel;
+	}
+
+	/**
 	 * Return the {@link JPanel} with all the settings
 	 * 
 	 * @return The {@link JPanel} with all the settings
 	 */
-	private JPanel getSettings() {
+	private JPanel getAffineChoice() {
 
 		final TransformationsListModel model = new TransformationsListModel("Transformation n° ");
 		final JList<String> list = this.getList(model);
@@ -688,6 +740,88 @@ public class FlameMakerGUI {
 		panel.setLayout(new BorderLayout());
 		panel.add(new JScrollPane(list), BorderLayout.CENTER);
 		panel.add(this.getButtons(list), BorderLayout.PAGE_END);
+
+		return panel;
+	}
+
+	private JPanel getAffineEdition() {
+
+		JPanel panel = new JPanel();
+		final GroupLayout layout = new GroupLayout(panel);
+
+		final JComponent[][] components = new JComponent[4][6];
+		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" },
+				{ "Rotation", "⟲", "⟲", null, null }, { "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" },
+				{ "Transvection", "←", "→", "↑", "↓" } };
+
+		// TODO grab it from the transformation
+		final double[] values = { 0.1, 15, 1.05, 0.1 };
+
+		// Groups
+		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
+		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
+
+		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
+		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[4];
+
+		for (int i = 0; i < Hs.length; i++) {
+			Hs[i] = layout.createParallelGroup();
+			H.addGroup(Hs[i]);
+		}
+
+		for (int i = 0; i < Vs.length; i++) {
+			Vs[i] = layout.createParallelGroup();
+			V.addGroup(Vs[i]);
+		}
+
+		// Add every components to the array
+		for (int i = 0; i < components.length; i++) {
+
+			final JFormattedTextField field = new JFormattedTextField();
+			field.setHorizontalAlignment(SwingConstants.RIGHT);
+			field.setValue(values[i]);
+
+			components[i][0] = new JLabel(labels[i][0]);
+			components[i][1] = field;
+
+			for (int j = 2; j < components.length; j++) {
+				if (labels[i][j] == null) {
+					break;
+				}
+				components[i][j] = new JButton(labels[i][j]);
+			}
+		}
+
+		for (int i = 0; i < components.length; i++) {
+
+			for (int j = 0; j < components[0].length; j++) {
+				if (components[i][j] == null) {
+					break;
+				}
+				Vs[i].addComponent(components[i][j]);
+				Hs[j].addComponent(components[i][j]);
+			}
+		}
+		
+		layout.setVerticalGroup(V);
+		layout.setHorizontalGroup(H);
+
+		panel.setLayout(layout);
+
+		return panel;
+	}
+
+	/**
+	 * Return the {@link JPanel} containg the button to setup the fractal
+	 * 
+	 * @return The {@link JPanel} containg the button to setup the fractal
+	 */
+	private JPanel getEdition() {
+
+		JPanel panel = new JPanel();
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.add(this.getAffineEdition());
 
 		return panel;
 	}
@@ -708,36 +842,5 @@ public class FlameMakerGUI {
 		panel.add(this.getPanelFractal());
 
 		return panel;
-	}
-
-	/**
-	 * Return the {@link JPanel} containing mainly the settings
-	 * 
-	 * @return The {@link JPanel} containing mainly the settings
-	 */
-	private JPanel getDownPanel() {
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
-		panel.add(this.getSettings());
-
-		return panel;
-	}
-
-	/**
-	 * Generate the GUI, used by {@link FlameMaker}
-	 */
-	public void start() {
-		final JFrame frame = new JFrame("Flame Maker");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
-
-		JPanel upPanel = this.getUpPanel();
-		JPanel downPanel = this.getDownPanel();
-
-		frame.getContentPane().add(upPanel, BorderLayout.CENTER);
-		frame.getContentPane().add(downPanel, BorderLayout.PAGE_END);
-
-		frame.pack();
-		frame.setVisible(true);
 	}
 }
