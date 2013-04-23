@@ -28,37 +28,15 @@ public class ObservableFlameBuilder {
 	}
 
 	/**
-	 * Remove the given {@link Observer}
-	 * 
-	 * @param observer
-	 *                An {@link Observer} to remove from the set of known
-	 *                {@link Observer}
+	 * The {@link Builder} used in internal to behave like the
+	 * {@link Builder}
 	 */
-	public void removeObserver(Observer observer) {
-		this.observers.remove(observer);
-	}
-
-	/**
-	 * Add a new {@link Observer}
-	 * 
-	 * @param observer
-	 *                An {@link Observer} to add to set of known
-	 *                {@link Observer}
-	 */
-	public void addObserver(Observer observer) {
-		this.observers.add(observer);
-	}
+	private final Flame.Builder	builder;
 
 	/**
 	 * {@link Set} of the {@link Observer} of the {@link Builder}
 	 */
 	private final Set<Observer>	observers;
-
-	/**
-	 * The {@link Builder} used in internal to behave like the
-	 * {@link Builder}
-	 */
-	private Flame.Builder		builder;
 
 	/**
 	 * Construct a {@link ObservableFlameBuilder} with the given
@@ -73,21 +51,14 @@ public class ObservableFlameBuilder {
 	}
 
 	/**
-	 * Execute changedObservedValue() for every {@link Observer} we have
-	 */
-	private void warnObservers() {
-		for (Observer observer : this.observers) {
-			observer.changedBuilder();
-		}
-	}
-
-	/**
-	 * Return the size of the list
+	 * Add a new {@link Observer}
 	 * 
-	 * @return The size of the list
+	 * @param observer
+	 *                An {@link Observer} to add to set of known
+	 *                {@link Observer}
 	 */
-	public int transformationCount() {
-		return this.builder.transformationCount();
+	public void addObserver(Observer observer) {
+		this.observers.add(observer);
 	}
 
 	/**
@@ -99,21 +70,6 @@ public class ObservableFlameBuilder {
 	 */
 	public void addTransformation(FlameTransformation transformation) {
 		this.builder.addTransformation(transformation);
-	}
-
-	/**
-	 * Remove the {@link FlameTransformation} at the given index
-	 * 
-	 * @param index
-	 *                The index in the list to remove
-	 * 
-	 * @throws IndexOutOfBoundsException
-	 *                 If the index is less than zero of greater than the
-	 *                 max index of the list
-	 */
-	public void removeTransformation(int index) {
-		this.builder.removeTransformation(index);
-		this.warnObservers();
 	}
 
 	/**
@@ -132,6 +88,41 @@ public class ObservableFlameBuilder {
 	 */
 	public AffineTransformation affineTransformation(int index) {
 		return this.builder.affineTransformation(index);
+	}
+
+	/**
+	 * Return a {@link Flame} with the actual state of the Builder
+	 * 
+	 * @return A {@link Flame} with the actual state of the Builder
+	 */
+	public Flame build() {
+		return this.builder.build();
+	}
+
+	/**
+	 * Remove the given {@link Observer}
+	 * 
+	 * @param observer
+	 *                An {@link Observer} to remove from the set of known
+	 *                {@link Observer}
+	 */
+	public void removeObserver(Observer observer) {
+		this.observers.remove(observer);
+	}
+
+	/**
+	 * Remove the {@link FlameTransformation} at the given index
+	 * 
+	 * @param index
+	 *                The index in the list to remove
+	 * 
+	 * @throws IndexOutOfBoundsException
+	 *                 If the index is less than zero of greater than the
+	 *                 max index of the list
+	 */
+	public void removeTransformation(int index) {
+		this.builder.removeTransformation(index);
+		this.warnObservers();
 	}
 
 	/**
@@ -175,11 +166,20 @@ public class ObservableFlameBuilder {
 	}
 
 	/**
-	 * Return a {@link Flame} with the actual state of the Builder
+	 * Return the size of the list
 	 * 
-	 * @return A {@link Flame} with the actual state of the Builder
+	 * @return The size of the list
 	 */
-	public Flame build() {
-		return this.builder.build();
+	public int transformationCount() {
+		return this.builder.transformationCount();
+	}
+
+	/**
+	 * Execute changedObservedValue() for every {@link Observer} we have
+	 */
+	private void warnObservers() {
+		for (final Observer observer : this.observers) {
+			observer.changedBuilder();
+		}
 	}
 }

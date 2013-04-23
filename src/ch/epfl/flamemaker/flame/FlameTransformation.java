@@ -5,8 +5,8 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Transformation;
 
 /**
- * A Transformation with an array of variation weight and an AffineTransformation
- * used to transform point
+ * A Transformation with an array of variation weight and an
+ * AffineTransformation used to transform point
  */
 public class FlameTransformation implements Transformation {
 	/**
@@ -46,18 +46,6 @@ public class FlameTransformation implements Transformation {
 		 * Construct a new FlameTransformation.Builder with the given
 		 * FlameTransformation
 		 * 
-		 * @param flameTransformation
-		 *                The FlameTransformation to build upon
-		 */
-		public Builder(FlameTransformation flameTransformation) {
-			this.affineTransformation = flameTransformation.affineTransformation;
-			this.variationWeight = flameTransformation.variationWeight;
-		}
-
-		/**
-		 * Construct a new FlameTransformation.Builder with the given
-		 * FlameTransformation
-		 * 
 		 * @param affineTransformation
 		 *                The AffineTransformation to use
 		 * @param variationWeight
@@ -75,22 +63,35 @@ public class FlameTransformation implements Transformation {
 		}
 
 		/**
+		 * Construct a new FlameTransformation.Builder with the given
+		 * FlameTransformation
+		 * 
+		 * @param flameTransformation
+		 *                The FlameTransformation to build upon
+		 */
+		public Builder(FlameTransformation flameTransformation) {
+			this.affineTransformation = flameTransformation.affineTransformation;
+			this.variationWeight = flameTransformation.variationWeight;
+		}
+
+		/**
+		 * Return a FlameTransformation with the current state of the
+		 * Builder
+		 * 
+		 * @return A FlameTransformation with the current state of the
+		 *         Builder
+		 */
+		public FlameTransformation build() {
+			return new FlameTransformation(this.affineTransformation, this.variationWeight);
+		}
+
+		/**
 		 * Return the current AffineTransformation
 		 * 
 		 * @return The current AffineTransformation
 		 */
 		public AffineTransformation getAffineTransformation() {
 			return this.affineTransformation;
-		}
-
-		/**
-		 * Set the AffineTransformation
-		 * 
-		 * @param affineTransformation
-		 *                The new AffineTransformation
-		 */
-		public void setAffineTransformation(AffineTransformation affineTransformation) {
-			this.affineTransformation = affineTransformation;
 		}
 
 		/**
@@ -108,6 +109,16 @@ public class FlameTransformation implements Transformation {
 		public double getVariationWeightValue(int index) {
 			Builder.checkIndex(index);
 			return this.variationWeight[index];
+		}
+
+		/**
+		 * Set the AffineTransformation
+		 * 
+		 * @param affineTransformation
+		 *                The new AffineTransformation
+		 */
+		public void setAffineTransformation(AffineTransformation affineTransformation) {
+			this.affineTransformation = affineTransformation;
 		}
 
 		/**
@@ -136,17 +147,6 @@ public class FlameTransformation implements Transformation {
 
 			this.variationWeight[index] = value;
 		}
-
-		/**
-		 * Return a FlameTransformation with the current state of the
-		 * Builder
-		 * 
-		 * @return A FlameTransformation with the current state of the
-		 *         Builder
-		 */
-		public FlameTransformation build() {
-			return new FlameTransformation(this.affineTransformation, this.variationWeight);
-		}
 	}
 
 	/**
@@ -158,6 +158,30 @@ public class FlameTransformation implements Transformation {
 	 * The array of weight for every variations
 	 */
 	private final double[]			variationWeight;
+
+	/**
+	 * Check the given array of variation
+	 * 
+	 * @param variationWeight
+	 *                The weight for every variations
+	 * 
+	 * @throws IllegalArgumentException
+	 *                 if the given variationWeight.lenght != 6 if any value
+	 *                 in variationWeight is not between 0 and 1 (both
+	 *                 included)
+	 * 
+	 */
+	private static void checkValue(double[] variationWeight) {
+		for (final double d : variationWeight) {
+			if (d < 0 || d > 1) {
+				throw new IllegalArgumentException();
+			}
+		}
+
+		if (variationWeight == null || variationWeight.length != 6) {
+			throw new IllegalArgumentException();
+		}
+	}
 
 	/**
 	 * Construct a new FlameTransformation with the given affine
@@ -180,30 +204,6 @@ public class FlameTransformation implements Transformation {
 		FlameTransformation.checkValue(variationWeight);
 
 		this.variationWeight = variationWeight.clone();
-	}
-
-	/**
-	 * Check the given array of variation
-	 * 
-	 * @param variationWeight
-	 *                The weight for every variations
-	 * 
-	 * @throws IllegalArgumentException
-	 *                 if the given variationWeight.lenght != 6 if any value
-	 *                 in variationWeight is not between 0 and 1 (both
-	 *                 included)
-	 * 
-	 */
-	private static void checkValue(double[] variationWeight) {
-		for (final double d : variationWeight) {
-			if (d < 0 || d > 1) {
-				throw new IllegalArgumentException();
-			}
-		}
-	
-		if (variationWeight == null || variationWeight.length != 6) {
-			throw new IllegalArgumentException();
-		}
 	}
 
 	@Override

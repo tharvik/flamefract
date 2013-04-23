@@ -97,7 +97,7 @@ public class FlamePGMMaker {
 		final Flame.Builder builder = new Flame.Builder(new Flame(new ArrayList<FlameTransformation>()));
 		final double[] array = { 1, 0, 0, 0, 0, 0 };
 		final Rectangle center = new Rectangle(new Point(0, 4.5), 6, 10);
-		
+
 		AffineTransformation affine = new AffineTransformation(0, 0, 0, 0, 0.16, 0);
 		builder.addTransformation(new FlameTransformation(affine, array));
 
@@ -106,10 +106,10 @@ public class FlamePGMMaker {
 
 		affine = new AffineTransformation(-0.15, 0.28, 0, 0.26, 0.24, 0.44);
 		builder.addTransformation(new FlameTransformation(affine, array));
-		
+
 		affine = new AffineTransformation(0.85, 0.04, 0, -0.04, 0.85, 1.6);
 		builder.addTransformation(new FlameTransformation(affine, array));
-		
+
 		return builder.build().compute(center, 120, 200, 150);
 	}
 

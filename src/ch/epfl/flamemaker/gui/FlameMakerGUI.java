@@ -19,7 +19,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.ParallelGroup;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -28,7 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -94,6 +92,11 @@ public class FlameMakerGUI {
 		public AffineTransformationsComponent(ObservableFlameBuilder builder, Rectangle frame) {
 			this.builder = builder;
 			this.frame = frame;
+		}
+
+		@Override
+		public void changedBuilder() {
+			this.repaint();
 		}
 
 		@Override
@@ -282,11 +285,6 @@ public class FlameMakerGUI {
 				}
 			}
 		}
-
-		@Override
-		public void changedBuilder() {
-			this.repaint();
-		}
 	}
 
 	/**
@@ -296,15 +294,11 @@ public class FlameMakerGUI {
 	class FlameBuilderPreviewComponent extends JComponent implements
 			ch.epfl.flamemaker.gui.ObservableFlameBuilder.Observer {
 
-		@Override
-		public void changedBuilder() {
-			this.repaint();
-		}
-
 		/**
 		 * The {@link Color} of the background we use to build the image
 		 */
 		private final Color			background;
+
 		/**
 		 * The {@link Builder} we are currently working on
 		 */
@@ -347,6 +341,11 @@ public class FlameMakerGUI {
 			this.palette = palette;
 			this.frame = frame;
 			this.density = density;
+		}
+
+		@Override
+		public void changedBuilder() {
+			this.repaint();
 		}
 
 		@Override
@@ -509,6 +508,100 @@ public class FlameMakerGUI {
 	}
 
 	/**
+	 * Return the {@link JPanel} with the setter for the currently selected
+	 * {@link Transformation}
+	 * 
+	 * @return The {@link JPanel} with the setter for the currently selected
+	 *         {@link Transformation}
+	 */
+	static private JPanel getAffineEdition() {
+
+		final JPanel panel = new JPanel();
+		final GroupLayout layout = new GroupLayout(panel);
+
+		final JComponent[][] components = new JComponent[4][6];
+		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" },
+				{ "Rotation", "⟲", "⟲", null, null }, { "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" },
+				{ "Transvection", "←", "→", "↑", "↓" } };
+
+		// TODO grab it from the transformation
+		final double[] values = { 0.1, 15, 1.05, 0.1 };
+
+		// Groups
+		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
+		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
+
+		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
+		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[4];
+
+		for (int i = 0; i < Hs.length; i++) {
+			Hs[i] = layout.createParallelGroup();
+			H.addGroup(Hs[i]);
+		}
+
+		for (int i = 0; i < Vs.length; i++) {
+			Vs[i] = layout.createParallelGroup();
+			V.addGroup(Vs[i]);
+		}
+
+		// Add every components to the array
+		for (int i = 0; i < components.length; i++) {
+
+			final JFormattedTextField field = new JFormattedTextField();
+			field.setHorizontalAlignment(SwingConstants.RIGHT);
+			field.setValue(values[i]);
+
+			// TODO alignment to right?
+			final JLabel label = new JLabel(labels[i][0]);
+
+			components[i][0] = label;
+			components[i][1] = field;
+
+			for (int j = 1; j < components[0].length - 1; j++) {
+				if (labels[i][j] == null) {
+					break;
+				}
+
+				components[i][j + 1] = new JButton(labels[i][j]);
+			}
+		}
+
+		for (int i = 0; i < components.length; i++) {
+
+			for (int j = 0; j < components[0].length; j++) {
+				if (components[i][j] == null) {
+					break;
+				}
+				Vs[i].addComponent(components[i][j]);
+				Hs[j].addComponent(components[i][j]);
+			}
+		}
+
+		layout.setVerticalGroup(V);
+		layout.setHorizontalGroup(H);
+
+		panel.setLayout(layout);
+		panel.setBorder(BorderFactory.createTitledBorder("Transformation courante"));
+
+		return panel;
+	}
+
+	/**
+	 * Return the {@link JPanel} containg the button to setup the fractal
+	 * 
+	 * @return The {@link JPanel} containg the button to setup the fractal
+	 */
+	static private JPanel getEdition() {
+
+		final JPanel panel = new JPanel();
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.add(FlameMakerGUI.getAffineEdition());
+
+		return panel;
+	}
+
+	/**
 	 * Construct a {@link FlameMakerGUI} with the default value
 	 */
 	public FlameMakerGUI() {
@@ -595,6 +688,25 @@ public class FlameMakerGUI {
 	}
 
 	/**
+	 * Return the {@link JPanel} with all the settings
+	 * 
+	 * @return The {@link JPanel} with all the settings
+	 */
+	private JPanel getAffineChoice() {
+
+		final TransformationsListModel model = new TransformationsListModel("Transformation n° ");
+		final JList<String> list = this.getList(model);
+
+		final JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		panel.setBorder(BorderFactory.createTitledBorder("Transformations"));
+		panel.add(new JScrollPane(list), BorderLayout.CENTER);
+		panel.add(this.getButtons(list), BorderLayout.PAGE_END);
+
+		return panel;
+	}
+
+	/**
 	 * Return the {@link JPanel} with the {@link JButton} to remove or add a
 	 * fractal
 	 * 
@@ -656,7 +768,7 @@ public class FlameMakerGUI {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 		panel.add(this.getAffineChoice());
-		panel.add(this.getEdition());
+		panel.add(FlameMakerGUI.getEdition());
 
 		return panel;
 	}
@@ -722,106 +834,6 @@ public class FlameMakerGUI {
 		panel.add(fractal, BorderLayout.CENTER);
 		panel.setBorder(BorderFactory.createTitledBorder("Fractale"));
 		this.builder.addObserver(fractal);
-
-		return panel;
-	}
-
-	/**
-	 * Return the {@link JPanel} with all the settings
-	 * 
-	 * @return The {@link JPanel} with all the settings
-	 */
-	private JPanel getAffineChoice() {
-
-		final TransformationsListModel model = new TransformationsListModel("Transformation n° ");
-		final JList<String> list = this.getList(model);
-
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(new JScrollPane(list), BorderLayout.CENTER);
-		panel.add(this.getButtons(list), BorderLayout.PAGE_END);
-
-		return panel;
-	}
-
-	private JPanel getAffineEdition() {
-
-		JPanel panel = new JPanel();
-		final GroupLayout layout = new GroupLayout(panel);
-
-		final JComponent[][] components = new JComponent[4][6];
-		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" },
-				{ "Rotation", "⟲", "⟲", null, null }, { "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" },
-				{ "Transvection", "←", "→", "↑", "↓" } };
-
-		// TODO grab it from the transformation
-		final double[] values = { 0.1, 15, 1.05, 0.1 };
-
-		// Groups
-		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
-		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
-
-		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
-		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[4];
-
-		for (int i = 0; i < Hs.length; i++) {
-			Hs[i] = layout.createParallelGroup();
-			H.addGroup(Hs[i]);
-		}
-
-		for (int i = 0; i < Vs.length; i++) {
-			Vs[i] = layout.createParallelGroup();
-			V.addGroup(Vs[i]);
-		}
-
-		// Add every components to the array
-		for (int i = 0; i < components.length; i++) {
-
-			final JFormattedTextField field = new JFormattedTextField();
-			field.setHorizontalAlignment(SwingConstants.RIGHT);
-			field.setValue(values[i]);
-
-			components[i][0] = new JLabel(labels[i][0]);
-			components[i][1] = field;
-
-			for (int j = 2; j < components.length; j++) {
-				if (labels[i][j] == null) {
-					break;
-				}
-				components[i][j] = new JButton(labels[i][j]);
-			}
-		}
-
-		for (int i = 0; i < components.length; i++) {
-
-			for (int j = 0; j < components[0].length; j++) {
-				if (components[i][j] == null) {
-					break;
-				}
-				Vs[i].addComponent(components[i][j]);
-				Hs[j].addComponent(components[i][j]);
-			}
-		}
-		
-		layout.setVerticalGroup(V);
-		layout.setHorizontalGroup(H);
-
-		panel.setLayout(layout);
-
-		return panel;
-	}
-
-	/**
-	 * Return the {@link JPanel} containg the button to setup the fractal
-	 * 
-	 * @return The {@link JPanel} containg the button to setup the fractal
-	 */
-	private JPanel getEdition() {
-
-		JPanel panel = new JPanel();
-
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.add(this.getAffineEdition());
 
 		return panel;
 	}

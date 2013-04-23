@@ -27,17 +27,18 @@ public final class Color {
 	public static final Color	WHITE	= new Color(1, 1, 1);
 
 	/**
-	 * The red value of the color
+	 * The blue value of the color
 	 */
-	private final double		r;
+	private final double		b;
 	/**
 	 * The green value of the color
 	 */
 	private final double		g;
 	/**
-	 * The blue value of the color
+	 * The red value of the color
 	 */
-	private final double		b;
+	private final double		r;
+
 	/**
 	 * @param v
 	 *                Value to encode in sRGB
@@ -95,12 +96,12 @@ public final class Color {
 	}
 
 	/**
-	 * Return the red value
+	 * Return the blue value
 	 * 
-	 * @return The red value
+	 * @return The blue value
 	 */
-	public double red() {
-		return this.r;
+	public double blue() {
+		return this.b;
 	}
 
 	/**
@@ -110,15 +111,6 @@ public final class Color {
 	 */
 	public double green() {
 		return this.g;
-	}
-
-	/**
-	 * Return the blue value
-	 * 
-	 * @return The blue value
-	 */
-	public double blue() {
-		return this.b;
 	}
 
 	/**
@@ -149,6 +141,15 @@ public final class Color {
 		return new Color((1 - proportion) * this.red() + proportion * that.red(), (1 - proportion)
 				* this.green() + proportion * that.green(), (1 - proportion) * this.blue() + proportion
 				* that.blue());
+	}
+
+	/**
+	 * Return the red value
+	 * 
+	 * @return The red value
+	 */
+	public double red() {
+		return this.r;
 	}
 
 	// "(0,0,0)"

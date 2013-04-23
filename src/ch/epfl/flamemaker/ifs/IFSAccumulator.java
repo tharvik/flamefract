@@ -36,15 +36,6 @@ public final class IFSAccumulator {
 	}
 
 	/**
-	 * Returns the width of the accumulator
-	 * 
-	 * @return The width of the accumulator
-	 */
-	public int width() {
-		return this.isHit.length;
-	}
-
-	/**
 	 * Return true if the point at the given coordinates is hit
 	 * 
 	 * @param x
@@ -64,5 +55,14 @@ public final class IFSAccumulator {
 		}
 
 		return (this.isHit[x][y]);
+	}
+
+	/**
+	 * Returns the width of the accumulator
+	 * 
+	 * @return The width of the accumulator
+	 */
+	public int width() {
+		return this.isHit.length;
 	}
 }

@@ -105,14 +105,14 @@ public class FlameAccumulator {
 	private final double[][]	colorIndexSum;
 
 	/**
-	 * Array containing the hit count of every pixel from the fractal
-	 */
-	private final int[][]		hitCount;
-
-	/**
 	 * Used to increase speed of intensity() method
 	 */
 	private final double		denominator;
+
+	/**
+	 * Array containing the hit count of every pixel from the fractal
+	 */
+	private final int[][]		hitCount;
 
 	/**
 	 * Construct a FlameAccumulator with the given array of hit count and
