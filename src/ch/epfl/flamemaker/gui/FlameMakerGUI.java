@@ -25,8 +25,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -126,10 +124,6 @@ public class FlameMakerGUI {
 		 *                 than zero or bigger than the max index
 		 */
 		public void setHighlightedTransformationIndex(int highlightedTransformationIndex) {
-			if (highlightedTransformationIndex < 0
-					|| highlightedTransformationIndex >= this.builder.transformationCount()) {
-				throw new NoSuchElementException();
-			}
 			this.highlightedTransformationIndex = highlightedTransformationIndex;
 			this.repaint();
 		}
@@ -137,26 +131,27 @@ public class FlameMakerGUI {
 		@Override
 		protected void paintComponent(Graphics g0) {
 			final Graphics2D g = (Graphics2D) g0;
-			final Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth()
+			final Rectangle actualFrame = this.frame.expandToAspectRatio((double) this.getWidth()
 					/ (double) this.getHeight());
 
-			// TODO wrong! doesn't gave the right values (but more
-			// or less right)
+			// FIXME wrong! doesn't gave the right values (but more
+			// or less right) or is it coming from the frame?
 			// this.transformation =
-			// AffineTransformation.newTranslation(
-			// this.frame.center().x() + this.getWidth() / 2.0,
-			// this.frame.center().y() + this.getHeight() / 2.0);
-			// this.transformation =
-			// this.transformation.composeWith(AffineTransformation.newScaling(
-			// this.getWidth() / this.frame.width(),
-			// -this.getHeight() / this.frame.height()));
-			this.transformation = AffineTransformation.newTranslation(
-					actualFrame.center().x() + this.getWidth() / 2.0, actualFrame.center().y()
-							+ this.getHeight() / 2.0);
-			this.transformation = this.transformation
-					.composeWith(AffineTransformation.newScaling(
-							this.getWidth() / actualFrame.width(), -this.getHeight()
-									/ actualFrame.height()));
+			// AffineTransformation.newTranslation(-actualFrame.left(),
+			// -actualFrame.top());
+			// this.transformation = this.transformation
+			// .composeWith(AffineTransformation.newScaling(
+			// this.getWidth() / actualFrame.width(),
+			// -this.getHeight()
+			// / actualFrame.height()));
+
+			this.transformation = AffineTransformation.newTranslation(-actualFrame.left(),
+					-actualFrame.top());
+
+			this.transformation = AffineTransformation.newScaling(this.getWidth() / actualFrame.width(),
+					-this.getHeight() / actualFrame.height());
+			this.transformation = this.transformation.composeWith(AffineTransformation.newTranslation(
+					-actualFrame.left(), -actualFrame.top()));
 
 			// setup the grid first
 			this.paintGrid(g);
@@ -343,10 +338,10 @@ public class FlameMakerGUI {
 
 		@Override
 		protected void paintComponent(Graphics g0) {
-			// TODO seem to be wrong (stretched)
 			final BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(),
 					BufferedImage.TYPE_INT_RGB);
 
+			// FIXME seem to be wrong (stretched)
 			final Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth()
 					/ (double) this.getHeight());
 			final FlameAccumulator accu = this.builder.build().compute(actualFrame, this.getWidth(),
@@ -550,8 +545,8 @@ public class FlameMakerGUI {
 	 *                 index
 	 */
 	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
-		if (selectedTransformationIndex < 0
-				|| selectedTransformationIndex >= this.builder.transformationCount()) {
+		if (selectedTransformationIndex < -1
+				|| selectedTransformationIndex > this.builder.transformationCount()) {
 			throw new NoSuchElementException();
 		}
 		this.selectedTransformationIndex = selectedTransformationIndex;
@@ -569,8 +564,7 @@ public class FlameMakerGUI {
 		// the window
 		final JFrame frame = new JFrame("Flame Maker");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.setVisible(true);
+		frame.setLayout(new BorderLayout());
 
 		// fractal
 		final JPanel panelFract = new JPanel();
@@ -595,10 +589,9 @@ public class FlameMakerGUI {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setVisibleRowCount(3);
 		list.setSelectedIndex(this.selectedTransformationIndex);
-
-		// TODO arf, this seem so wrong, so ugly to write, why Java?
 		list.addListSelectionListener(new ListSelectionListener() {
 
+			@SuppressWarnings("unused")
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				FlameMakerGUI.this.setSelectedTransformationIndex(list.getSelectedIndex());
@@ -614,12 +607,13 @@ public class FlameMakerGUI {
 
 		remove.addActionListener(new ActionListener() {
 
+			@SuppressWarnings("unused")
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
 				listModel.removeTransformation(index);
 				list.setSelectedIndex(index == listModel.getSize() ? index - 1 : index);
-				
+
 				if (listModel.getSize() == 1) {
 					remove.setEnabled(false);
 				}
@@ -628,6 +622,7 @@ public class FlameMakerGUI {
 
 		add.addActionListener(new ActionListener() {
 
+			@SuppressWarnings("unused")
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				listModel.addTransformation();
@@ -662,6 +657,10 @@ public class FlameMakerGUI {
 
 		frame.getContentPane().add(upPanel, BorderLayout.CENTER);
 		frame.getContentPane().add(downPanel, BorderLayout.PAGE_END);
+		// frame.getContentPane().add(transformations,
+		// BorderLayout.CENTER);
+
 		frame.pack();
+		frame.setVisible(true);
 	}
 }
