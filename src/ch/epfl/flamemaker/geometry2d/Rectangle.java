@@ -104,9 +104,9 @@ public final class Rectangle {
 		}
 
 		if (aspectRatio < this.aspectRatio()) {
-			return new Rectangle(this.center, this.width(), this.height / aspectRatio);
+			return new Rectangle(this.center, this.width(), this.width / aspectRatio);
 		} else if (aspectRatio > this.aspectRatio()) {
-			return new Rectangle(this.center, this.width() * aspectRatio, this.height);
+			return new Rectangle(this.center, this.height() * aspectRatio, this.height);
 		} else {
 			return new Rectangle(this.center, this.width(), this.height);
 		}

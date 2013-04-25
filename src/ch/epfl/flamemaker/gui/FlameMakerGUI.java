@@ -112,7 +112,7 @@ public class FlameMakerGUI {
 		 * @return The index of the highlighted
 		 *         {@link AffineTransformation}
 		 */
-		public int getHighlightedTransformationIndex() {
+		public int highlightedTransformationIndex() {
 			return this.highlightedTransformationIndex;
 		}
 
@@ -143,21 +143,6 @@ public class FlameMakerGUI {
 			final Graphics2D g = (Graphics2D) g0;
 			final Rectangle actualFrame = this.frame.expandToAspectRatio((double) this.getWidth()
 					/ (double) this.getHeight());
-
-			// FIXME wrong! doesn't gave the right values (but more
-			// or less right) or is it coming from the frame?
-			// this.transformation =
-			// AffineTransformation.newTranslation(-actualFrame.left(),
-			// -actualFrame.top());
-			// this.transformation = this.transformation
-			// .composeWith(AffineTransformation.newScaling(
-			// this.getWidth() / actualFrame.width(),
-			// -this.getHeight()
-			// / actualFrame.height()));
-
-			this.transformation = AffineTransformation.newTranslation(-actualFrame.left(),
-					-actualFrame.top());
-
 			this.transformation = AffineTransformation.newScaling(this.getWidth() / actualFrame.width(),
 					-this.getHeight() / actualFrame.height());
 			this.transformation = this.transformation.composeWith(AffineTransformation.newTranslation(
@@ -169,8 +154,8 @@ public class FlameMakerGUI {
 
 			for (int i = 0; i < this.builder.transformationCount(); i++) {
 
-				// we skip the highlighted, because we want to
-				// be draw at the end
+				// we skip the highlighted, because we want it
+				// to be drawn at the end
 				if (i == this.highlightedTransformationIndex) {
 					continue;
 				}
@@ -245,9 +230,12 @@ public class FlameMakerGUI {
 		 */
 		private void paintGrid(Graphics2D g) {
 
+			final Rectangle actualFrame = this.frame.expandToAspectRatio((double) this.getWidth()
+					/ (double) this.getHeight());
+
 			for (int i = 0; i < 2; i++) {
 
-				for (int j = (int) this.frame.left(); j < this.frame.right(); j++) {
+				for (int j = (int) actualFrame.left(); j < actualFrame.right(); j++) {
 
 					// Only the center line is white
 					if (j == 0) {
@@ -256,16 +244,16 @@ public class FlameMakerGUI {
 						g.setColor(new java.awt.Color(new Color(0.9, 0.9, 0.9).asPackedRGB()));
 					}
 
-					final Point up = this.transformation.transformPoint(new Point(j, this.frame
+					final Point up = this.transformation.transformPoint(new Point(j, actualFrame
 							.top()));
-					final Point down = this.transformation.transformPoint(new Point(j, this.frame
+					final Point down = this.transformation.transformPoint(new Point(j, actualFrame
 							.bottom()));
 
 					final Line2D.Double line = new Line2D.Double(down.x(), down.y(), up.x(), up.y());
 					g.draw(line);
 				}
 
-				for (int y = (int) this.frame.bottom(); y < this.frame.top(); y++) {
+				for (int y = (int) actualFrame.bottom(); y < actualFrame.top(); y++) {
 
 					// Only the y=0 line is white
 					if (y == 0) {
@@ -274,9 +262,9 @@ public class FlameMakerGUI {
 						g.setColor(new java.awt.Color(new Color(0.9, 0.9, 0.9).asPackedRGB()));
 					}
 
-					final Point left = this.transformation.transformPoint(new Point(this.frame
+					final Point left = this.transformation.transformPoint(new Point(actualFrame
 							.left(), y));
-					final Point right = this.transformation.transformPoint(new Point(this.frame
+					final Point right = this.transformation.transformPoint(new Point(actualFrame
 							.right(), y));
 
 					final Line2D.Double line = new Line2D.Double(left.x(), left.y(), right.x(),
@@ -358,7 +346,6 @@ public class FlameMakerGUI {
 			final BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(),
 					BufferedImage.TYPE_INT_RGB);
 
-			// FIXME seem to be wrong (stretched)
 			final Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth()
 					/ (double) this.getHeight());
 			final FlameAccumulator accu = this.builder.build().compute(actualFrame, this.getWidth(),
@@ -685,6 +672,8 @@ public class FlameMakerGUI {
 
 		frame.pack();
 		frame.setVisible(true);
+
+		frame.setSize(new Dimension(600, 300));
 	}
 
 	/**
@@ -850,7 +839,7 @@ public class FlameMakerGUI {
 	private JPanel getUpPanel() {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(1, 2));
-		panel.add(this.getPanelAffine());
+		panel.add(getPanelAffine());
 		panel.add(this.getPanelFractal());
 
 		return panel;
