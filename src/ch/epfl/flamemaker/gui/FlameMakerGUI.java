@@ -506,7 +506,7 @@ public class FlameMakerGUI {
 	 * @return The {@link JPanel} with the setter for the currently selected
 	 *         {@link Transformation}
 	 */
-	static private JPanel getAffineEdition() {
+	private JPanel getAffineEdition() {
 
 		final JPanel panel = new JPanel();
 		final GroupLayout layout = new GroupLayout(panel);
@@ -514,8 +514,6 @@ public class FlameMakerGUI {
 		final JComponent[][] components = new JComponent[4][6];
 		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" }, { "Rotation", "⟲", "⟲" },
 				{ "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" }, { "Transvection", "←", "→", "↑", "↓" } };
-
-		// TODO grab it from the transformation
 		final double[] values = { 0.1, 15, 1.05, 0.1 };
 
 		// Groups
@@ -574,7 +572,29 @@ public class FlameMakerGUI {
 			components[i][1] = field;
 
 			for (int j = 1; j < labels[i].length; j++) {
-				components[i][j + 1] = new JButton(labels[i][j]);
+
+				final int a = i, b = j;
+
+				final JButton button = new JButton();
+				button.setText(labels[i][j]);
+				button.addActionListener(new ActionListener() {
+
+					@SuppressWarnings("unused")
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						final double value = (Double) field.getValue();
+						final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
+
+						AffineTransformation trans = FlameMakerGUI.this.builder
+								.affineTransformation(index);
+						trans = FlameMakerGUI.getAffineTransformation(a, b - 1, value)
+								.composeWith(trans);
+
+						FlameMakerGUI.this.builder.setAffineTransformation(index, trans);
+					}
+				});
+
+				components[i][j + 1] = button;
 			}
 		}
 
@@ -596,16 +616,69 @@ public class FlameMakerGUI {
 	}
 
 	/**
+	 * Return an {@link AffineTransformation} at the given position and with
+	 * the given value
+	 * 
+	 * @param i
+	 *                The vertical position in the array
+	 * @param j
+	 *                The horizontal position in the array
+	 * @param value
+	 *                The value to use in the {@link AffineTransformation}
+	 * 
+	 * @return An {@link AffineTransformation} at the given position and
+	 *         with the given value
+	 */
+	static private AffineTransformation getAffineTransformation(int i, int j, double value) {
+		switch ((i << 2) + j) {
+		case (0 << 2) + 0:
+			return AffineTransformation.newTranslation(-value, 0);
+		case (0 << 2) + 1:
+			return AffineTransformation.newTranslation(value, 0);
+		case (0 << 2) + 2:
+			return AffineTransformation.newTranslation(0, value);
+		case (0 << 2) + 3:
+			return AffineTransformation.newTranslation(0, -value);
+
+		case (1 << 2) + 0:
+			return AffineTransformation.newRotation(value / 180);
+		case (1 << 2) + 1:
+			return AffineTransformation.newRotation(-value / 180);
+
+		case (2 << 2) + 0:
+			return AffineTransformation.newScaling(value, 1);
+		case (2 << 2) + 1:
+			return AffineTransformation.newScaling(1 / value, 1);
+		case (2 << 2) + 2:
+			return AffineTransformation.newScaling(1, value);
+		case (2 << 2) + 3:
+			return AffineTransformation.newScaling(1, 1 / value);
+
+		case (3 << 2) + 0:
+			return AffineTransformation.newShearX(-value);
+		case (3 << 2) + 1:
+			return AffineTransformation.newShearX(value);
+		case (3 << 2) + 2:
+			return AffineTransformation.newShearY(-value);
+		case (3 << 2) + 3:
+			return AffineTransformation.newShearY(value);
+
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
+
+	/**
 	 * Return the {@link JPanel} containg the button to setup the fractal
 	 * 
 	 * @return The {@link JPanel} containg the button to setup the fractal
 	 */
-	static private JPanel getEdition() {
+	private JPanel getEdition() {
 
 		final JPanel panel = new JPanel();
 
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-		panel.add(FlameMakerGUI.getAffineEdition());
+		panel.add(this.getAffineEdition());
 
 		return panel;
 	}
@@ -779,7 +852,7 @@ public class FlameMakerGUI {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 		panel.add(this.getAffineChoice());
-		panel.add(FlameMakerGUI.getEdition());
+		panel.add(this.getEdition());
 
 		return panel;
 	}
