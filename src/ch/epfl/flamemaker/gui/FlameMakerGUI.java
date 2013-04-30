@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,9 +21,12 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -507,9 +512,8 @@ public class FlameMakerGUI {
 		final GroupLayout layout = new GroupLayout(panel);
 
 		final JComponent[][] components = new JComponent[4][6];
-		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" },
-				{ "Rotation", "⟲", "⟲", null, null }, { "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" },
-				{ "Transvection", "←", "→", "↑", "↓" } };
+		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" }, { "Rotation", "⟲", "⟲" },
+				{ "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" }, { "Transvection", "←", "→", "↑", "↓" } };
 
 		// TODO grab it from the transformation
 		final double[] values = { 0.1, 15, 1.05, 0.1 };
@@ -534,33 +538,51 @@ public class FlameMakerGUI {
 		// Add every components to the array
 		for (int i = 0; i < components.length; i++) {
 
-			final JFormattedTextField field = new JFormattedTextField();
+			final JFormattedTextField field = new JFormattedTextField(new DecimalFormat("#0.##"));
 			field.setHorizontalAlignment(SwingConstants.RIGHT);
 			field.setValue(values[i]);
+			field.setInputVerifier(new InputVerifier() {
 
-			// TODO alignment to right?
+				@SuppressWarnings("unused")
+				@Override
+				public boolean verify(JComponent input) {
+
+					AbstractFormatter formatter = field.getFormatter();
+
+					try {
+						// get the current value
+						Number value = (Number) formatter.stringToValue(field.getText());
+
+						if (value.doubleValue() == 0) {
+							throw new ParseException("Haha, bubble the exception!", 0);
+						}
+
+						field.setValue(value);
+
+					} catch (ParseException e) {
+						// restore old value
+						field.setValue(field.getValue());
+					}
+
+					return true;
+				}
+			});
+
 			final JLabel label = new JLabel(labels[i][0]);
 
 			components[i][0] = label;
 			components[i][1] = field;
 
-			for (int j = 1; j < components[0].length - 1; j++) {
-				if (labels[i][j] == null) {
-					break;
-				}
-
+			for (int j = 1; j < labels[i].length; j++) {
 				components[i][j + 1] = new JButton(labels[i][j]);
 			}
 		}
 
 		for (int i = 0; i < components.length; i++) {
 
-			for (int j = 0; j < components[0].length; j++) {
-				if (components[i][j] == null) {
-					break;
-				}
-				Vs[i].addComponent(components[i][j]);
-				Hs[j].addComponent(components[i][j]);
+			for (int j = 0; j < labels[i].length + 1; j++) {
+				Vs[i].addComponent(components[i][j], Alignment.CENTER);
+				Hs[j].addComponent(components[i][j], Alignment.TRAILING);
 			}
 		}
 
