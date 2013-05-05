@@ -512,7 +512,7 @@ public class FlameMakerGUI {
 		final GroupLayout layout = new GroupLayout(panel);
 
 		final JComponent[][] components = new JComponent[4][6];
-		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" }, { "Rotation", "⟲", "⟲" },
+		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" }, { "Rotation", "⟲", "⟳" },
 				{ "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" }, { "Transvection", "←", "→", "↑", "↓" } };
 		final double[] values = { 0.1, 15, 1.05, 0.1 };
 
@@ -582,7 +582,7 @@ public class FlameMakerGUI {
 					@SuppressWarnings("unused")
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						final double value = (Double) field.getValue();
+						final double value = ((Number) field.getValue()).doubleValue();
 						final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
 
 						AffineTransformation trans = FlameMakerGUI.this.builder
@@ -631,6 +631,7 @@ public class FlameMakerGUI {
 	 */
 	static private AffineTransformation getAffineTransformation(int i, int j, double value) {
 		switch ((i << 2) + j) {
+
 		case (0 << 2) + 0:
 			return AffineTransformation.newTranslation(-value, 0);
 		case (0 << 2) + 1:
