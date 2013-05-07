@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -740,10 +742,23 @@ public class FlameMakerGUI {
 
 				@Override
 				public void changedObservedValue() {
-					
+
 					final double value = FlameMakerGUI.this.builder.variationWeight(
 							FlameMakerGUI.this.getSelectedTransformationIndex(), variation);
 					field.setValue(value);
+				}
+			});
+
+			// TODO have to check input value?
+			field.addPropertyChangeListener("value", new PropertyChangeListener() {
+
+				@SuppressWarnings("unused")
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					final double value = ((Number) field.getValue()).doubleValue();
+					FlameMakerGUI.this.builder.setVariationWeight(
+							FlameMakerGUI.this.getSelectedTransformationIndex(), variation,
+							value);
 				}
 			});
 
@@ -825,7 +840,7 @@ public class FlameMakerGUI {
 	 *                 index
 	 */
 	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
-		
+
 		if (selectedTransformationIndex < -1
 				|| selectedTransformationIndex > this.builder.transformationCount()) {
 			throw new NoSuchElementException();

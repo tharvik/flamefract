@@ -181,7 +181,7 @@ public class ObservableFlameBuilder {
 	 *                 max index of the list
 	 */
 	public void setVariationWeight(int index, Variation variation, double newWeight) {
-		this.setVariationWeight(index, variation, newWeight);
+		this.builder.setVariationWeight(index, variation, newWeight);
 		this.warnObservers();
 	}
 

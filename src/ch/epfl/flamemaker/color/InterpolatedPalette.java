@@ -1,5 +1,6 @@
 package ch.epfl.flamemaker.color;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,7 +33,10 @@ public class InterpolatedPalette implements Palette {
 			throw new IllegalArgumentException();
 		}
 
-		this.colors = colors;
+		this.colors = new ArrayList<Color>();
+		for (Color color : colors) {
+			this.colors.add(color);
+		}
 	}
 
 	@Override
