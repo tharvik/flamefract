@@ -12,27 +12,22 @@ import ch.epfl.flamemaker.geometry2d.Transformation;
 public abstract class Variation implements Transformation {
 
 	/**
-	 * The actual index of the Variation, to compute the needed index by
-	 * {@link Variation}
-	 */
-	private static int			total		= 0;
-
-	/**
 	 * A list of all the variations
 	 */
-	public final static List<Variation>	ALL_VARIATIONS	= Arrays.asList(new Variation(total++, "Linear") {
+	public final static List<Variation>	ALL_VARIATIONS	= Arrays.asList(new Variation(Variation.total++,
+										"Linear") {
 									@Override
 									public Point transformPoint(Point p) {
 										return p;
 									}
-								}, new Variation(total++, "Sinusoidal") {
+								}, new Variation(Variation.total++, "Sinusoidal") {
 									@Override
 									public Point transformPoint(Point p) {
 										final double x = Math.sin(p.x());
 										final double y = Math.sin(p.y());
 										return new Point(x, y);
 									}
-								}, new Variation(total++, "Spherical") {
+								}, new Variation(Variation.total++, "Spherical") {
 									@Override
 									public Point transformPoint(Point p) {
 										final double x = p.x()
@@ -41,7 +36,7 @@ public abstract class Variation implements Transformation {
 												/ Math.pow(p.r(), 2);
 										return new Point(x, y);
 									}
-								}, new Variation(total++, "Swirl") {
+								}, new Variation(Variation.total++, "Swirl") {
 									@Override
 									public Point transformPoint(Point p) {
 										final double r = Math.pow(p.r(), 2);
@@ -51,7 +46,7 @@ public abstract class Variation implements Transformation {
 												+ p.y() * Math.sin(r);
 										return new Point(x, y);
 									}
-								}, new Variation(total++, "Horseshoe") {
+								}, new Variation(Variation.total++, "Horseshoe") {
 									@Override
 									public Point transformPoint(Point p) {
 										final double x = (p.x() - p.y())
@@ -61,7 +56,7 @@ public abstract class Variation implements Transformation {
 												/ p.r();
 										return new Point(x, y);
 									}
-								}, new Variation(total++, "Bubble") {
+								}, new Variation(Variation.total++, "Bubble") {
 									@Override
 									public Point transformPoint(Point p) {
 										final double r = Math.pow(p.r(), 2) + 4;
@@ -70,6 +65,12 @@ public abstract class Variation implements Transformation {
 										return new Point(x, y);
 									}
 								});
+
+	/**
+	 * The actual index of the Variation, to compute the needed index by
+	 * {@link Variation}
+	 */
+	private static int			total		= 0;
 	/**
 	 * The index of the variation
 	 */

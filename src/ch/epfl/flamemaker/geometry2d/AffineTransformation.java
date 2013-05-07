@@ -164,6 +164,14 @@ public final class AffineTransformation implements Transformation {
 	}
 
 	@Override
+	public String toString() {
+		return String.format(
+				"|% f % f % f|" + System.lineSeparator() + "|% f % f % f|" + System.lineSeparator()
+						+ "|% f % f % f|", this.a, this.b, this.c, this.d, this.e, this.f, 0.0,
+				0.0, 1.0);
+	}
+
+	@Override
 	public Point transformPoint(Point p) {
 		final double newX = p.x() * this.a + p.y() * this.b + this.c;
 		final double newY = p.x() * this.d + p.y() * this.e + this.f;
@@ -187,13 +195,5 @@ public final class AffineTransformation implements Transformation {
 	 */
 	public double translationY() {
 		return this.f;
-	}
-
-	@Override
-	public String toString() {
-		return String.format(
-				"|% f % f % f|" + System.lineSeparator() + "|% f % f % f|" + System.lineSeparator()
-						+ "|% f % f % f|", this.a, this.b, this.c, this.d, this.e, this.f, 0.0,
-				0.0, 1.0);
 	}
 }

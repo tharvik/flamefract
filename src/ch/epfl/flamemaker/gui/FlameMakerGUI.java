@@ -115,6 +115,11 @@ public class FlameMakerGUI {
 			this.repaint();
 		}
 
+		@Override
+		public Dimension getPreferredSize() {
+			return new Dimension(200, 100);
+		}
+
 		/**
 		 * Return the index of the highlighted
 		 * {@link AffineTransformation}
@@ -124,11 +129,6 @@ public class FlameMakerGUI {
 		 */
 		public int highlightedTransformationIndex() {
 			return this.highlightedTransformationIndex;
-		}
-
-		@Override
-		public Dimension getPreferredSize() {
-			return new Dimension(200, 100);
 		}
 
 		/**
@@ -505,121 +505,6 @@ public class FlameMakerGUI {
 	}
 
 	/**
-	 * Return the {@link JPanel} with the setter for the currently selected
-	 * {@link Transformation}
-	 * 
-	 * @return The {@link JPanel} with the setter for the currently selected
-	 *         {@link Transformation}
-	 */
-	private JPanel getAffineEdition() {
-
-		final JPanel panel = new JPanel();
-		final GroupLayout layout = new GroupLayout(panel);
-
-		final JComponent[][] components = new JComponent[4][6];
-		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" }, { "Rotation", "⟲", "⟳" },
-				{ "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" }, { "Transvection", "←", "→", "↑", "↓" } };
-		final double[] values = { 0.1, 15, 1.05, 0.1 };
-
-		// Groups
-		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
-		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
-
-		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
-		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[4];
-
-		for (int i = 0; i < Hs.length; i++) {
-			Hs[i] = layout.createParallelGroup();
-			H.addGroup(Hs[i]);
-		}
-
-		for (int i = 0; i < Vs.length; i++) {
-			Vs[i] = layout.createParallelGroup();
-			V.addGroup(Vs[i]);
-		}
-
-		// Add every components to the array
-		for (int i = 0; i < components.length; i++) {
-
-			final JFormattedTextField field = new JFormattedTextField(new DecimalFormat("#0.##"));
-			field.setHorizontalAlignment(SwingConstants.RIGHT);
-			field.setValue(values[i]);
-			field.setInputVerifier(new InputVerifier() {
-
-				@SuppressWarnings("unused")
-				@Override
-				public boolean verify(JComponent input) {
-
-					final AbstractFormatter formatter = field.getFormatter();
-
-					try {
-						// get the current value
-						final Number value = (Number) formatter.stringToValue(field.getText());
-
-						if (value.doubleValue() == 0) {
-							throw new ParseException("Haha, bubble the exception!", 0);
-						}
-
-						field.setValue(value);
-
-					} catch (ParseException e) {
-						// restore old value
-						field.setValue(field.getValue());
-					}
-
-					return true;
-				}
-			});
-
-			final JLabel label = new JLabel(labels[i][0]);
-
-			components[i][0] = label;
-			components[i][1] = field;
-
-			for (int j = 1; j < labels[i].length; j++) {
-
-				final int a = i, b = j;
-
-				final JButton button = new JButton();
-				button.setText(labels[i][j]);
-				button.addActionListener(new ActionListener() {
-
-					@SuppressWarnings("unused")
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						final double value = ((Number) field.getValue()).doubleValue();
-						final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
-
-						AffineTransformation trans = FlameMakerGUI.this.builder
-								.affineTransformation(index);
-						trans = FlameMakerGUI.getAffineTransformation(a, b - 1, value)
-								.composeWith(trans);
-
-						FlameMakerGUI.this.builder.setAffineTransformation(index, trans);
-					}
-				});
-
-				components[i][j + 1] = button;
-			}
-		}
-
-		for (int i = 0; i < components.length; i++) {
-
-			for (int j = 0; j < labels[i].length + 1; j++) {
-				Vs[i].addComponent(components[i][j], Alignment.CENTER);
-				Hs[j].addComponent(components[i][j], Alignment.TRAILING);
-			}
-		}
-
-		layout.setVerticalGroup(V);
-		layout.setHorizontalGroup(H);
-
-		panel.setLayout(layout);
-
-		return panel;
-	}
-
-	/**
 	 * Return an {@link AffineTransformation} at the given position and with
 	 * the given value
 	 * 
@@ -671,117 +556,6 @@ public class FlameMakerGUI {
 		default:
 			throw new IllegalArgumentException();
 		}
-	}
-
-	/**
-	 * Return the {@link JPanel} containing the button to setup the fractal
-	 * 
-	 * @return The {@link JPanel} containing the button to setup the fractal
-	 */
-	private JPanel getEdition() {
-
-		final JPanel panel = new JPanel();
-
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createTitledBorder("Transformation courante"));
-		panel.add(this.getAffineEdition());
-		panel.add(new JSeparator());
-		panel.add(this.getWeights());
-
-		return panel;
-	}
-
-	/**
-	 * Return the {@link JPanel} containing the fields with the weights of
-	 * the {@link Builder}
-	 * 
-	 * @return The {@link JPanel} containing the fields with the weights of
-	 *         the {@link Builder}
-	 */
-	private JPanel getWeights() {
-
-		final JPanel panel = new JPanel();
-		final GroupLayout layout = new GroupLayout(panel);
-
-		final JComponent[][] components = new JComponent[6][2];
-
-		// Groups
-		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
-		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
-
-		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
-		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[2];
-
-		for (int i = 0; i < Hs.length; i++) {
-			Hs[i] = layout.createParallelGroup();
-
-			if (i % 2 == 0) {
-				H.addPreferredGap(ComponentPlacement.UNRELATED);
-			}
-
-			H.addGroup(Hs[i]);
-		}
-
-		for (int i = 0; i < Vs.length; i++) {
-			Vs[i] = layout.createParallelGroup();
-			V.addGroup(Vs[i]);
-		}
-
-		// Add every components to the array
-		for (int i = 0; i < components.length; i++) {
-
-			final Variation variation = Variation.ALL_VARIATIONS.get(i);
-
-			final JFormattedTextField field = new JFormattedTextField(new DecimalFormat("#0.##"));
-			field.setHorizontalAlignment(SwingConstants.RIGHT);
-			field.setValue(this.builder.variationWeight(this.getSelectedTransformationIndex(), variation));
-
-			final JLabel label = new JLabel(variation.name());
-
-			this.addObserver(new Observer() {
-
-				@Override
-				public void changedObservedValue() {
-
-					final double value = FlameMakerGUI.this.builder.variationWeight(
-							FlameMakerGUI.this.getSelectedTransformationIndex(), variation);
-					field.setValue(value);
-				}
-			});
-
-			// TODO have to check input value?
-			field.addPropertyChangeListener("value", new PropertyChangeListener() {
-
-				@SuppressWarnings("unused")
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					final double value = ((Number) field.getValue()).doubleValue();
-					FlameMakerGUI.this.builder.setVariationWeight(
-							FlameMakerGUI.this.getSelectedTransformationIndex(), variation,
-							value);
-				}
-			});
-
-			components[(i * 2) % 6][i / 3] = label;
-			components[(i * 2 + 1) % 6][i / 3] = field;
-		}
-
-		for (int i = 0; i < components.length; i++) {
-
-			for (int j = 0; j < components[0].length; j++) {
-				Vs[j].addComponent(components[i][j], Alignment.CENTER);
-				Hs[i].addComponent(components[i][j], Alignment.TRAILING);
-
-			}
-		}
-
-		layout.setVerticalGroup(V);
-		layout.setHorizontalGroup(H);
-
-		panel.setLayout(layout);
-
-		return panel;
-
 	}
 
 	/**
@@ -893,6 +667,121 @@ public class FlameMakerGUI {
 	}
 
 	/**
+	 * Return the {@link JPanel} with the setter for the currently selected
+	 * {@link Transformation}
+	 * 
+	 * @return The {@link JPanel} with the setter for the currently selected
+	 *         {@link Transformation}
+	 */
+	private JPanel getAffineEdition() {
+
+		final JPanel panel = new JPanel();
+		final GroupLayout layout = new GroupLayout(panel);
+
+		final JComponent[][] components = new JComponent[4][6];
+		final String[][] labels = { { "Translation", "←", "→", "↑", "↓" }, { "Rotation", "⟲", "⟳" },
+				{ "Dilatation", "+ ↔", "- ↔", "+ ↕", "- ↕" }, { "Transvection", "←", "→", "↑", "↓" } };
+		final double[] values = { 0.1, 15, 1.05, 0.1 };
+
+		// Groups
+		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
+		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
+
+		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
+		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[4];
+
+		for (int i = 0; i < Hs.length; i++) {
+			Hs[i] = layout.createParallelGroup();
+			H.addGroup(Hs[i]);
+		}
+
+		for (int i = 0; i < Vs.length; i++) {
+			Vs[i] = layout.createParallelGroup();
+			V.addGroup(Vs[i]);
+		}
+
+		// Add every components to the array
+		for (int i = 0; i < components.length; i++) {
+
+			final JFormattedTextField field = new JFormattedTextField(new DecimalFormat("#0.##"));
+			field.setHorizontalAlignment(SwingConstants.RIGHT);
+			field.setValue(values[i]);
+			field.setInputVerifier(new InputVerifier() {
+
+				@SuppressWarnings("unused")
+				@Override
+				public boolean verify(JComponent input) {
+
+					final AbstractFormatter formatter = field.getFormatter();
+
+					try {
+						// get the current value
+						final Number value = (Number) formatter.stringToValue(field.getText());
+
+						if (value.doubleValue() == 0) {
+							throw new ParseException("Haha, bubble the exception!", 0);
+						}
+
+						field.setValue(value);
+
+					} catch (final ParseException e) {
+						// restore old value
+						field.setValue(field.getValue());
+					}
+
+					return true;
+				}
+			});
+
+			final JLabel label = new JLabel(labels[i][0]);
+
+			components[i][0] = label;
+			components[i][1] = field;
+
+			for (int j = 1; j < labels[i].length; j++) {
+
+				final int a = i, b = j;
+
+				final JButton button = new JButton();
+				button.setText(labels[i][j]);
+				button.addActionListener(new ActionListener() {
+
+					@SuppressWarnings("unused")
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						final double value = ((Number) field.getValue()).doubleValue();
+						final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
+
+						AffineTransformation trans = FlameMakerGUI.this.builder
+								.affineTransformation(index);
+						trans = FlameMakerGUI.getAffineTransformation(a, b - 1, value)
+								.composeWith(trans);
+
+						FlameMakerGUI.this.builder.setAffineTransformation(index, trans);
+					}
+				});
+
+				components[i][j + 1] = button;
+			}
+		}
+
+		for (int i = 0; i < components.length; i++) {
+
+			for (int j = 0; j < labels[i].length + 1; j++) {
+				Vs[i].addComponent(components[i][j], Alignment.CENTER);
+				Hs[j].addComponent(components[i][j], Alignment.TRAILING);
+			}
+		}
+
+		layout.setVerticalGroup(V);
+		layout.setHorizontalGroup(H);
+
+		panel.setLayout(layout);
+
+		return panel;
+	}
+
+	/**
 	 * Return the {@link JPanel} with the {@link JButton} to remove or add a
 	 * fractal
 	 * 
@@ -955,6 +844,24 @@ public class FlameMakerGUI {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 		panel.add(this.getAffineChoice());
 		panel.add(this.getEdition());
+
+		return panel;
+	}
+
+	/**
+	 * Return the {@link JPanel} containing the button to setup the fractal
+	 * 
+	 * @return The {@link JPanel} containing the button to setup the fractal
+	 */
+	private JPanel getEdition() {
+
+		final JPanel panel = new JPanel();
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setBorder(BorderFactory.createTitledBorder("Transformation courante"));
+		panel.add(this.getAffineEdition());
+		panel.add(new JSeparator());
+		panel.add(this.getWeights());
 
 		return panel;
 	}
@@ -1036,9 +943,102 @@ public class FlameMakerGUI {
 	private JPanel getUpPanel() {
 		final JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(1, 2));
-		panel.add(getPanelAffine());
+		panel.add(this.getPanelAffine());
 		panel.add(this.getPanelFractal());
 
 		return panel;
+	}
+
+	/**
+	 * Return the {@link JPanel} containing the fields with the weights of
+	 * the {@link Builder}
+	 * 
+	 * @return The {@link JPanel} containing the fields with the weights of
+	 *         the {@link Builder}
+	 */
+	private JPanel getWeights() {
+
+		final JPanel panel = new JPanel();
+		final GroupLayout layout = new GroupLayout(panel);
+
+		final JComponent[][] components = new JComponent[6][2];
+
+		// Groups
+		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
+		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
+
+		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
+		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[2];
+
+		for (int i = 0; i < Hs.length; i++) {
+			Hs[i] = layout.createParallelGroup();
+
+			if (i % 2 == 0) {
+				H.addPreferredGap(ComponentPlacement.UNRELATED);
+			}
+
+			H.addGroup(Hs[i]);
+		}
+
+		for (int i = 0; i < Vs.length; i++) {
+			Vs[i] = layout.createParallelGroup();
+			V.addGroup(Vs[i]);
+		}
+
+		// Add every components to the array
+		for (int i = 0; i < components.length; i++) {
+
+			final Variation variation = Variation.ALL_VARIATIONS.get(i);
+
+			final JFormattedTextField field = new JFormattedTextField(new DecimalFormat("#0.##"));
+			field.setHorizontalAlignment(SwingConstants.RIGHT);
+			field.setValue(this.builder.variationWeight(this.getSelectedTransformationIndex(), variation));
+
+			final JLabel label = new JLabel(variation.name());
+
+			this.addObserver(new Observer() {
+
+				@Override
+				public void changedObservedValue() {
+
+					final double value = FlameMakerGUI.this.builder.variationWeight(
+							FlameMakerGUI.this.getSelectedTransformationIndex(), variation);
+					field.setValue(value);
+				}
+			});
+
+			// TODO have to check input value?
+			field.addPropertyChangeListener("value", new PropertyChangeListener() {
+
+				@SuppressWarnings("unused")
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					final double value = ((Number) field.getValue()).doubleValue();
+					FlameMakerGUI.this.builder.setVariationWeight(
+							FlameMakerGUI.this.getSelectedTransformationIndex(), variation,
+							value);
+				}
+			});
+
+			components[(i * 2) % 6][i / 3] = label;
+			components[(i * 2 + 1) % 6][i / 3] = field;
+		}
+
+		for (int i = 0; i < components.length; i++) {
+
+			for (int j = 0; j < components[0].length; j++) {
+				Vs[j].addComponent(components[i][j], Alignment.CENTER);
+				Hs[i].addComponent(components[i][j], Alignment.TRAILING);
+
+			}
+		}
+
+		layout.setVerticalGroup(V);
+		layout.setHorizontalGroup(H);
+
+		panel.setLayout(layout);
+
+		return panel;
+
 	}
 }

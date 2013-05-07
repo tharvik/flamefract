@@ -28,26 +28,6 @@ public class ObservableFlameBuilder {
 	}
 
 	/**
-	 * Get the weight of given {@link Variation} of the
-	 * {@link FlameTransformation} at the given index in the list
-	 * 
-	 * @param index
-	 *                The index for the {@link FlameTransformation}
-	 * @param variation
-	 *                The {@link Variation} of which we want to get the
-	 *                weight
-	 * @return The weight of the {@link Variation} in the
-	 *         {@link FlameTransformation} at the given index in the list
-	 * 
-	 * @throws IndexOutOfBoundsException
-	 *                 If the index is less than zero of greater than the
-	 *                 max index of the list
-	 */
-	public double variationWeight(int index, Variation variation) {
-		return this.builder.variationWeight(index, variation);
-	}
-
-	/**
 	 * The {@link Builder} used in internal to behave like the
 	 * {@link Builder}
 	 */
@@ -192,6 +172,26 @@ public class ObservableFlameBuilder {
 	 */
 	public int transformationCount() {
 		return this.builder.transformationCount();
+	}
+
+	/**
+	 * Get the weight of given {@link Variation} of the
+	 * {@link FlameTransformation} at the given index in the list
+	 * 
+	 * @param index
+	 *                The index for the {@link FlameTransformation}
+	 * @param variation
+	 *                The {@link Variation} of which we want to get the
+	 *                weight
+	 * @return The weight of the {@link Variation} in the
+	 *         {@link FlameTransformation} at the given index in the list
+	 * 
+	 * @throws IndexOutOfBoundsException
+	 *                 If the index is less than zero of greater than the
+	 *                 max index of the list
+	 */
+	public double variationWeight(int index, Variation variation) {
+		return this.builder.variationWeight(index, variation);
 	}
 
 	/**

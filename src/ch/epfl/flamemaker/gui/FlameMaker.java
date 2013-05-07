@@ -19,13 +19,13 @@ public class FlameMaker {
 			public void run() {
 
 				try {
-					for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+					for (final LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
 						if (info.getName().equals("Nimbus")) {
 							UIManager.setLookAndFeel(info.getClassName());
 							break;
 						}
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 
 				}
 

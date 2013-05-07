@@ -34,7 +34,7 @@ public class InterpolatedPalette implements Palette {
 		}
 
 		this.colors = new ArrayList<Color>();
-		for (Color color : colors) {
+		for (final Color color : colors) {
 			this.colors.add(color);
 		}
 	}
