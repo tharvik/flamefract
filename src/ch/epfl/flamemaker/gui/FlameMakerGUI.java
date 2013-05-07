@@ -32,6 +32,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -44,6 +46,7 @@ import ch.epfl.flamemaker.flame.Flame;
 import ch.epfl.flamemaker.flame.Flame.Builder;
 import ch.epfl.flamemaker.flame.FlameAccumulator;
 import ch.epfl.flamemaker.flame.FlameTransformation;
+import ch.epfl.flamemaker.flame.Variation;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
@@ -412,7 +415,7 @@ public class FlameMakerGUI {
 			final double[] array = { 1, 0, 0, 0, 0, 0 };
 			final FlameTransformation t = new FlameTransformation(AffineTransformation.IDENTITY, array);
 			FlameMakerGUI.this.builder.addTransformation(t);
-			this.fireIntervalAdded(this, this.getSize() - 2, this.getSize() - 1);
+			this.fireIntervalAdded(this, this.getSize() - 1, this.getSize());
 		}
 
 		@Override
@@ -435,7 +438,7 @@ public class FlameMakerGUI {
 		 */
 		public void removeTransformation(int i) {
 			FlameMakerGUI.this.builder.removeTransformation(i);
-			this.fireIntervalRemoved(this, i, i + 1);
+			this.fireIntervalRemoved(this, i + 1, i + 2);
 		}
 	}
 
@@ -545,11 +548,11 @@ public class FlameMakerGUI {
 				@Override
 				public boolean verify(JComponent input) {
 
-					AbstractFormatter formatter = field.getFormatter();
+					final AbstractFormatter formatter = field.getFormatter();
 
 					try {
 						// get the current value
-						Number value = (Number) formatter.stringToValue(field.getText());
+						final Number value = (Number) formatter.stringToValue(field.getText());
 
 						if (value.doubleValue() == 0) {
 							throw new ParseException("Haha, bubble the exception!", 0);
@@ -610,7 +613,6 @@ public class FlameMakerGUI {
 		layout.setHorizontalGroup(H);
 
 		panel.setLayout(layout);
-		panel.setBorder(BorderFactory.createTitledBorder("Transformation courante"));
 
 		return panel;
 	}
@@ -670,18 +672,101 @@ public class FlameMakerGUI {
 	}
 
 	/**
-	 * Return the {@link JPanel} containg the button to setup the fractal
+	 * Return the {@link JPanel} containing the button to setup the fractal
 	 * 
-	 * @return The {@link JPanel} containg the button to setup the fractal
+	 * @return The {@link JPanel} containing the button to setup the fractal
 	 */
 	private JPanel getEdition() {
 
 		final JPanel panel = new JPanel();
 
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setBorder(BorderFactory.createTitledBorder("Transformation courante"));
 		panel.add(this.getAffineEdition());
+		panel.add(new JSeparator());
+		panel.add(this.getWeights());
 
 		return panel;
+	}
+
+	/**
+	 * Return the {@link JPanel} containing the fields with the weights of
+	 * the {@link Builder}
+	 * 
+	 * @return The {@link JPanel} containing the fields with the weights of
+	 *         the {@link Builder}
+	 */
+	private JPanel getWeights() {
+
+		final JPanel panel = new JPanel();
+		final GroupLayout layout = new GroupLayout(panel);
+
+		final JComponent[][] components = new JComponent[6][2];
+
+		// Groups
+		final GroupLayout.SequentialGroup H = layout.createSequentialGroup();
+		final GroupLayout.SequentialGroup V = layout.createSequentialGroup();
+
+		final GroupLayout.ParallelGroup[] Hs = new GroupLayout.ParallelGroup[6];
+		final GroupLayout.ParallelGroup[] Vs = new GroupLayout.ParallelGroup[2];
+
+		for (int i = 0; i < Hs.length; i++) {
+			Hs[i] = layout.createParallelGroup();
+
+			if (i % 2 == 0) {
+				H.addPreferredGap(ComponentPlacement.UNRELATED);
+			}
+
+			H.addGroup(Hs[i]);
+		}
+
+		for (int i = 0; i < Vs.length; i++) {
+			Vs[i] = layout.createParallelGroup();
+			V.addGroup(Vs[i]);
+		}
+
+		// Add every components to the array
+		for (int i = 0; i < components.length; i++) {
+
+			final Variation variation = Variation.ALL_VARIATIONS.get(i);
+
+			final JFormattedTextField field = new JFormattedTextField(new DecimalFormat("#0.##"));
+			field.setHorizontalAlignment(SwingConstants.RIGHT);
+			field.setValue(this.builder.variationWeight(this.getSelectedTransformationIndex(), variation));
+
+			final JLabel label = new JLabel(variation.name());
+
+			this.addObserver(new Observer() {
+
+				@Override
+				public void changedObservedValue() {
+					
+					final double value = FlameMakerGUI.this.builder.variationWeight(
+							FlameMakerGUI.this.getSelectedTransformationIndex(), variation);
+					field.setValue(value);
+				}
+			});
+
+			components[(i * 2) % 6][i / 3] = label;
+			components[(i * 2 + 1) % 6][i / 3] = field;
+		}
+
+		for (int i = 0; i < components.length; i++) {
+
+			for (int j = 0; j < components[0].length; j++) {
+				Vs[j].addComponent(components[i][j], Alignment.CENTER);
+				Hs[i].addComponent(components[i][j], Alignment.TRAILING);
+
+			}
+		}
+
+		layout.setVerticalGroup(V);
+		layout.setHorizontalGroup(H);
+
+		panel.setLayout(layout);
+
+		return panel;
+
 	}
 
 	/**
@@ -740,6 +825,7 @@ public class FlameMakerGUI {
 	 *                 index
 	 */
 	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
+		
 		if (selectedTransformationIndex < -1
 				|| selectedTransformationIndex > this.builder.transformationCount()) {
 			throw new NoSuchElementException();

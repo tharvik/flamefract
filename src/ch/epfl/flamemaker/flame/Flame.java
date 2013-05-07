@@ -72,6 +72,28 @@ public class Flame {
 		}
 
 		/**
+		 * Get the weight of given {@link Variation} of the
+		 * {@link FlameTransformation} at the given index in the list
+		 * 
+		 * @param index
+		 *                The index for the {@link FlameTransformation}
+		 * @param variation
+		 *                The {@link Variation} of which we want to get
+		 *                the weight
+		 * @return The weight of the {@link Variation} in the
+		 *         {@link FlameTransformation} at the given index in the
+		 *         list
+		 * 
+		 * @throws IndexOutOfBoundsException
+		 *                 If the index is less than zero of greater
+		 *                 than the max index of the list
+		 */
+		public double variationWeight(int index, Variation variation) {
+			this.checkIndex(index);
+			return this.list.get(index).getVariationWeightValue(variation.index());
+		}
+
+		/**
 		 * Return a {@link Flame} with the actual state of the Builder
 		 * 
 		 * @return A {@link Flame} with the actual state of the Builder
@@ -234,7 +256,7 @@ public class Flame {
 	 */
 	public FlameAccumulator compute(Rectangle frame, int width, int height, int density) {
 
-		final Random rand = new Random(2013);
+		final Random rand = new Random();
 		Point p = Point.ORIGIN;
 		final int m = density * width * height;
 		final FlameAccumulator.Builder image = new FlameAccumulator.Builder(frame, width, height);

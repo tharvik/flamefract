@@ -1,11 +1,5 @@
 package ch.epfl.flamemaker.geometry2d;
 
-import java.text.FieldPosition;
-import java.text.NumberFormat;
-import java.text.ParsePosition;
-
-import javax.swing.text.NumberFormatter;
-
 /**
  * A {@link Transformation} with a given matrix which will transform any given
  * point with his matrix
@@ -197,7 +191,9 @@ public final class AffineTransformation implements Transformation {
 
 	@Override
 	public String toString() {
-		return String.format("|% f % f % f|" + System.lineSeparator() + "|% f % f % f|" + System.lineSeparator()
-				+ "|% f % f % f|", this.a, this.b, this.c, this.d, this.e, this.f, 0.0, 0.0, 1.0);
+		return String.format(
+				"|% f % f % f|" + System.lineSeparator() + "|% f % f % f|" + System.lineSeparator()
+						+ "|% f % f % f|", this.a, this.b, this.c, this.d, this.e, this.f, 0.0,
+				0.0, 1.0);
 	}
 }
