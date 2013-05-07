@@ -14,7 +14,6 @@ import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -42,8 +41,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import ch.epfl.flamemaker.color.Color;
-import ch.epfl.flamemaker.color.InterpolatedPalette;
 import ch.epfl.flamemaker.color.Palette;
+import ch.epfl.flamemaker.extra.Preferences;
 import ch.epfl.flamemaker.flame.Flame;
 import ch.epfl.flamemaker.flame.Flame.Builder;
 import ch.epfl.flamemaker.flame.FlameAccumulator;
@@ -73,7 +72,7 @@ public class FlameMakerGUI {
 		 */
 		private final ObservableFlameBuilder	builder;
 		/**
-		 * The scope of the fractale, used to have the same aspect ratio
+		 * The scope of the fractal, used to have the same aspect ratio
 		 * as the {@link FlameBuilderPreviewComponent}
 		 */
 		private final Rectangle			frame;
@@ -562,11 +561,13 @@ public class FlameMakerGUI {
 	 * Construct a {@link FlameMakerGUI} with the default value
 	 */
 	public FlameMakerGUI() {
+		final Preferences pref = new Preferences();
+
 		this.builder = FlameMakerGUI.generateSharkFin();
-		this.background = Color.BLACK;
-		this.palette = new InterpolatedPalette(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE));
+		this.background = pref.getBackground();
+		this.palette = pref.getPalette();
 		this.frame = new Rectangle(new Point(-0.25, 0), 5, 4);
-		this.density = 50;
+		this.density = pref.getDensity();
 		this.selectedTransformationIndex = 0;
 		this.observers = new HashSet<FlameMakerGUI.Observer>();
 	}
