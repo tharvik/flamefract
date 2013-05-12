@@ -13,7 +13,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -37,6 +36,7 @@ import javax.swing.JSeparator;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -292,6 +292,11 @@ public class FlameMakerGUI {
 			ch.epfl.flamemaker.gui.ObservableFlameBuilder.Observer {
 
 		/**
+		 * The {@link Thread} building the fractal
+		 */
+		private Thread				thread;
+
+		/**
 		 * The {@link Color} of the background we use to build the image
 		 */
 		private final Color			background;
@@ -351,7 +356,8 @@ public class FlameMakerGUI {
 		}
 
 		@Override
-		protected void paintComponent(Graphics g0) {
+		protected void paintComponent(final Graphics g0) {
+
 			final BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(),
 					BufferedImage.TYPE_INT_RGB);
 
@@ -360,15 +366,45 @@ public class FlameMakerGUI {
 			final FlameAccumulator accu = this.builder.build().compute(actualFrame, this.getWidth(),
 					this.getHeight(), this.density);
 
-			for (int x = 0; x < accu.width(); x++) {
-				for (int y = 0; y < accu.height(); y++) {
-					final Color c = accu.color(this.palette, this.background, x, y);
-					final int RGB = c.asPackedRGB();
-					image.setRGB(x, accu.height() - 1 - y, RGB);
-				}
-			}
+			final Palette palette = this.palette;
+			final Color background = this.background;
 
-			g0.drawImage(image, 0, 0, null);
+			// if(this.thread != null && this.thread.isAlive()) {
+			// this.thread.interrupt();
+			// }
+
+			this.thread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+
+					final ActionListener listener = new ActionListener() {
+
+						@SuppressWarnings("unused")
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							g0.drawImage(image, 0, 0, null);
+						}
+					};
+
+					Timer timer = new Timer(100, listener);
+					timer.setInitialDelay(0);
+					timer.start();
+
+					for (int x = 0; x < accu.width(); x++) {
+						for (int y = 0; y < accu.height(); y++) {
+							final Color c = accu.color(palette, background, x, y);
+							final int RGB = c.asPackedRGB();
+							image.setRGB(x, accu.height() - 1 - y, RGB);
+						}
+					}
+
+					timer.stop();
+					g0.drawImage(image, 0, 0, null);
+				}
+			});
+
+			this.thread.run();
 		}
 	}
 
@@ -481,29 +517,6 @@ public class FlameMakerGUI {
 	private int				selectedTransformationIndex;
 
 	/**
-	 * Generate the Shark Fin fractal
-	 * 
-	 * @return A {@link Flame} containing the fractal
-	 */
-	private static ObservableFlameBuilder generateSharkFin() {
-		final ObservableFlameBuilder builder = new ObservableFlameBuilder(new Flame(
-				new ArrayList<FlameTransformation>()));
-		final double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
-
-		AffineTransformation affine = new AffineTransformation(-0.4113504, -0.7124804, -0.4, 0.7124795,
-				-0.4113508, 0.8);
-		builder.addTransformation(new FlameTransformation(affine, array[0]));
-
-		affine = new AffineTransformation(-0.3957339, 0, -1.6, 0, -0.3957337, 0.2);
-		builder.addTransformation(new FlameTransformation(affine, array[1]));
-
-		affine = new AffineTransformation(0.4810169, 0, 1, 0, 0.4810169, 0.9);
-		builder.addTransformation(new FlameTransformation(affine, array[2]));
-
-		return builder;
-	}
-
-	/**
 	 * Return an {@link AffineTransformation} at the given position and with
 	 * the given value
 	 * 
@@ -563,11 +576,12 @@ public class FlameMakerGUI {
 	public FlameMakerGUI() {
 		final Preferences pref = new Preferences();
 
-		this.builder = FlameMakerGUI.generateSharkFin();
+		this.builder = pref.getBuilder();
 		this.background = pref.getBackground();
 		this.palette = pref.getPalette();
-		this.frame = new Rectangle(new Point(-0.25, 0), 5, 4);
+		this.frame = pref.getFrame();
 		this.density = pref.getDensity();
+		
 		this.selectedTransformationIndex = 0;
 		this.observers = new HashSet<FlameMakerGUI.Observer>();
 	}
