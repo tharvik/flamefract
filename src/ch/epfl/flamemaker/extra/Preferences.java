@@ -21,7 +21,6 @@ import ch.epfl.flamemaker.flame.Variation;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
-import ch.epfl.flamemaker.geometry2d.Transformation;
 import ch.epfl.flamemaker.gui.ObservableFlameBuilder;
 
 /**
@@ -65,12 +64,6 @@ public class Preferences {
 		 * The path to the default configuration file
 		 */
 		private final String			path;
-
-		/**
-		 * The {@link FlameTransformation} actually selected in the list
-		 * of {@link Transformation}
-		 */
-		private final int			selectedTransformationIndex;
 
 		/**
 		 * Return the string without any comments
@@ -494,7 +487,6 @@ public class Preferences {
 			this.palette = new InterpolatedPalette(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE));
 			this.frame = new Rectangle(new Point(-0.25, 0), 5, 4);
 			this.density = 50;
-			this.selectedTransformationIndex = 0;
 
 			try {
 				final BufferedReader reader = Files.newBufferedReader(Paths.get(this.path),
@@ -554,8 +546,7 @@ public class Preferences {
 		 *         the {@link Builder}
 		 */
 		private Preferences build() {
-			return new Preferences(this.background, this.builder, this.density, this.frame, this.palette,
-					this.selectedTransformationIndex);
+			return new Preferences(this.background, this.builder, this.density, this.frame, this.palette);
 		}
 
 		/**
@@ -679,12 +670,6 @@ public class Preferences {
 	private final Palette			palette;
 
 	/**
-	 * The {@link FlameTransformation} actually selected in the list of
-	 * {@link Transformation}
-	 */
-	private final int			selectedIndex;
-
-	/**
 	 * Construct a new {@link Preferences} by loading the file hardcode
 	 * (still ugly way) in {@link Builder}
 	 */
@@ -705,7 +690,6 @@ public class Preferences {
 		this.density = pref.density;
 		this.frame = pref.frame;
 		this.palette = pref.palette;
-		this.selectedIndex = pref.selectedIndex;
 	}
 
 	/**
@@ -725,19 +709,15 @@ public class Preferences {
 	 *                The scope of the fractal
 	 * @param palette
 	 *                The {@link Palette} we use to build the image
-	 * @param selectedTransformationIndex
-	 *                The {@link FlameTransformation} actually selected in
-	 *                the list of {@link Transformation}
 	 */
 	private Preferences(Color background, ObservableFlameBuilder builder, int density, Rectangle frame,
-			Palette palette, int selectedTransformationIndex) {
+			Palette palette) {
 		super();
 		this.background = background;
 		this.builder = builder;
 		this.density = density;
 		this.frame = frame;
 		this.palette = palette;
-		this.selectedIndex = selectedTransformationIndex;
 	}
 
 	/**

@@ -3,6 +3,7 @@ package ch.epfl.flamemaker.flame;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
@@ -214,6 +215,10 @@ public class Flame {
 
 		this.arrayIndex = new double[this.transformations.size()];
 		switch (this.arrayIndex.length) {
+
+		case 3:
+			this.arrayIndex[2] = 0.5;
+
 		case 2:
 			this.arrayIndex[1] = 1;
 
@@ -227,10 +232,11 @@ public class Flame {
 		default:
 			this.arrayIndex[0] = 0;
 			this.arrayIndex[1] = 1;
-			for (int i = 2; i < this.arrayIndex.length; i++) {
-				final double log2I = Math.log(i) / Math.log(2);
-				this.arrayIndex[i] = ((i - (Math.pow(2, Math.floor(log2I)))) * 2 + 1)
-						/ (Math.pow(2, Math.ceil(log2I)));
+			this.arrayIndex[2] = 0.5;
+			for (int i = 3; i < this.arrayIndex.length; i++) {
+				final double powLog2 = Math.pow(2, Math.ceil(Math.log(i) / Math.log(2)));
+				final double powLogI = Math.pow(2, Math.floor(Math.log(i - 1) / Math.log(2)));
+				this.arrayIndex[i] = ((i - 1 - powLogI) * 2 + 1) / powLog2;
 			}
 			break;
 		}
@@ -257,30 +263,62 @@ public class Flame {
 	public FlameAccumulator compute(Rectangle frame, int width, int height, int density) {
 
 		final Random rand = new Random();
-		Point p = Point.ORIGIN;
 		final int m = density * width * height;
 		final FlameAccumulator.Builder image = new FlameAccumulator.Builder(frame, width, height);
+
+		// TODO preferences for size of threads
+		final int totalThreads = 2;
+		final Semaphore semaphore = new Semaphore(totalThreads);
+		final Thread[] threads = new Thread[totalThreads];
+		for (int i = 0; i < threads.length; i++) {
+			threads[i] = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					Point p = Point.ORIGIN;
+
+					// Randomize the point 20 times
+					double lastColor = 0;
+					for (int j = 0; j < 20; j++) {
+						final int i = rand.nextInt(Flame.this.transformations.size());
+						p = Flame.this.transformations.get(i).transformPoint(p);
+						lastColor = (Flame.this.arrayIndex[i] + lastColor) / 2.0;
+					}
+
+					// Actually hit the accumulator
+					for (int j = 0; j < m / totalThreads; j++) {
+						final int i = rand.nextInt(Flame.this.transformations.size());
+						p = Flame.this.transformations.get(i).transformPoint(p);
+
+						lastColor = (Flame.this.arrayIndex[i] + lastColor) / 2.0;
+
+						try {
+							semaphore.acquire();
+							image.hit(p, lastColor);
+							semaphore.release();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+		}
 
 		// If we do not have list, just return the image.build()
 		if (this.transformations.size() == 0) {
 			return image.build();
 		}
 
-		// Randomize the point 20 times
-		double lastColor = 0;
-		for (int j = 0; j < 20; j++) {
-			final int i = rand.nextInt(this.transformations.size());
-			p = this.transformations.get(i).transformPoint(p);
-			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
+		for (Thread thread : threads) {
+			thread.run();
 		}
 
-		// Actually hit the accumulator
-		for (int j = 0; j < m; j++) {
-			final int i = rand.nextInt(this.transformations.size());
-			p = this.transformations.get(i).transformPoint(p);
-
-			lastColor = (this.arrayIndex[i] + lastColor) / 2.0;
-			image.hit(p, lastColor);
+		for (Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return image.build();
