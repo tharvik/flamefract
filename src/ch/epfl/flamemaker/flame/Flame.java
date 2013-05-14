@@ -3,7 +3,6 @@ package ch.epfl.flamemaker.flame;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
 
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
@@ -243,6 +242,78 @@ public class Flame {
 	}
 
 	/**
+	 * Compute the fractal, with the given definition (width and height) and
+	 * the accuracy (density), and hit the given
+	 * {@link ch.epfl.flamemaker.flame.FlameAccumulator.Builder}
+	 * 
+	 * @param width
+	 *                The width of the {@link FlameAccumulator}
+	 * @param height
+	 *                The height of the {@link FlameAccumulator}
+	 * @param density
+	 *                A constant representing the number of wanted iteration
+	 *                (the more, the better the fractal will be but the
+	 *                longer it will take to generate)
+	 * @param image
+	 *                The
+	 *                {@link ch.epfl.flamemaker.flame.FlameAccumulator.Builder}
+	 *                to hit
+	 */
+	public void compute(int width, int height, int density, final FlameAccumulator.Builder image) {
+
+		final Random rand = new Random();
+		final int m = density * width * height;
+
+		// TODO preferences for size of threads
+		final int totalThreads = 4;
+		final Thread[] threads = new Thread[totalThreads];
+		for (int i = 0; i < threads.length; i++) {
+			threads[i] = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					Point p = Point.ORIGIN;
+
+					// Randomize the point 20 times
+					double lastColor = 0;
+					for (int j = 0; j < 20; j++) {
+						final int i = rand.nextInt(Flame.this.transformations.size());
+						p = Flame.this.transformations.get(i).transformPoint(p);
+						lastColor = (Flame.this.arrayIndex[i] + lastColor) / 2.0;
+					}
+
+					// Actually hit the accumulator
+					for (int j = 0; j < m / totalThreads; j++) {
+						final int i = rand.nextInt(Flame.this.transformations.size());
+						p = Flame.this.transformations.get(i).transformPoint(p);
+
+						lastColor = (Flame.this.arrayIndex[i] + lastColor) / 2.0;
+
+						image.hit(p, lastColor);
+					}
+				}
+			});
+		}
+
+		// If we do not have list, just return the image.build()
+		if (this.transformations.size() == 0) {
+			return;
+		}
+
+		for (Thread thread : threads) {
+			thread.start();
+		}
+
+		for (Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
 	 * Compute the fractal, with the given scope (frame), the definition
 	 * (width and height) and the accuracy (density)
 	 * 
@@ -267,8 +338,7 @@ public class Flame {
 		final FlameAccumulator.Builder image = new FlameAccumulator.Builder(frame, width, height);
 
 		// TODO preferences for size of threads
-		final int totalThreads = 2;
-		final Semaphore semaphore = new Semaphore(totalThreads);
+		final int totalThreads = 4;
 		final Thread[] threads = new Thread[totalThreads];
 		for (int i = 0; i < threads.length; i++) {
 			threads[i] = new Thread(new Runnable() {
@@ -292,13 +362,7 @@ public class Flame {
 
 						lastColor = (Flame.this.arrayIndex[i] + lastColor) / 2.0;
 
-						try {
-							semaphore.acquire();
-							image.hit(p, lastColor);
-							semaphore.release();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+						image.hit(p, lastColor);
 					}
 				}
 			});
@@ -310,7 +374,7 @@ public class Flame {
 		}
 
 		for (Thread thread : threads) {
-			thread.run();
+			thread.start();
 		}
 
 		for (Thread thread : threads) {

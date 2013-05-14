@@ -36,7 +36,6 @@ import javax.swing.JSeparator;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -294,7 +293,7 @@ public class FlameMakerGUI {
 		/**
 		 * The {@link Thread} building the fractal
 		 */
-		private Thread				thread;
+		// private Thread thread;
 
 		/**
 		 * The {@link Color} of the background we use to build the image
@@ -355,56 +354,50 @@ public class FlameMakerGUI {
 			return new Dimension(200, 100);
 		}
 
+		// private FlameAccumulator.Builder flameAccBuilder;
+
 		@Override
 		protected void paintComponent(final Graphics g0) {
 
-			final BufferedImage image = new BufferedImage(this.getWidth(), this.getHeight(),
-					BufferedImage.TYPE_INT_RGB);
+			// if (this.thread == null) {
 
-			final Rectangle actualFrame = this.frame.expandToAspectRatio(this.getWidth()
-					/ (double) this.getHeight());
-			final FlameAccumulator accu = this.builder.build().compute(actualFrame, this.getWidth(),
-					this.getHeight(), this.density);
+			// create the real sized frame and a relevant
+			// builder to have access to the state of it
+			// during computation
+			final Rectangle actualFrame = frame.expandToAspectRatio(getWidth() / (double) getHeight());
+			FlameAccumulator.Builder flameAccBuilder = new FlameAccumulator.Builder(actualFrame,
+					getWidth(), getHeight());
+			//
+			// this.thread = new Thread(new Runnable() {
+			//
+			// @Override
+			// public void run() {
 
-			final Palette palette = this.palette;
-			final Color background = this.background;
+			builder.build().compute(getWidth(), getHeight(), density, flameAccBuilder);
 
-			// if(this.thread != null && this.thread.isAlive()) {
-			// this.thread.interrupt();
+			// }
+			// });
+			//
+			// this.thread.start();
 			// }
 
-			this.thread = new Thread(new Runnable() {
+			final FlameAccumulator accu = flameAccBuilder.build();
+			final BufferedImage image = new BufferedImage(accu.width(), accu.height(),
+					BufferedImage.TYPE_INT_RGB);
 
-				@Override
-				public void run() {
-
-					final ActionListener listener = new ActionListener() {
-
-						@SuppressWarnings("unused")
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							g0.drawImage(image, 0, 0, null);
-						}
-					};
-
-					Timer timer = new Timer(100, listener);
-					timer.setInitialDelay(0);
-					timer.start();
-
-					for (int x = 0; x < accu.width(); x++) {
-						for (int y = 0; y < accu.height(); y++) {
-							final Color c = accu.color(palette, background, x, y);
-							final int RGB = c.asPackedRGB();
-							image.setRGB(x, accu.height() - 1 - y, RGB);
-						}
-					}
-
-					timer.stop();
-					g0.drawImage(image, 0, 0, null);
+			for (int x = 0; x < accu.width(); x++) {
+				for (int y = 0; y < accu.height(); y++) {
+					final Color c = accu.color(palette, background, x, y);
+					final int RGB = c.asPackedRGB();
+					image.setRGB(x, accu.height() - 1 - y, RGB);
 				}
-			});
+			}
 
-			this.thread.run();
+			g0.drawImage(image, 0, 0, null);
+			// if (!this.thread.isAlive()) {
+			// this.thread = null;
+			// this.repaint();
+			// }
 		}
 	}
 
@@ -413,7 +406,7 @@ public class FlameMakerGUI {
 	 * every {@link Observer} will be fired by the target every time the
 	 * value (given by the context) inside the target is changed
 	 */
-	static interface Observer {
+	public static interface Observer {
 		/**
 		 * Will be fired by the target every time the value (given by
 		 * the context) inside the target is changed
@@ -574,14 +567,12 @@ public class FlameMakerGUI {
 	 * Construct a {@link FlameMakerGUI} with the default value
 	 */
 	public FlameMakerGUI() {
-		final Preferences pref = new Preferences();
+		this.builder = Preferences.values.builder;
+		this.background = Preferences.values.background;
+		this.palette = Preferences.values.palette;
+		this.frame = Preferences.values.frame;
+		this.density = Preferences.values.density;
 
-		this.builder = pref.getBuilder();
-		this.background = pref.getBackground();
-		this.palette = pref.getPalette();
-		this.frame = pref.getFrame();
-		this.density = pref.getDensity();
-		
 		this.selectedTransformationIndex = 0;
 		this.observers = new HashSet<FlameMakerGUI.Observer>();
 	}

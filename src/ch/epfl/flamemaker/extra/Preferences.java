@@ -66,6 +66,11 @@ public class Preferences {
 		private final String			path;
 
 		/**
+		 * The number of threads used in computation
+		 */
+		private int				threads;
+
+		/**
 		 * Return the string without any comments
 		 * 
 		 * @param line
@@ -437,6 +442,10 @@ public class Preferences {
 			stream.println("# Density of the computation (the more, the more point it'll generate)");
 			stream.println("density = 50");
 			stream.println();
+			stream.println("# Number of threads used in the computation (will be set to numberOfCore + 1");
+			stream.println("# if there is no value)");
+			stream.println("#threads = 5");
+			stream.println();
 			stream.println("# Color of the background (in RGB), values as double, min 0, max 1");
 			stream.println("color = (0,0,0)");
 			stream.println();
@@ -546,7 +555,8 @@ public class Preferences {
 		 *         the {@link Builder}
 		 */
 		private Preferences build() {
-			return new Preferences(this.background, this.builder, this.density, this.frame, this.palette);
+			return new Preferences(this.background, this.builder, this.density, this.frame, this.palette,
+					this.threads);
 		}
 
 		/**
@@ -617,6 +627,9 @@ public class Preferences {
 							Builder.parseWeight(value, weights);
 							break;
 
+						case "threads":
+							this.threads = Builder.parseInt(value);
+
 						default:
 							throw new IllegalArgumentException("unrecognized value");
 						}
@@ -647,35 +660,46 @@ public class Preferences {
 	/**
 	 * The {@link Color} of the background we use to build the image
 	 */
-	private final Color			background;
+	public final Color			background;
 
 	/**
 	 * The {@link Builder} we are currently working on
 	 */
-	private final ObservableFlameBuilder	builder;
+	public final ObservableFlameBuilder	builder;
 
 	/**
 	 * The number of iteration
 	 */
-	private final int			density;
+	public final int			density;
 
 	/**
 	 * The scope of the fractal
 	 */
-	private final Rectangle			frame;
+	public final Rectangle			frame;
 
 	/**
 	 * The {@link Palette} we use to build the image
 	 */
-	private final Palette			palette;
+	public final Palette			palette;
+
+	/**
+	 * The number of threads used in computation
+	 */
+	public final int			threads;
 
 	/**
 	 * Construct a new {@link Preferences} by loading the file hardcode
 	 * (still ugly way) in {@link Builder}
 	 */
-	public Preferences() {
+	private Preferences() {
 		this(new Preferences.Builder().build());
 	}
+
+	/**
+	 * All the values of the {@link Preferences}, the only way to access
+	 * anything
+	 */
+	public final static Preferences	values	= new Preferences();
 
 	/**
 	 * Copy-construct a {@link Preferences} with the given
@@ -684,12 +708,13 @@ public class Preferences {
 	 * @param pref
 	 *                The {@link Preferences} to copy
 	 */
-	Preferences(Preferences pref) {
+	private Preferences(Preferences pref) {
 		this.background = pref.background;
 		this.builder = pref.builder;
 		this.density = pref.density;
 		this.frame = pref.frame;
 		this.palette = pref.palette;
+		this.threads = pref.threads;
 	}
 
 	/**
@@ -698,71 +723,25 @@ public class Preferences {
 	 * @param background
 	 *                The {@link Color} of the background we use to build
 	 *                the image
-	 * 
 	 * @param builder
 	 *                The {@link Builder} we are currently working on
-	 * 
 	 * @param density
 	 *                The number of iteration
-	 * 
 	 * @param frame
 	 *                The scope of the fractal
 	 * @param palette
 	 *                The {@link Palette} we use to build the image
+	 * @param threads
+	 *                The number of {@link Thread} used in computation
 	 */
 	private Preferences(Color background, ObservableFlameBuilder builder, int density, Rectangle frame,
-			Palette palette) {
+			Palette palette, int threads) {
 		super();
 		this.background = background;
 		this.builder = builder;
 		this.density = density;
 		this.frame = frame;
 		this.palette = palette;
-	}
-
-	/**
-	 * Return the background {@link Color} value wanted by the user
-	 * 
-	 * @return The background {@link Color} value wanted by the user
-	 */
-	public Color getBackground() {
-		return this.background;
-	}
-
-	/**
-	 * Return the {@link ObservableFlameBuilder} value wanted by the user
-	 * 
-	 * @return The {@link ObservableFlameBuilder} value wanted by the user
-	 */
-	public ObservableFlameBuilder getBuilder() {
-		return this.builder;
-	}
-
-	/**
-	 * Return the density value wanted by the user
-	 * 
-	 * @return The density value wanted by the user
-	 */
-	public int getDensity() {
-		return this.density;
-	}
-
-	/**
-	 * Return the {@link Rectangle} value wanted by the user
-	 * 
-	 * @return The {@link Rectangle} value wanted by the user
-	 */
-
-	public Rectangle getFrame() {
-		return this.frame;
-	}
-
-	/**
-	 * Return the {@link Palette} value wanted by the user
-	 * 
-	 * @return The {@link Palette} value wanted by the user
-	 */
-	public Palette getPalette() {
-		return this.palette;
+		this.threads = threads;
 	}
 }
