@@ -86,11 +86,11 @@ public final class Color {
 	 * @return Colors as an int, a value by byte in red, green, blue order
 	 */
 	public int asPackedRGB() {
-		int color = sRGBEncode(this.red(), 255);
+		int color = sRGBEncode(this.r, 255);
 		color = color << 8;
-		color += sRGBEncode(this.green(), 255);
+		color += sRGBEncode(this.g, 255);
 		color = color << 8;
-		color += sRGBEncode(this.blue(), 255);
+		color += sRGBEncode(this.b, 255);
 		return color;
 	}
 

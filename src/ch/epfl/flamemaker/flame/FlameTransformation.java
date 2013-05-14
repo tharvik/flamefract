@@ -133,18 +133,9 @@ public class FlameTransformation implements Transformation {
 		 * @throws IndexOutOfBoundsException
 		 *                 if the given index is not between 0 and 5
 		 *                 (both included)
-		 * 
-		 * @throws IllegalArgumentException
-		 *                 if the given value is not between 0 and 1
-		 *                 (both inclusive)
 		 */
 		public void setVariationWeight(int index, double value) {
 			Builder.checkIndex(index);
-
-			if (value < 0 || value > 1) {
-				throw new IllegalArgumentException();
-			}
-
 			this.variationWeight[index] = value;
 		}
 	}
@@ -172,12 +163,6 @@ public class FlameTransformation implements Transformation {
 	 * 
 	 */
 	private static void checkValue(double[] variationWeight) {
-		for (final double d : variationWeight) {
-			if (d < 0 || d > 1) {
-				throw new IllegalArgumentException();
-			}
-		}
-
 		if (variationWeight == null || variationWeight.length != 6) {
 			throw new IllegalArgumentException();
 		}

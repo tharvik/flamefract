@@ -112,7 +112,6 @@ public class FlameMakerGUI {
 		@Override
 		public void changedObservedValue() {
 			this.setHighlightedTransformationIndex(FlameMakerGUI.this.getSelectedTransformationIndex());
-			this.repaint();
 		}
 
 		@Override
@@ -369,7 +368,7 @@ public class FlameMakerGUI {
 			final Rectangle actualFrame = frame.expandToAspectRatio(getWidth() / (double) getHeight());
 			FlameAccumulator.Builder flameAccBuilder = new FlameAccumulator.Builder(actualFrame,
 					getWidth(), getHeight());
-			
+
 			// this.thread = new Thread(new Runnable() {
 			//
 			// @Override
@@ -526,39 +525,33 @@ public class FlameMakerGUI {
 	 *         with the given value
 	 */
 	static private AffineTransformation getAffineTransformation(int i, int j, double value) {
-		switch ((i << 2) + j) {
+		final int val = (i << 2) + j;
+		switch (val) {
 
 		case (0 << 2) + 0:
-			return AffineTransformation.newTranslation(-value, 0);
 		case (0 << 2) + 1:
-			return AffineTransformation.newTranslation(value, 0);
+			return AffineTransformation.newTranslation((val % 2 == 0 ? -value : value), 0);
 		case (0 << 2) + 2:
-			return AffineTransformation.newTranslation(0, value);
 		case (0 << 2) + 3:
-			return AffineTransformation.newTranslation(0, -value);
+			return AffineTransformation.newTranslation(0, (val % 2 == 0 ? -value : value));
 
 		case (1 << 2) + 0:
-			return AffineTransformation.newRotation(value / 180);
 		case (1 << 2) + 1:
-			return AffineTransformation.newRotation(-value / 180);
+			return AffineTransformation.newRotation((val % 2 == 0 ? value : -value) / 180);
 
 		case (2 << 2) + 0:
-			return AffineTransformation.newScaling(value, 1);
 		case (2 << 2) + 1:
-			return AffineTransformation.newScaling(1 / value, 1);
+			return AffineTransformation.newScaling((val % 2 == 0 ? value : 1 / value), 1);
 		case (2 << 2) + 2:
-			return AffineTransformation.newScaling(1, value);
 		case (2 << 2) + 3:
-			return AffineTransformation.newScaling(1, 1 / value);
+			return AffineTransformation.newScaling(1, (val % 2 == 0 ? value : 1 / value));
 
 		case (3 << 2) + 0:
-			return AffineTransformation.newShearX(-value);
 		case (3 << 2) + 1:
-			return AffineTransformation.newShearX(value);
+			return AffineTransformation.newShearX((val % 2 == 0 ? -value : value));
 		case (3 << 2) + 2:
-			return AffineTransformation.newShearY(-value);
 		case (3 << 2) + 3:
-			return AffineTransformation.newShearY(value);
+			return AffineTransformation.newShearY((val % 2 == 0 ? -value : value));
 
 		default:
 			throw new IllegalArgumentException();
@@ -623,8 +616,8 @@ public class FlameMakerGUI {
 	 */
 	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
 
-		if (selectedTransformationIndex < -1
-				|| selectedTransformationIndex > this.builder.transformationCount()) {
+		if (selectedTransformationIndex < 0
+				|| selectedTransformationIndex >= this.builder.transformationCount()) {
 			throw new NoSuchElementException();
 		}
 		this.selectedTransformationIndex = selectedTransformationIndex;
@@ -826,6 +819,7 @@ public class FlameMakerGUI {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				model.addTransformation();
+				FlameMakerGUI.this.setSelectedTransformationIndex(model.getSize() - 1);
 				list.setSelectedIndex(model.getSize() - 1);
 
 				if (!remove.isEnabled()) {
@@ -1042,10 +1036,8 @@ public class FlameMakerGUI {
 
 		layout.setVerticalGroup(V);
 		layout.setHorizontalGroup(H);
-
 		panel.setLayout(layout);
 
 		return panel;
-
 	}
 }

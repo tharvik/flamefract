@@ -186,7 +186,7 @@ public class Flame {
 		 *                 than the max index of the list
 		 */
 		private void checkIndex(int index) {
-			if (index < 0 || index > this.transformationCount()) {
+			if (index < 0 || index >= this.transformationCount()) {
 				throw new IndexOutOfBoundsException();
 			}
 		}
