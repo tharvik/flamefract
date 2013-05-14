@@ -52,6 +52,8 @@ import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
 import ch.epfl.flamemaker.geometry2d.Transformation;
 
+// FIXME list is not repaint if end selected
+
 /**
  * The GUI, use much of {@link Flame} in internal
  * 
@@ -367,7 +369,7 @@ public class FlameMakerGUI {
 			final Rectangle actualFrame = frame.expandToAspectRatio(getWidth() / (double) getHeight());
 			FlameAccumulator.Builder flameAccBuilder = new FlameAccumulator.Builder(actualFrame,
 					getWidth(), getHeight());
-			//
+			
 			// this.thread = new Thread(new Runnable() {
 			//
 			// @Override

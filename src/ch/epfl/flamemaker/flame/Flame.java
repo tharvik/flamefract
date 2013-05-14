@@ -286,7 +286,6 @@ public class Flame {
 					for (int j = 0; j < m / totalThreads; j++) {
 						final int i = rand.nextInt(Flame.this.transformations.size());
 						p = Flame.this.transformations.get(i).transformPoint(p);
-
 						lastColor = (Flame.this.arrayIndex[i] + lastColor) / 2.0;
 
 						image.hit(p, lastColor);
