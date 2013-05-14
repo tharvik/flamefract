@@ -1013,7 +1013,6 @@ public class FlameMakerGUI {
 				}
 			});
 
-			// TODO have to check input value?
 			field.addPropertyChangeListener("value", new PropertyChangeListener() {
 
 				@SuppressWarnings("unused")

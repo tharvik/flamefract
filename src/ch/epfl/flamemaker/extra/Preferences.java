@@ -486,7 +486,7 @@ public class Preferences {
 		 * Construct a new {@link Builder} which try to load the file or
 		 * fall back on default configuration
 		 */
-		public Builder() {
+		private Builder() {
 
 			this.path = "flamefract.conf";
 
@@ -496,6 +496,7 @@ public class Preferences {
 			this.palette = new InterpolatedPalette(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE));
 			this.frame = new Rectangle(new Point(-0.25, 0), 5, 4);
 			this.density = 50;
+			this.threads = Runtime.getRuntime().availableProcessors() + 1;
 
 			try {
 				final BufferedReader reader = Files.newBufferedReader(Paths.get(this.path),
@@ -573,7 +574,6 @@ public class Preferences {
 			final ArrayList<double[]> weights = new ArrayList<double[]>();
 
 			// remove already set builder
-
 			while (this.builder.transformationCount() > 0) {
 				this.builder.removeTransformation(0);
 			}

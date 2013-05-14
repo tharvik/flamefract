@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import ch.epfl.flamemaker.extra.Preferences;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
@@ -264,8 +265,7 @@ public class Flame {
 		final Random rand = new Random();
 		final int m = density * width * height;
 
-		// TODO preferences for size of threads
-		final int totalThreads = 4;
+		final int totalThreads = Preferences.values.threads;
 		final Thread[] threads = new Thread[totalThreads];
 		for (int i = 0; i < threads.length; i++) {
 			threads[i] = new Thread(new Runnable() {
@@ -337,8 +337,7 @@ public class Flame {
 		final int m = density * width * height;
 		final FlameAccumulator.Builder image = new FlameAccumulator.Builder(frame, width, height);
 
-		// TODO preferences for size of threads
-		final int totalThreads = 4;
+		final int totalThreads = Preferences.values.threads;
 		final Thread[] threads = new Thread[totalThreads];
 		for (int i = 0; i < threads.length; i++) {
 			threads[i] = new Thread(new Runnable() {
