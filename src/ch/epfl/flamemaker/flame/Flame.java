@@ -1,6 +1,7 @@
 package ch.epfl.flamemaker.flame;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -27,6 +28,36 @@ public class Flame {
 		 */
 		private final ArrayList<FlameTransformation.Builder>	list;
 
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			Builder other = (Builder) obj;
+			if (list == null) {
+				if (other.list != null) {
+					return false;
+				}
+			} else if (!list.equals(other.list)) {
+				return false;
+			}
+
+			final Iterator<FlameTransformation.Builder> i = this.list.iterator(), o = other.list.iterator();
+			for (; i.hasNext() && o.hasNext();) {
+				if (!i.next().equals(o.next())) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		/**
 		 * Construct a Flame.Builder with the given {@link Flame}
 		 * 
@@ -38,6 +69,24 @@ public class Flame {
 			this.list = new ArrayList<FlameTransformation.Builder>();
 			for (final FlameTransformation flameTransformation : flame.transformations) {
 				this.list.add(new FlameTransformation.Builder(flameTransformation));
+			}
+		}
+
+		/**
+		 * Copy-construct a new {@link Builder} based on the given one
+		 * 
+		 * @param copy
+		 *                The {@link Builder} to copy
+		 */
+		public Builder(Builder copy) {
+			this.list = new ArrayList<FlameTransformation.Builder>();
+			for (FlameTransformation.Builder builder : copy.list) {
+				double[] array = new double[6];
+				for (int i = 0; i < array.length; i++) {
+					array[i] = builder.getVariationWeightValue(i);
+				}
+				this.list.add(new FlameTransformation.Builder(new FlameTransformation(builder
+						.getAffineTransformation(), array)));
 			}
 		}
 
@@ -244,30 +293,24 @@ public class Flame {
 
 	/**
 	 * Compute the fractal, with the given definition (width and height) and
-	 * the accuracy (density), and hit the given
+	 * the number of points, and hit the given
 	 * {@link ch.epfl.flamemaker.flame.FlameAccumulator.Builder}
 	 * 
-	 * @param width
-	 *                The width of the {@link FlameAccumulator}
-	 * @param height
-	 *                The height of the {@link FlameAccumulator}
-	 * @param density
-	 *                A constant representing the number of wanted iteration
-	 *                (the more, the better the fractal will be but the
-	 *                longer it will take to generate)
+	 * @param points
+	 *                The average number of points to hit
 	 * @param image
 	 *                The
 	 *                {@link ch.epfl.flamemaker.flame.FlameAccumulator.Builder}
 	 *                to hit
 	 */
-	public void compute(int width, int height, int density, final FlameAccumulator.Builder image) {
+	public void compute(final int points, final FlameAccumulator.Builder image) {
 
 		final Random rand = new Random();
-		final int m = density * width * height;
 
 		final int totalThreads = Preferences.values.threads;
 		final Thread[] threads = new Thread[totalThreads];
 		for (int i = 0; i < threads.length; i++) {
+
 			threads[i] = new Thread(new Runnable() {
 
 				@Override
@@ -283,9 +326,10 @@ public class Flame {
 					}
 
 					// Actually hit the accumulator
-					for (int j = 0; j < m / totalThreads; j++) {
+					for (int j = 0; j < points / totalThreads; j++) {
 						final int i = rand.nextInt(Flame.this.transformations.size());
 						p = Flame.this.transformations.get(i).transformPoint(p);
+
 						lastColor = (Flame.this.arrayIndex[i] + lastColor) / 2.0;
 
 						image.hit(p, lastColor);

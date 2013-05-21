@@ -1,5 +1,7 @@
 package ch.epfl.flamemaker.flame;
 
+import java.util.Arrays;
+
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Transformation;
@@ -14,6 +16,32 @@ public class FlameTransformation implements Transformation {
 	 * transformations
 	 */
 	public static class Builder {
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			Builder other = (Builder) obj;
+			if (affineTransformation == null) {
+				if (other.affineTransformation != null) {
+					return false;
+				}
+			} else if (!affineTransformation.equals(other.affineTransformation)) {
+				return false;
+			}
+			if (!Arrays.equals(variationWeight, other.variationWeight)) {
+				return false;
+			}
+			return true;
+		}
 
 		/**
 		 * The AffineTransformation used in every transformPoint

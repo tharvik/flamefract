@@ -51,6 +51,50 @@ public class ObservableFlameBuilder {
 	}
 
 	/**
+	 * Copy-construct a new {@link ObservableFlameBuilder} based on the
+	 * given {@link ObservableFlameBuilder}
+	 * 
+	 * @param builder
+	 *                The {@link ObservableFlameBuilder} to copy
+	 */
+	public ObservableFlameBuilder(ObservableFlameBuilder builder) {
+		this.builder = new Builder(builder.builder);
+		this.observers = new HashSet<ObservableFlameBuilder.Observer>();
+		for (Observer observer : builder.observers) {
+			this.observers.add(observer);
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		ObservableFlameBuilder other = (ObservableFlameBuilder) obj;
+		if (builder == null) {
+			if (other.builder != null) {
+				return false;
+			}
+		} else if (!builder.equals(other.builder)) {
+			return false;
+		}
+		if (observers == null) {
+			if (other.observers != null) {
+				return false;
+			}
+		} else if (!observers.equals(other.observers)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Add a new {@link Observer}
 	 * 
 	 * @param observer
@@ -70,6 +114,7 @@ public class ObservableFlameBuilder {
 	 */
 	public void addTransformation(FlameTransformation transformation) {
 		this.builder.addTransformation(transformation);
+		this.warnObservers();
 	}
 
 	/**

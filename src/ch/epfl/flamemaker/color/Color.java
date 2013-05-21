@@ -151,7 +151,6 @@ public final class Color {
 		return this.r;
 	}
 
-	// "(0,0,0)"
 	/**
 	 * Returns a textual form of a color
 	 * 

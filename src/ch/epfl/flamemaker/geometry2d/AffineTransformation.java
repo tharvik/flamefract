@@ -15,6 +15,25 @@ package ch.epfl.flamemaker.geometry2d;
  */
 public final class AffineTransformation implements Transformation {
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		AffineTransformation other = (AffineTransformation) obj;
+		if (this.a != other.a || this.b != other.b || this.c != other.c || this.d != other.d
+				|| this.e != other.e || this.f != other.f) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * <p>
 	 * The identity matrix

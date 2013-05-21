@@ -71,6 +71,23 @@ public class Preferences {
 		private int				threads;
 
 		/**
+		 * The time between every refresh of the fractal
+		 */
+		private int				refresh;
+
+		/**
+		 * The number of points computed every time, if -1, then we try
+		 * to set the best value at runtime
+		 */
+		private int				step;
+
+		/**
+		 * The threshold in number of points where we will increase the
+		 * refresh time
+		 */
+		private int				threshold;
+
+		/**
 		 * Return the string without any comments
 		 * 
 		 * @param line
@@ -439,6 +456,8 @@ public class Preferences {
 			stream.println("# Every settings will have the following template");
 			stream.println("#  variable = value # eventually a comment");
 			stream.println();
+			stream.println("## Core part (everything which is not directly GUI)");
+			stream.println();
 			stream.println("# Density of the computation (the more, the more point it'll generate)");
 			stream.println("density = 50");
 			stream.println();
@@ -479,7 +498,20 @@ public class Preferences {
 			stream.println("weight = (1,0.1,0,0,0,0)");
 			stream.println("weight = (0,0,0,0,0.8,1)");
 			stream.println("weight = (1,0,0,0,0,0)");
-
+			stream.println();
+			stream.println("## GUI part");
+			stream.println();
+			stream.println("# The time in ms between every refresh of the fractal");
+			stream.println("refresh = 200");
+			stream.println();
+			stream.println("# The number of points computed beetween every refresh");
+			stream.println("# If unset, we will monitor the computation to set the best value");
+			stream.println("# (not really recommanded to set it yourself, but hey, it's your choice!)");
+			stream.println("#step = 20000");
+			stream.println("");
+			stream.println("# The threshold in number of points where we will increase the refresh time");
+			stream.println("# It won't be used if we have a fixed value for step");
+			stream.println("threshold = 10000");
 		}
 
 		/**
@@ -491,12 +523,15 @@ public class Preferences {
 			this.path = "flamefract.conf";
 
 			// Set the basic values, to avoid any empty values
-			this.builder = Preferences.Builder.generateSharkFin();
-			this.background = Color.BLACK;
-			this.palette = new InterpolatedPalette(Arrays.asList(Color.RED, Color.GREEN, Color.BLUE));
-			this.frame = new Rectangle(new Point(-0.25, 0), 5, 4);
-			this.density = 50;
-			this.threads = Runtime.getRuntime().availableProcessors() + 1;
+			this.builder = Preferences.defaults.builder;
+			this.background = Preferences.defaults.background;
+			this.palette = Preferences.defaults.palette;
+			this.frame = Preferences.defaults.frame;
+			this.density = Preferences.defaults.density;
+			this.threads = Preferences.defaults.threads;
+			this.step = Preferences.defaults.step;
+			this.refresh = Preferences.defaults.refresh;
+			this.threshold = Preferences.defaults.threshold;
 
 			try {
 				final BufferedReader reader = Files.newBufferedReader(Paths.get(this.path),
@@ -557,7 +592,7 @@ public class Preferences {
 		 */
 		private Preferences build() {
 			return new Preferences(this.background, this.builder, this.density, this.frame, this.palette,
-					this.threads);
+					this.threads, this.refresh, this.step, this.threshold);
 		}
 
 		/**
@@ -629,6 +664,19 @@ public class Preferences {
 
 						case "threads":
 							this.threads = Builder.parseInt(value);
+							break;
+
+						case "refresh":
+							this.refresh = Builder.parseInt(value);
+							break;
+
+						case "step":
+							this.step = Builder.parseInt(value);
+							break;
+
+						case "threshold":
+							this.threshold = Builder.parseInt(value);
+							break;
 
 						default:
 							throw new IllegalArgumentException("unrecognized value");
@@ -688,18 +736,47 @@ public class Preferences {
 	public final int			threads;
 
 	/**
-	 * Construct a new {@link Preferences} by loading the file hardcode
-	 * (still ugly way) in {@link Builder}
+	 * The time between every refresh of the fractal
+	 */
+	public final int			refresh;
+
+	/**
+	 * The number of points computed every time, if -1, then we try to set
+	 * the best value at runtime
+	 */
+	public final int			step;
+
+	/**
+	 * The threshold in number of points where we will increase the refresh
+	 * time
+	 */
+	public final int			threshold;
+
+	/**
+	 * Construct a new {@link Preferences} by loading the file in
+	 * {@link Builder}
 	 */
 	private Preferences() {
 		this(new Preferences.Builder().build());
 	}
 
 	/**
-	 * All the values of the {@link Preferences}, the only way to access
-	 * anything
+	 * All the defaults values of the {@link Preferences}
 	 */
-	public final static Preferences	values	= new Preferences();
+	public final static Preferences	defaults	= new Preferences(Color.BLACK,
+									Preferences.Builder.generateSharkFin(), 50,
+									new Rectangle(new Point(-0.25, 0), 5, 4),
+									new InterpolatedPalette(Arrays.asList(
+											Color.RED, Color.GREEN,
+											Color.BLUE)), Runtime
+											.getRuntime()
+											.availableProcessors() + 1,
+									100, -1, 10000);
+	
+	/**
+	 * All the values of the {@link Preferences} set by the builder
+	 */
+	public final static Preferences	values		= new Preferences();
 
 	/**
 	 * Copy-construct a {@link Preferences} with the given
@@ -715,6 +792,9 @@ public class Preferences {
 		this.frame = pref.frame;
 		this.palette = pref.palette;
 		this.threads = pref.threads;
+		this.refresh = pref.refresh;
+		this.step = pref.step;
+		this.threshold = pref.threshold;
 	}
 
 	/**
@@ -733,15 +813,25 @@ public class Preferences {
 	 *                The {@link Palette} we use to build the image
 	 * @param threads
 	 *                The number of {@link Thread} used in computation
+	 * @param refresh
+	 *                The time between every refresh of the fractal
+	 * @param step
+	 *                The number of points computed every time, if -1, then
+	 *                we try to set the best value at runtime
+	 * @param threshold
+	 *                The threshold in number of points where we will
+	 *                increase the refresh time
 	 */
 	private Preferences(Color background, ObservableFlameBuilder builder, int density, Rectangle frame,
-			Palette palette, int threads) {
-		super();
+			Palette palette, int threads, int refresh, int step, int threshold) {
 		this.background = background;
 		this.builder = builder;
 		this.density = density;
 		this.frame = frame;
 		this.palette = palette;
 		this.threads = threads;
+		this.refresh = refresh;
+		this.step = step;
+		this.threshold = threshold;
 	}
 }

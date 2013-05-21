@@ -13,29 +13,31 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -50,68 +52,68 @@ import ch.epfl.flamemaker.flame.Variation;
 import ch.epfl.flamemaker.geometry2d.AffineTransformation;
 import ch.epfl.flamemaker.geometry2d.Point;
 import ch.epfl.flamemaker.geometry2d.Rectangle;
-import ch.epfl.flamemaker.geometry2d.Transformation;
+import ch.epfl.flamemaker.gui.FlameMakerGUI.TransformationsListModel;
+import ch.epfl.flamemaker.gui.ObservableFlameBuilder.Observer;
 
-// FIXME list is not repaint if end selected
-
-/**
- * The GUI, use much of {@link Flame} in internal
- * 
- * @see Flame
- */
 public class FlameMakerGUI {
-	/**
-	 * The part of the GUI showing the {@link AffineTransformation} of the
-	 * fractal {@link Flame}
-	 */
-	@SuppressWarnings("serial")
-	class AffineTransformationsComponent extends JComponent implements Observer,
-			ch.epfl.flamemaker.gui.ObservableFlameBuilder.Observer {
-		/**
-		 * The {@link Builder} used to get the needed
-		 * {@link AffineTransformation}
-		 */
-		private final ObservableFlameBuilder	builder;
-		/**
-		 * The scope of the fractal, used to have the same aspect ratio
-		 * as the {@link FlameBuilderPreviewComponent}
-		 */
-		private final Rectangle			frame;
-		/**
-		 * The selected transformation (draw in red in the component)
-		 */
-		private int				highlightedTransformationIndex;
-		/**
-		 * A {@link AffineTransformation} used to move a point in the
-		 * frame to the {@link JComponent}
-		 */
-		private AffineTransformation		transformation;
 
-		/**
-		 * Construct an {@link AffineTransformationsComponent} with the
-		 * given {@link Builder} to retrieve the needed
-		 * {@link AffineTransformation} and the frame to have a correct
-		 * sized graph
-		 * 
-		 * @param builder
-		 *                Used to retrieve the needed
-		 *                {@link AffineTransformation}
-		 * @param frame
-		 *                Used to have a correct sized graph
-		 */
-		public AffineTransformationsComponent(ObservableFlameBuilder builder, Rectangle frame) {
+	private static class FlameBuilderPreviewComponent extends JComponent implements Observer {
+
+		private class Clock {
+			private long	begin;
+			private long	end;
+
+			public long time() {
+				return end - begin;
+			}
+
+			public void start() {
+				begin = System.currentTimeMillis();
+			}
+
+			public void stop() {
+				end = System.currentTimeMillis();
+			}
+		}
+
+		private ObservableFlameBuilder		builder;
+		private Color				background;
+		private Palette				palette;
+		private Rectangle			frame;
+		private int				density;
+
+		private Timer				timer;
+		private FlameAccumulator.Builder	accuBuilder;
+		private int				totalDensity;
+
+		int					step;
+		int					time;
+
+		private ObservableFlameBuilder		computedBuilder;
+
+		private FlameBuilderPreviewComponent(ObservableFlameBuilder builder, Color background, Palette palette,
+				Rectangle frame, int density) {
 			this.builder = builder;
+			this.background = background;
+			this.palette = palette;
 			this.frame = frame;
+			this.density = density;
+			this.time = Preferences.values.refresh;
+			// Use a low value just to have something to test
+			this.step = 1000;
+
+			this.builder.addObserver(this);
+			this.computedBuilder = new ObservableFlameBuilder(this.builder);
 		}
 
 		@Override
 		public void changedBuilder() {
-			this.repaint();
-		}
 
-		@Override
-		public void changedObservedValue() {
-			this.setHighlightedTransformationIndex(FlameMakerGUI.this.getSelectedTransformationIndex());
+			if (!this.builder.equals(this.computedBuilder)) {
+				this.computedBuilder = new ObservableFlameBuilder(this.builder);
+				this.timer.stop();
+				this.repaint();
+			}
 		}
 
 		@Override
@@ -119,32 +121,118 @@ public class FlameMakerGUI {
 			return new Dimension(200, 100);
 		}
 
-		/**
-		 * Return the index of the highlighted
-		 * {@link AffineTransformation}
-		 * 
-		 * @return The index of the highlighted
-		 *         {@link AffineTransformation}
-		 */
-		public int highlightedTransformationIndex() {
-			return this.highlightedTransformationIndex;
+		private void paintAccuBuilder(Graphics g) {
+
+			if (accuBuilder == null) {
+				return;
+			}
+
+			final FlameAccumulator accu = accuBuilder.build();
+			final BufferedImage image = new BufferedImage(accu.width(), accu.height(),
+					BufferedImage.TYPE_INT_RGB);
+
+			for (int x = 0; x < accu.width(); x++) {
+				for (int y = 0; y < accu.height(); y++) {
+					final Color c = accu.color(palette, background, x, y);
+					final int RGB = c.asPackedRGB();
+					image.setRGB(x, accu.height() - 1 - y, RGB);
+				}
+			}
+			g.drawImage(image, 0, 0, null);
 		}
 
-		/**
-		 * Set the index of the highlighted {@link AffineTransformation}
-		 * 
-		 * @param highlightedTransformationIndex
-		 *                The index of the newly selected
-		 *                {@link AffineTransformation}, as given in the
-		 *                {@link Builder} as construction
-		 * 
-		 * @throws NoSuchElementException
-		 *                 if the highlightedTransformationIndex is less
-		 *                 than zero or bigger than the max index
-		 */
+		@Override
+		protected void paintComponent(final Graphics g) {
+
+			final int width = getWidth(), height = getHeight();
+
+			if (this.timer != null && accuBuilder != null) {
+				final FlameAccumulator build = accuBuilder.build();
+				if ((build.width() != getWidth() || build.height() != getHeight())) {
+					this.timer.stop();
+				}
+			}
+
+			if (this.timer == null || !this.timer.isRunning()) {
+				final Rectangle actualFrame = frame.expandToAspectRatio(width / (double) height);
+				accuBuilder = new FlameAccumulator.Builder(actualFrame, width, height);
+
+				paintAccuBuilder(g);
+
+				this.totalDensity = 0;
+				this.step = 1000;
+				this.timer = new Timer(Preferences.values.refresh, new ActionListener() {
+
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						repaint();
+					}
+				});
+				this.timer.start();
+
+			} else if (totalDensity < this.density * width * height) {
+				totalDensity += step;
+				final Clock clock = new Clock();
+				clock.start();
+				builder.build().compute(step, accuBuilder);
+				paintAccuBuilder(g);
+				clock.stop();
+
+				// Accurate the step
+				this.step *= (this.time / (double) clock.time());
+				if ((this.time / (double) clock.time()) < 1 && this.step < Preferences.values.threshold) {
+					System.out.println("Your time setting (the refresh rate) is too low, and thus,");
+					System.out.println("we can't keep up. We're adjusting it for now, but");
+					System.out.println("consider adding an higher value to the preferences.");
+					this.time += 100;
+					this.step = 1000;
+				}
+
+			} else {
+				this.timer.stop();
+				paintAccuBuilder(g);
+			}
+		}
+	}
+
+	private class AffineTransformationsComponent extends JComponent implements SelectionObserver, Observer {
+
+		private ObservableFlameBuilder	builder;
+		private Rectangle		frame;
+
+		private int			highlightedTransformationIndex;
+		private AffineTransformation	transformation;
+
+		@Override
+		public void valueChanged() {
+			this.highlightedTransformationIndex = getSelectedTransformationIndex();
+			this.repaint();
+		}
+
+		@Override
+		public void changedBuilder() {
+			this.repaint();
+		}
+
+		public AffineTransformationsComponent(ObservableFlameBuilder builder, Rectangle frame) {
+			this.builder = builder;
+			this.frame = frame;
+			this.highlightedTransformationIndex = 0;
+
+			this.builder.addObserver(this);
+		}
+
 		public void setHighlightedTransformationIndex(int highlightedTransformationIndex) {
 			this.highlightedTransformationIndex = highlightedTransformationIndex;
-			this.repaint();
+		}
+
+		public int getHighlightedTransformationIndex() {
+			return highlightedTransformationIndex;
+		}
+
+		@Override
+		public Dimension getPreferredSize() {
+			return new Dimension(200, 100);
 		}
 
 		@Override
@@ -177,16 +265,6 @@ public class FlameMakerGUI {
 			this.drawTransformation(g, this.highlightedTransformationIndex);
 		}
 
-		/**
-		 * Draw the set of arrows for the {@link Transformation} given
-		 * by the index
-		 * 
-		 * @param g
-		 *                The {@link Graphics2D} to draw to
-		 * @param index
-		 *                The index of the {@link Transformation} to
-		 *                draw
-		 */
 		private void drawTransformation(Graphics2D g, int index) {
 			final AffineTransformation buildAffine = this.builder.affineTransformation(index);
 			final AffineTransformation rotate = AffineTransformation.newRotation(Math.PI / 2);
@@ -231,12 +309,6 @@ public class FlameMakerGUI {
 			}
 		}
 
-		/**
-		 * Paint the grid in the given {@link Graphics2D}
-		 * 
-		 * @param g
-		 *                The {@link Graphics2D} to draw to
-		 */
 		private void paintGrid(Graphics2D g) {
 
 			final Rectangle actualFrame = this.frame.expandToAspectRatio((double) this.getWidth()
@@ -284,283 +356,66 @@ public class FlameMakerGUI {
 		}
 	}
 
-	/**
-	 * The fractal part of the GUI
-	 */
-	@SuppressWarnings("serial")
-	class FlameBuilderPreviewComponent extends JComponent implements
-			ch.epfl.flamemaker.gui.ObservableFlameBuilder.Observer {
+	public class TransformationsListModel extends AbstractListModel<String> {
 
-		/**
-		 * The {@link Thread} building the fractal
-		 */
-		// private Thread thread;
+		private final String	text;
 
-		/**
-		 * The {@link Color} of the background we use to build the image
-		 */
-		private final Color			background;
-
-		/**
-		 * The {@link Builder} we are currently working on
-		 */
-		private final ObservableFlameBuilder	builder;
-		/**
-		 * The number of iteration
-		 */
-		private final int			density;
-		/**
-		 * The scope of the fractal
-		 */
-		private final Rectangle			frame;
-		/**
-		 * The {@link Palette} we use to build the image
-		 */
-		private final Palette			palette;
-
-		/**
-		 * Construct a new {@link FlameBuilderPreviewComponent} with the
-		 * given {@link Builder}, background {@link Color},
-		 * {@link Palette}, scope of the fractal and the density of
-		 * computation
-		 * 
-		 * @param builder
-		 *                The {@link Builder} containing the fractal
-		 * @param background
-		 *                The background {@link Color} of the fractal
-		 * @param palette
-		 *                The {@link Palette} to compute the fractal
-		 *                with
-		 * @param frame
-		 *                The scope of the fractal
-		 * @param density
-		 *                The density of computation for the fractal
-		 */
-		public FlameBuilderPreviewComponent(ObservableFlameBuilder builder, Color background, Palette palette,
-				Rectangle frame, int density) {
-			this.builder = builder;
-			this.background = background;
-			this.palette = palette;
-			this.frame = frame;
-			this.density = density;
-		}
-
-		@Override
-		public void changedBuilder() {
-			this.repaint();
-		}
-
-		@Override
-		public Dimension getPreferredSize() {
-			return new Dimension(200, 100);
-		}
-
-		// private FlameAccumulator.Builder flameAccBuilder;
-
-		@Override
-		protected void paintComponent(final Graphics g0) {
-
-			// if (this.thread == null) {
-
-			// create the real sized frame and a relevant
-			// builder to have access to the state of it
-			// during computation
-			final Rectangle actualFrame = frame.expandToAspectRatio(getWidth() / (double) getHeight());
-			FlameAccumulator.Builder flameAccBuilder = new FlameAccumulator.Builder(actualFrame,
-					getWidth(), getHeight());
-
-			// this.thread = new Thread(new Runnable() {
-			//
-			// @Override
-			// public void run() {
-
-			builder.build().compute(getWidth(), getHeight(), density, flameAccBuilder);
-
-			// }
-			// });
-			//
-			// this.thread.start();
-			// }
-
-			final FlameAccumulator accu = flameAccBuilder.build();
-			final BufferedImage image = new BufferedImage(accu.width(), accu.height(),
-					BufferedImage.TYPE_INT_RGB);
-
-			for (int x = 0; x < accu.width(); x++) {
-				for (int y = 0; y < accu.height(); y++) {
-					final Color c = accu.color(palette, background, x, y);
-					final int RGB = c.asPackedRGB();
-					image.setRGB(x, accu.height() - 1 - y, RGB);
-				}
-			}
-
-			g0.drawImage(image, 0, 0, null);
-			// if (!this.thread.isAlive()) {
-			// this.thread = null;
-			// this.repaint();
-			// }
-		}
-	}
-
-	/**
-	 * Define the concept of observer: the changedObservedValue function in
-	 * every {@link Observer} will be fired by the target every time the
-	 * value (given by the context) inside the target is changed
-	 */
-	public static interface Observer {
-		/**
-		 * Will be fired by the target every time the value (given by
-		 * the context) inside the target is changed
-		 */
-		void changedObservedValue();
-	}
-
-	/**
-	 * List of transformation used by the scroll bar
-	 */
-	@SuppressWarnings("serial")
-	class TransformationsListModel extends AbstractListModel<String> {
-
-		/**
-		 * Used as a prefix to each {@link FlameTransformation}
-		 */
-		String	text;
-
-		/**
-		 * Construct a {@link TransformationsListModel} with the given
-		 * text as a prefix to {@link FlameTransformation}
-		 * 
-		 * @param text
-		 *                Used as a prefix to each
-		 *                {@link FlameTransformation}
-		 */
 		public TransformationsListModel(String text) {
 			this.text = text;
 		}
 
-		/**
-		 * Add a new identity {@link FlameTransformation} to the
-		 * builder, bubble
-		 */
-		public void addTransformation() {
-			final double[] array = { 1, 0, 0, 0, 0, 0 };
-			final FlameTransformation t = new FlameTransformation(AffineTransformation.IDENTITY, array);
-			FlameMakerGUI.this.builder.addTransformation(t);
-			this.fireIntervalAdded(this, this.getSize() - 1, this.getSize());
+		@Override
+		public int getSize() {
+			return builder.transformationCount();
 		}
 
 		@Override
 		public String getElementAt(int index) {
-			return (this.text + (index + 1));
+			return this.text + (index + 1);
 		}
 
-		@Override
-		public int getSize() {
-			return FlameMakerGUI.this.builder.transformationCount();
+		public void addTransformation() {
+			final double[] array = { 1, 0, 0, 0, 0, 0 };
+			final FlameTransformation trans = new FlameTransformation(AffineTransformation.IDENTITY, array);
+			builder.addTransformation(trans);
+
+			this.fireIntervalAdded(this, getSize() - 1, getSize());
 		}
 
-		/**
-		 * Remove the {@link FlameTransformation} at the given index,
-		 * bubble
-		 * 
-		 * @param i
-		 *                The index of the {@link FlameTransformation}
-		 *                to remove
-		 */
-		public void removeTransformation(int i) {
-			FlameMakerGUI.this.builder.removeTransformation(i);
-			this.fireIntervalRemoved(this, i + 1, i + 2);
+		public void removeTransformation(int index) {
+			builder.removeTransformation(index);
+			setSelectedTransformationIndex(index == builder.transformationCount() ? index - 1 : index);
+
+			this.fireIntervalRemoved(this, index, index);
 		}
 	}
 
-	/**
-	 * The {@link Color} of the background we use to build the image
-	 */
-	private final Color			background;
+	private static Flame.Builder generateSharkFin() {
+		final Flame.Builder builder = new Flame.Builder(new Flame(new ArrayList<FlameTransformation>()));
+		final double[][] array = { { 1, 0.1, 0, 0, 0, 0 }, { 0, 0, 0, 0, 0.8, 1 }, { 1, 0, 0, 0, 0, 0 } };
 
-	/**
-	 * The {@link Builder} we are currently working on
-	 */
-	private final ObservableFlameBuilder	builder;
+		AffineTransformation affine = new AffineTransformation(-0.4113504, -0.7124804, -0.4, 0.7124795,
+				-0.4113508, 0.8);
+		builder.addTransformation(new FlameTransformation(affine, array[0]));
 
-	/**
-	 * The number of iteration
-	 */
-	private final int			density;
+		affine = new AffineTransformation(-0.3957339, 0, -1.6, 0, -0.3957337, 0.2);
+		builder.addTransformation(new FlameTransformation(affine, array[1]));
 
-	/**
-	 * The scope of the fractal
-	 */
-	private final Rectangle			frame;
+		affine = new AffineTransformation(0.4810169, 0, 1, 0, 0.4810169, 0.9);
+		builder.addTransformation(new FlameTransformation(affine, array[2]));
 
-	/**
-	 * {@link Set} of the {@link Observer} of the
-	 * selectedTransformationIndex
-	 */
-	private final Set<Observer>		observers;
-
-	/**
-	 * The {@link Palette} we use to build the image
-	 */
-	private final Palette			palette;
-
-	/**
-	 * The {@link FlameTransformation} actually selected in the list of
-	 * {@link Transformation}
-	 */
-	private int				selectedTransformationIndex;
-
-	/**
-	 * Return an {@link AffineTransformation} at the given position and with
-	 * the given value
-	 * 
-	 * @param i
-	 *                The vertical position in the array
-	 * @param j
-	 *                The horizontal position in the array
-	 * @param value
-	 *                The value to use in the {@link AffineTransformation}
-	 * 
-	 * @return An {@link AffineTransformation} at the given position and
-	 *         with the given value
-	 */
-	static private AffineTransformation getAffineTransformation(int i, int j, double value) {
-		final int val = (i << 2) + j;
-		switch (val) {
-
-		case (0 << 2) + 0:
-		case (0 << 2) + 1:
-			return AffineTransformation.newTranslation((val % 2 == 0 ? -value : value), 0);
-		case (0 << 2) + 2:
-		case (0 << 2) + 3:
-			return AffineTransformation.newTranslation(0, (val % 2 == 0 ? -value : value));
-
-		case (1 << 2) + 0:
-		case (1 << 2) + 1:
-			return AffineTransformation.newRotation((val % 2 == 0 ? value : -value) / 180);
-
-		case (2 << 2) + 0:
-		case (2 << 2) + 1:
-			return AffineTransformation.newScaling((val % 2 == 0 ? value : 1 / value), 1);
-		case (2 << 2) + 2:
-		case (2 << 2) + 3:
-			return AffineTransformation.newScaling(1, (val % 2 == 0 ? value : 1 / value));
-
-		case (3 << 2) + 0:
-		case (3 << 2) + 1:
-			return AffineTransformation.newShearX((val % 2 == 0 ? -value : value));
-		case (3 << 2) + 2:
-		case (3 << 2) + 3:
-			return AffineTransformation.newShearY((val % 2 == 0 ? -value : value));
-
-		default:
-			throw new IllegalArgumentException();
-		}
+		return builder;
 	}
 
-	/**
-	 * Construct a {@link FlameMakerGUI} with the default value
-	 */
+	private ObservableFlameBuilder	builder;
+	private Color			background;
+	private Palette			palette;
+	private Rectangle		frame;
+	private int			density;
+
+	private int			selectedTransformationIndex;
+	private Set<SelectionObserver>	observers;
+
 	public FlameMakerGUI() {
 		this.builder = Preferences.values.builder;
 		this.background = Preferences.values.background;
@@ -569,112 +424,93 @@ public class FlameMakerGUI {
 		this.density = Preferences.values.density;
 
 		this.selectedTransformationIndex = 0;
-		this.observers = new HashSet<FlameMakerGUI.Observer>();
+		this.observers = new HashSet<SelectionObserver>();
 	}
 
-	/**
-	 * Add a new {@link Observer}
-	 * 
-	 * @param observer
-	 *                An {@link Observer} to add to set of known
-	 *                {@link Observer}
-	 */
-	public void addObserver(Observer observer) {
+	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
+		this.selectedTransformationIndex = selectedTransformationIndex;
+
+		for (SelectionObserver observer : this.observers) {
+			observer.valueChanged();
+		}
+	}
+
+	public int getSelectedTransformationIndex() {
+		return selectedTransformationIndex;
+	}
+
+	private static interface SelectionObserver {
+		void valueChanged();
+	}
+
+	public void addObserver(SelectionObserver observer) {
 		this.observers.add(observer);
 	}
 
-	/**
-	 * Return the index of the selected {@link FlameTransformation}
-	 * 
-	 * @return return The index of the selected {@link FlameTransformation}
-	 */
-	public int getSelectedTransformationIndex() {
-		return this.selectedTransformationIndex;
-	}
-
-	/**
-	 * Remove the given {@link Observer}
-	 * 
-	 * @param observer
-	 *                An {@link Observer} to remove from the set of known
-	 *                {@link Observer}
-	 */
-	public void removeObserver(Observer observer) {
+	public void removeObserver(SelectionObserver observer) {
 		this.observers.remove(observer);
 	}
 
-	/**
-	 * Select a new {@link FlameTransformation}
-	 * 
-	 * @param selectedTransformationIndex
-	 *                The index of the wanted {@link FlameTransformation} as
-	 *                in the {@link Builder} we got at construction
-	 * 
-	 * @throws NoSuchElementException
-	 *                 if the index is less than zero or larger than the max
-	 *                 index
-	 */
-	public void setSelectedTransformationIndex(int selectedTransformationIndex) {
-
-		if (selectedTransformationIndex < 0
-				|| selectedTransformationIndex >= this.builder.transformationCount()) {
-			throw new NoSuchElementException();
-		}
-		this.selectedTransformationIndex = selectedTransformationIndex;
-
-		// warn the observers
-		for (final Observer observer : this.observers) {
-			observer.changedObservedValue();
-		}
-	}
-
-	/**
-	 * Generate the GUI, used by {@link FlameMaker}
-	 */
-	public void start() {
-		final JFrame frame = new JFrame("Flame Maker");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
-
-		final JPanel upPanel = this.getUpPanel();
-		final JPanel downPanel = this.getDownPanel();
-
-		frame.getContentPane().add(upPanel, BorderLayout.CENTER);
-		frame.getContentPane().add(downPanel, BorderLayout.PAGE_END);
-
-		frame.pack();
-		frame.setVisible(true);
-
-		frame.setSize(new Dimension(600, 300));
-	}
-
-	/**
-	 * Return the {@link JPanel} with all the settings
-	 * 
-	 * @return The {@link JPanel} with all the settings
-	 */
-	private JPanel getAffineChoice() {
-
-		final TransformationsListModel model = new TransformationsListModel("Transformation n° ");
-		final JList<String> list = this.getList(model);
-
+	private JPanel getTransformations() {
 		final JPanel panel = new JPanel();
+
+		final Border border = BorderFactory.createTitledBorder("Transformations affines");
+		panel.setBorder(border);
+
+		final AffineTransformationsComponent affine = new AffineTransformationsComponent(builder, frame);
+		addObserver(affine);
+
 		panel.setLayout(new BorderLayout());
-		panel.setBorder(BorderFactory.createTitledBorder("Transformations"));
-		panel.add(new JScrollPane(list), BorderLayout.CENTER);
-		panel.add(this.getButtons(list), BorderLayout.PAGE_END);
+		panel.add(affine);
 
 		return panel;
 	}
 
-	/**
-	 * Return the {@link JPanel} with the setter for the currently selected
-	 * {@link Transformation}
-	 * 
-	 * @return The {@link JPanel} with the setter for the currently selected
-	 *         {@link Transformation}
-	 */
+	private JPanel getFractal() {
+		final JPanel panel = new JPanel();
+
+		final Border border = BorderFactory.createTitledBorder("Fractale");
+		panel.setBorder(border);
+
+		panel.setLayout(new BorderLayout());
+		panel.add(new FlameBuilderPreviewComponent(builder, background, palette, frame, density));
+
+		return panel;
+	}
+
+	private JPanel getUpPanel() {
+		final JPanel panel = new JPanel();
+
+		panel.setLayout(new GridLayout());
+		panel.add(getTransformations());
+		panel.add(getFractal());
+
+		return panel;
+	}
+
+	private JPanel getDownPanel() {
+		final JPanel panel = new JPanel();
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
+		panel.add(getTransformationEdition());
+		panel.add(getAffineEdition());
+
+		return panel;
+	}
+
 	private JPanel getAffineEdition() {
+		final JPanel panel = new JPanel();
+
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		panel.setBorder(BorderFactory.createTitledBorder("Transformation courante"));
+
+		panel.add(getAffineButtons());
+		panel.add(new JSeparator());
+		panel.add(getAffineWeights());
+		return panel;
+	}
+
+	private JPanel getAffineButtons() {
 
 		final JPanel panel = new JPanel();
 		final GroupLayout layout = new GroupLayout(panel);
@@ -751,14 +587,12 @@ public class FlameMakerGUI {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						final double value = ((Number) field.getValue()).doubleValue();
-						final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
+						final int index = getSelectedTransformationIndex();
 
-						AffineTransformation trans = FlameMakerGUI.this.builder
-								.affineTransformation(index);
-						trans = FlameMakerGUI.getAffineTransformation(a, b - 1, value)
-								.composeWith(trans);
+						AffineTransformation trans = builder.affineTransformation(index);
+						trans = getAffineTransformation(a, b - 1, value).composeWith(trans);
 
-						FlameMakerGUI.this.builder.setAffineTransformation(index, trans);
+						builder.setAffineTransformation(index, trans);
 					}
 				});
 
@@ -782,183 +616,54 @@ public class FlameMakerGUI {
 		return panel;
 	}
 
-	/**
-	 * Return the {@link JPanel} with the {@link JButton} to remove or add a
-	 * fractal
-	 * 
-	 * @param list
-	 *                The {@link JList} build with the
-	 *                {@link TransformationsListModel}
-	 * 
-	 * @return The {@link JPanel} with the {@link JButton} to remove or add
-	 *         a fractal
-	 */
-	private JPanel getButtons(final JList<String> list) {
-		final JButton remove = new JButton("Supprimer");
-		final JButton add = new JButton("Ajouter");
-		final TransformationsListModel model = (TransformationsListModel) list.getModel();
+	static private AffineTransformation getAffineTransformation(int i, int j, double value) {
+		final int val = (i << 2) + j;
+		switch (val) {
 
-		remove.addActionListener(new ActionListener() {
+		case (0 << 2) + 0:
+		case (0 << 2) + 1:
+			return AffineTransformation.newTranslation((val % 2 == 0 ? -value : value), 0);
+		case (0 << 2) + 2:
+		case (0 << 2) + 3:
+			return AffineTransformation.newTranslation(0, (val % 2 == 0 ? -value : value));
 
-			@SuppressWarnings("unused")
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				final int index = FlameMakerGUI.this.getSelectedTransformationIndex();
-				model.removeTransformation(index);
-				list.setSelectedIndex(index == model.getSize() ? index - 1 : index);
+		case (1 << 2) + 0:
+		case (1 << 2) + 1:
+			return AffineTransformation.newRotation((val % 2 == 0 ? value : -value) / 180);
 
-				if (model.getSize() == 1) {
-					remove.setEnabled(false);
-				}
-			}
-		});
+		case (2 << 2) + 0:
+		case (2 << 2) + 1:
+			return AffineTransformation.newScaling((val % 2 == 0 ? value : 1 / value), 1);
+		case (2 << 2) + 2:
+		case (2 << 2) + 3:
+			return AffineTransformation.newScaling(1, (val % 2 == 0 ? value : 1 / value));
 
-		add.addActionListener(new ActionListener() {
+		case (3 << 2) + 0:
+		case (3 << 2) + 1:
+			return AffineTransformation.newShearX((val % 2 == 0 ? -value : value));
+		case (3 << 2) + 2:
+		case (3 << 2) + 3:
+			return AffineTransformation.newShearY((val % 2 == 0 ? -value : value));
 
-			@SuppressWarnings("unused")
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				model.addTransformation();
-				FlameMakerGUI.this.setSelectedTransformationIndex(model.getSize() - 1);
-				list.setSelectedIndex(model.getSize() - 1);
-
-				if (!remove.isEnabled()) {
-					remove.setEnabled(true);
-				}
-			}
-		});
-
-		final JPanel buttons = new JPanel();
-		buttons.setLayout(new GridLayout(1, 2));
-		buttons.add(remove);
-		buttons.add(add);
-
-		return buttons;
+		default:
+			throw new IllegalArgumentException();
+		}
 	}
 
-	/**
-	 * Return the {@link JPanel} containing mainly the settings
-	 * 
-	 * @return The {@link JPanel} containing mainly the settings
-	 */
-	private JPanel getDownPanel() {
+	private JPanel getTransformationEdition() {
 		final JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
-		panel.add(this.getAffineChoice());
-		panel.add(this.getEdition());
+		final TransformationsListModel model = new TransformationsListModel("Transformation n°");
+		final JList<String> list = getTransformationList(model);
 
-		return panel;
-	}
-
-	/**
-	 * Return the {@link JPanel} containing the button to setup the fractal
-	 * 
-	 * @return The {@link JPanel} containing the button to setup the fractal
-	 */
-	private JPanel getEdition() {
-
-		final JPanel panel = new JPanel();
-
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createTitledBorder("Transformation courante"));
-		panel.add(this.getAffineEdition());
-		panel.add(new JSeparator());
-		panel.add(this.getWeights());
-
-		return panel;
-	}
-
-	/**
-	 * Return a {@link JList} build with the given
-	 * {@link TransformationsListModel}
-	 * 
-	 * @param model
-	 *                The {@link TransformationsListModel} to use to
-	 *                construct the {@link JList}
-	 * 
-	 * @return A {@link JList} build with the given
-	 *         {@link TransformationsListModel}
-	 */
-	private JList<String> getList(TransformationsListModel model) {
-		final JList<String> list = new JList<String>(model);
-		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		list.setVisibleRowCount(3);
-		list.setSelectedIndex(this.selectedTransformationIndex);
-		list.addListSelectionListener(new ListSelectionListener() {
-
-			@SuppressWarnings("unused")
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				FlameMakerGUI.this.setSelectedTransformationIndex(list.getSelectedIndex());
-			}
-		});
-
-		return list;
-	}
-
-	/**
-	 * Return a {@link JPanel} with the representation of the
-	 * {@link Transformation}
-	 * 
-	 * @return The {@link JPanel} with the representation of the
-	 *         {@link Transformation}
-	 */
-	private JPanel getPanelAffine() {
-		final JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		final AffineTransformationsComponent transformations = new AffineTransformationsComponent(this.builder,
-				this.frame);
-		panel.add(transformations, BorderLayout.CENTER);
-		panel.setBorder(BorderFactory.createTitledBorder("Transformations affines"));
-		this.addObserver(transformations);
-		this.builder.addObserver(transformations);
+		panel.setBorder(BorderFactory.createTitledBorder("Transformations"));
+		panel.add(new JScrollPane(list), BorderLayout.CENTER);
+		panel.add(getTransformationButtons(model, list), BorderLayout.PAGE_END);
 
 		return panel;
 	}
 
-	/**
-	 * Build a fractal and return the {@link JPanel} containing it
-	 * 
-	 * @return A {@link JPanel} with the fractal
-	 */
-	private JPanel getPanelFractal() {
-		final JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		final FlameBuilderPreviewComponent fractal = new FlameBuilderPreviewComponent(this.builder,
-				this.background, this.palette, this.frame, this.density);
-		panel.add(fractal, BorderLayout.CENTER);
-		panel.setBorder(BorderFactory.createTitledBorder("Fractale"));
-		this.builder.addObserver(fractal);
-
-		return panel;
-	}
-
-	/**
-	 * Return the {@link JPanel} containing the {@link JPanel} with the
-	 * {@link AffineTransformationsComponent} and
-	 * {@link FlameBuilderPreviewComponent}
-	 * 
-	 * @return The {@link JPanel} containing the {@link JPanel} with the
-	 *         {@link AffineTransformationsComponent} and
-	 *         {@link FlameBuilderPreviewComponent}
-	 */
-	private JPanel getUpPanel() {
-		final JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(1, 2));
-		panel.add(this.getPanelAffine());
-		panel.add(this.getPanelFractal());
-
-		return panel;
-	}
-
-	/**
-	 * Return the {@link JPanel} containing the fields with the weights of
-	 * the {@link Builder}
-	 * 
-	 * @return The {@link JPanel} containing the fields with the weights of
-	 *         the {@link Builder}
-	 */
-	private JPanel getWeights() {
+	private JPanel getAffineWeights() {
 
 		final JPanel panel = new JPanel();
 		final GroupLayout layout = new GroupLayout(panel);
@@ -998,14 +703,18 @@ public class FlameMakerGUI {
 
 			final JLabel label = new JLabel(variation.name());
 
-			this.addObserver(new Observer() {
+			addObserver(new SelectionObserver() {
 
 				@Override
-				public void changedObservedValue() {
+				public void valueChanged() {
 
-					final double value = FlameMakerGUI.this.builder.variationWeight(
-							FlameMakerGUI.this.getSelectedTransformationIndex(), variation);
-					field.setValue(value);
+					try {
+						final double value = builder.variationWeight(
+								getSelectedTransformationIndex(), variation);
+						field.setValue(value);
+					} catch (IndexOutOfBoundsException e) {
+						// Swing..
+					}
 				}
 			});
 
@@ -1015,9 +724,7 @@ public class FlameMakerGUI {
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
 					final double value = ((Number) field.getValue()).doubleValue();
-					FlameMakerGUI.this.builder.setVariationWeight(
-							FlameMakerGUI.this.getSelectedTransformationIndex(), variation,
-							value);
+					builder.setVariationWeight(getSelectedTransformationIndex(), variation, value);
 				}
 			});
 
@@ -1039,5 +746,76 @@ public class FlameMakerGUI {
 		panel.setLayout(layout);
 
 		return panel;
+	}
+
+	private JPanel getTransformationButtons(final TransformationsListModel model, final JList<String> list) {
+		final JPanel panel = new JPanel();
+		final JButton buttons[] = new JButton[2];
+
+		buttons[0] = new JButton("Ajouter");
+		buttons[1] = new JButton("Supprimer");
+
+		buttons[0].addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				model.addTransformation();
+				list.setSelectedIndex(builder.transformationCount() - 1);
+
+				if (!buttons[1].isEnabled()) {
+					buttons[1].setEnabled(true);
+				}
+			}
+		});
+
+		buttons[1].addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				final int old = getSelectedTransformationIndex();
+				model.removeTransformation(getSelectedTransformationIndex());
+				list.setSelectedIndex(old == builder.transformationCount() ? old - 1 : old);
+
+				if (builder.transformationCount() == 1) {
+					buttons[1].setEnabled(false);
+				}
+			}
+		});
+
+		panel.setLayout(new GridLayout(1, 2));
+		panel.add(buttons[0]);
+		panel.add(buttons[1]);
+
+		return panel;
+	}
+
+	private JList<String> getTransformationList(TransformationsListModel model) {
+		final JList<String> list = new JList<String>(model);
+
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		list.setVisibleRowCount(3);
+		list.setSelectedIndex(this.selectedTransformationIndex);
+
+		list.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				setSelectedTransformationIndex(list.getSelectedIndex());
+			}
+		});
+
+		return list;
+	}
+
+	public void start() {
+		final JFrame frame = new JFrame("Flame Maker");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		// TODO needed to a layout?
+		frame.getContentPane().add(getUpPanel(), BorderLayout.CENTER);
+		frame.getContentPane().add(getDownPanel(), BorderLayout.PAGE_END);
+
+		frame.pack();
+		frame.setVisible(true);
 	}
 }

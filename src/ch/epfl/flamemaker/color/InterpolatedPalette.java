@@ -41,7 +41,9 @@ public class InterpolatedPalette implements Palette {
 
 	@Override
 	public Color colorForIndex(double index) {
+		
 		if (index > 1 || index < 0) {
+			System.out.println(index);
 			throw new IllegalArgumentException();
 		}
 
