@@ -52,7 +52,7 @@ public class FlameAccumulator {
 		 *                 if the height or width are smaller or equal
 		 *                 to one
 		 */
-		public Builder(Rectangle frame, int width, int height) {
+		public Builder(final Rectangle frame, final int width, final int height) {
 			if (width <= 0 || height <= 0) {
 				throw new IllegalArgumentException();
 			}
@@ -86,7 +86,7 @@ public class FlameAccumulator {
 		 *                The index of the color for this point
 		 */
 		// FIXME lock the arrays to avoid any errors
-		public void hit(Point p, double colorIndex) {
+		public void hit(Point p, final double colorIndex) {
 			if (!this.frame.contains(p)) {
 				return;
 			}
@@ -127,7 +127,7 @@ public class FlameAccumulator {
 	 * @throws IllegalArgumentException
 	 *                 if the given arrays have not the same size
 	 */
-	private FlameAccumulator(int[][] hitCount, double[][] colorIndexSum) {
+	private FlameAccumulator(final int[][] hitCount, final double[][] colorIndexSum) {
 		this.hitCount = new int[hitCount.length][hitCount[0].length];
 		this.colorIndexSum = new double[colorIndexSum.length][colorIndexSum[0].length];
 
@@ -176,7 +176,7 @@ public class FlameAccumulator {
 	 * @throws IndexOutOfBoundsException
 	 *                 if x or y are not in the accumulator
 	 */
-	public Color color(Palette palette, Color background, int x, int y) {
+	public Color color(final Palette palette, final Color background, final int x, final int y) {
 		if (x < 0 || y < 0 || x > this.width() || y > this.height()) {
 			throw new IndexOutOfBoundsException();
 		}
@@ -216,7 +216,7 @@ public class FlameAccumulator {
 	 * @throws IndexOutOfBoundsException
 	 *                 if x or y are not in the accumulator
 	 */
-	double intensity(int x, int y) {
+	double intensity(final int x, final int y) {
 		if (x < 0 || y < 0 || x > this.width() || y > this.height()) {
 			throw new IndexOutOfBoundsException();
 		}

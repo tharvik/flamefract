@@ -23,7 +23,7 @@ public class FlamePGMMaker {
 	 * @param args
 	 *                Not used
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		final Runnable sharkfin = new Runnable() {
 
@@ -167,7 +167,7 @@ public class FlamePGMMaker {
 	 * @param stream
 	 *                The stream to write the fractal to
 	 */
-	private static void writeToPGM(FlameAccumulator accu, PrintStream stream) {
+	private static void writeToPGM(final FlameAccumulator accu, final PrintStream stream) {
 		stream.println("P2");
 		stream.println(accu.width() + " " + accu.height());
 		stream.println(100);

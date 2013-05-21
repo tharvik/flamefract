@@ -15,25 +15,6 @@ package ch.epfl.flamemaker.geometry2d;
  */
 public final class AffineTransformation implements Transformation {
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		AffineTransformation other = (AffineTransformation) obj;
-		if (this.a != other.a || this.b != other.b || this.c != other.c || this.d != other.d
-				|| this.e != other.e || this.f != other.f) {
-			return false;
-		}
-		return true;
-	}
-
 	/**
 	 * <p>
 	 * The identity matrix
@@ -47,6 +28,7 @@ public final class AffineTransformation implements Transformation {
 	 * 
 	 */
 	public static final AffineTransformation	IDENTITY	= new AffineTransformation(1, 0, 0, 0, 1, 0);
+
 	/**
 	 * The 1,1 element of the matrix
 	 */
@@ -67,7 +49,6 @@ public final class AffineTransformation implements Transformation {
 	 * The 2,2 element of the matrix
 	 */
 	final private double				e;
-
 	/**
 	 * The 2,3 element of the matrix
 	 */
@@ -80,7 +61,7 @@ public final class AffineTransformation implements Transformation {
 	 *                The angle of the rotation (in radians)
 	 * @return A matrix we use to rotate a vector
 	 */
-	public static AffineTransformation newRotation(double theta) {
+	public static AffineTransformation newRotation(final double theta) {
 		final double sin = Math.sin(theta);
 		final double cos = Math.cos(theta);
 
@@ -96,7 +77,7 @@ public final class AffineTransformation implements Transformation {
 	 *                The dilation factor on the y-axis
 	 * @return A matrix we use to scale a vector
 	 */
-	public static AffineTransformation newScaling(double sX, double sY) {
+	public static AffineTransformation newScaling(final double sX, final double sY) {
 		return new AffineTransformation(sX, 0.0, 0.0, 0.0, sY, 0.0);
 	}
 
@@ -107,7 +88,7 @@ public final class AffineTransformation implements Transformation {
 	 *                The factor of shearing
 	 * @return A matrix we use to shear a vector
 	 */
-	public static AffineTransformation newShearX(double sX) {
+	public static AffineTransformation newShearX(final double sX) {
 		return new AffineTransformation(1, sX, 0, 0, 1, 0);
 	}
 
@@ -118,7 +99,7 @@ public final class AffineTransformation implements Transformation {
 	 *                The factor of shearing
 	 * @return A matrix we use to shear a vector
 	 */
-	public static AffineTransformation newShearY(double sY) {
+	public static AffineTransformation newShearY(final double sY) {
 		return new AffineTransformation(1, 0, 0, sY, 1, 0);
 	}
 
@@ -133,7 +114,7 @@ public final class AffineTransformation implements Transformation {
 	 *                transformed vector on the y-axis
 	 * @return A matrix we use to translate a vector
 	 */
-	public static AffineTransformation newTranslation(double dX, double dY) {
+	public static AffineTransformation newTranslation(final double dX, final double dY) {
 		return new AffineTransformation(1, 0, dX, 0, 1, dY);
 	}
 
@@ -153,7 +134,8 @@ public final class AffineTransformation implements Transformation {
 	 * @param f
 	 *                The 2,3 element of the matrix
 	 */
-	public AffineTransformation(double a, double b, double c, double d, double e, double f) {
+	public AffineTransformation(final double a, final double b, final double c, final double d, final double e,
+			final double f) {
 		this.a = a;
 		this.b = b;
 		this.c = c;
@@ -171,7 +153,7 @@ public final class AffineTransformation implements Transformation {
 	 * @return A matrix that represents the compounded function of two
 	 *         transformation
 	 */
-	public AffineTransformation composeWith(AffineTransformation that) {
+	public AffineTransformation composeWith(final AffineTransformation that) {
 		final double newA = this.a * that.a + this.b * that.d;
 		final double newB = this.a * that.b + this.b * that.e;
 		final double newC = this.a * that.c + this.b * that.f + this.c;
@@ -183,6 +165,25 @@ public final class AffineTransformation implements Transformation {
 	}
 
 	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final AffineTransformation other = (AffineTransformation) obj;
+		if (this.a != other.a || this.b != other.b || this.c != other.c || this.d != other.d
+				|| this.e != other.e || this.f != other.f) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return String.format(
 				"|% f % f % f|" + System.lineSeparator() + "|% f % f % f|" + System.lineSeparator()
@@ -191,7 +192,7 @@ public final class AffineTransformation implements Transformation {
 	}
 
 	@Override
-	public Point transformPoint(Point p) {
+	public Point transformPoint(final Point p) {
 		final double newX = p.x() * this.a + p.y() * this.b + this.c;
 		final double newY = p.x() * this.d + p.y() * this.e + this.f;
 

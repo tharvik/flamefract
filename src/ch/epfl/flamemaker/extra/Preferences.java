@@ -66,11 +66,6 @@ public class Preferences {
 		private final String			path;
 
 		/**
-		 * The number of threads used in computation
-		 */
-		private int				threads;
-
-		/**
 		 * The time between every refresh of the fractal
 		 */
 		private int				refresh;
@@ -80,6 +75,11 @@ public class Preferences {
 		 * to set the best value at runtime
 		 */
 		private int				step;
+
+		/**
+		 * The number of threads used in computation
+		 */
+		private int				threads;
 
 		/**
 		 * The threshold in number of points where we will increase the
@@ -138,7 +138,7 @@ public class Preferences {
 		 *                 {@link String} are not {@link Double} or if
 		 *                 there is not exactly three values
 		 */
-		private static Color parseColor(String value) {
+		private static Color parseColor(final String value) {
 			final String[] strings = Builder.splitValue(value);
 
 			if (strings.length != 3) {
@@ -167,7 +167,7 @@ public class Preferences {
 		 *                 if the values inside the {@link String} are
 		 *                 not {@link Double}
 		 */
-		private static double parseDouble(String value) {
+		private static double parseDouble(final String value) {
 			try {
 				return Double.parseDouble(value);
 			} catch (final NumberFormatException e) {
@@ -189,7 +189,7 @@ public class Preferences {
 		 *                 if the values inside the {@link String} are
 		 *                 not {@link Integer}
 		 */
-		private static int parseInt(String value) {
+		private static int parseInt(final String value) {
 			int i;
 			try {
 				i = Integer.parseInt(value);
@@ -217,7 +217,7 @@ public class Preferences {
 		 *                 {@link String} are not double and are not
 		 *                 exactly three
 		 */
-		private static void parseMatrix(String value, ArrayList<AffineTransformation> affines) {
+		private static void parseMatrix(final String value, final ArrayList<AffineTransformation> affines) {
 
 			final String[] split = Builder.splitValue(value);
 
@@ -267,7 +267,7 @@ public class Preferences {
 		 *                 {@link String} are not {@link Color} or if
 		 *                 there is not exactly three values
 		 */
-		private static Palette parsePalette(String value) {
+		private static Palette parsePalette(final String value) {
 			final String[] strings = Builder.splitValue(value);
 
 			if (strings.length != 3) {
@@ -298,7 +298,7 @@ public class Preferences {
 		 *                 {@link String} are not {@link Double} or if
 		 *                 there is not exactly two values
 		 */
-		private static Point parsePoint(String value) {
+		private static Point parsePoint(final String value) {
 
 			final String[] strings = Builder.splitValue(value);
 
@@ -332,7 +332,7 @@ public class Preferences {
 		 *                 the {@link String} are not {@link Double} or
 		 *                 if there is not exactly three values
 		 */
-		private static Rectangle parseRectangle(String value) {
+		private static Rectangle parseRectangle(final String value) {
 			final String[] strings = Builder.splitValue(value);
 
 			if (strings.length != 3) {
@@ -365,7 +365,7 @@ public class Preferences {
 		 *                 exactly six
 		 * 
 		 */
-		private static void parseWeight(String value, ArrayList<double[]> weights) {
+		private static void parseWeight(final String value, final ArrayList<double[]> weights) {
 			final String[] split = Builder.splitValue(value);
 
 			if (split.length != 6) {
@@ -448,7 +448,7 @@ public class Preferences {
 		 * @param stream
 		 *                The stream to write to
 		 */
-		private static void writeConf(PrintStream stream) {
+		private static void writeConf(final PrintStream stream) {
 			stream.println("# Default configuration file for flamefract");
 			stream.println();
 			stream.println("# Every times the is a '#', it means the begin of a comment which won't be relevant");
@@ -566,7 +566,7 @@ public class Preferences {
 		 * @throws IllegalArgumentException
 		 *                 if the arrays aren't of the same size
 		 */
-		private void addArrays(ArrayList<AffineTransformation> affines, ArrayList<double[]> weights) {
+		private void addArrays(final ArrayList<AffineTransformation> affines, final ArrayList<double[]> weights) {
 			if (affines.size() != weights.size()) {
 				throw new IllegalArgumentException(
 						"The number of matrix is not equal to the number of weight");
@@ -601,7 +601,7 @@ public class Preferences {
 		 * @param reader
 		 *                The {@link DataInputStream} to parse
 		 */
-		private void readConf(BufferedReader reader) {
+		private void readConf(final BufferedReader reader) {
 
 			int num = 0;
 
@@ -706,6 +706,26 @@ public class Preferences {
 	}
 
 	/**
+	 * All the defaults values of the {@link Preferences}
+	 */
+	public final static Preferences		defaults	= new Preferences(
+										Color.BLACK,
+										Preferences.Builder.generateSharkFin(),
+										50,
+										new Rectangle(new Point(-0.25, 0), 5, 4),
+										new InterpolatedPalette(Arrays.asList(
+												Color.RED, Color.GREEN,
+												Color.BLUE)),
+										Runtime.getRuntime()
+												.availableProcessors() + 1,
+										100, -1, 10000);
+
+	/**
+	 * All the values of the {@link Preferences} set by the builder
+	 */
+	public final static Preferences		values		= new Preferences();
+
+	/**
 	 * The {@link Color} of the background we use to build the image
 	 */
 	public final Color			background;
@@ -731,11 +751,6 @@ public class Preferences {
 	public final Palette			palette;
 
 	/**
-	 * The number of threads used in computation
-	 */
-	public final int			threads;
-
-	/**
 	 * The time between every refresh of the fractal
 	 */
 	public final int			refresh;
@@ -745,6 +760,11 @@ public class Preferences {
 	 * the best value at runtime
 	 */
 	public final int			step;
+
+	/**
+	 * The number of threads used in computation
+	 */
+	public final int			threads;
 
 	/**
 	 * The threshold in number of points where we will increase the refresh
@@ -758,43 +778,6 @@ public class Preferences {
 	 */
 	private Preferences() {
 		this(new Preferences.Builder().build());
-	}
-
-	/**
-	 * All the defaults values of the {@link Preferences}
-	 */
-	public final static Preferences	defaults	= new Preferences(Color.BLACK,
-									Preferences.Builder.generateSharkFin(), 50,
-									new Rectangle(new Point(-0.25, 0), 5, 4),
-									new InterpolatedPalette(Arrays.asList(
-											Color.RED, Color.GREEN,
-											Color.BLUE)), Runtime
-											.getRuntime()
-											.availableProcessors() + 1,
-									100, -1, 10000);
-	
-	/**
-	 * All the values of the {@link Preferences} set by the builder
-	 */
-	public final static Preferences	values		= new Preferences();
-
-	/**
-	 * Copy-construct a {@link Preferences} with the given
-	 * {@link Preferences}
-	 * 
-	 * @param pref
-	 *                The {@link Preferences} to copy
-	 */
-	private Preferences(Preferences pref) {
-		this.background = pref.background;
-		this.builder = pref.builder;
-		this.density = pref.density;
-		this.frame = pref.frame;
-		this.palette = pref.palette;
-		this.threads = pref.threads;
-		this.refresh = pref.refresh;
-		this.step = pref.step;
-		this.threshold = pref.threshold;
 	}
 
 	/**
@@ -822,8 +805,9 @@ public class Preferences {
 	 *                The threshold in number of points where we will
 	 *                increase the refresh time
 	 */
-	private Preferences(Color background, ObservableFlameBuilder builder, int density, Rectangle frame,
-			Palette palette, int threads, int refresh, int step, int threshold) {
+	private Preferences(final Color background, final ObservableFlameBuilder builder, final int density,
+			final Rectangle frame, final Palette palette, final int threads, final int refresh,
+			final int step, final int threshold) {
 		this.background = background;
 		this.builder = builder;
 		this.density = density;
@@ -833,5 +817,24 @@ public class Preferences {
 		this.refresh = refresh;
 		this.step = step;
 		this.threshold = threshold;
+	}
+
+	/**
+	 * Copy-construct a {@link Preferences} with the given
+	 * {@link Preferences}
+	 * 
+	 * @param pref
+	 *                The {@link Preferences} to copy
+	 */
+	private Preferences(final Preferences pref) {
+		this.background = pref.background;
+		this.builder = pref.builder;
+		this.density = pref.density;
+		this.frame = pref.frame;
+		this.palette = pref.palette;
+		this.threads = pref.threads;
+		this.refresh = pref.refresh;
+		this.step = pref.step;
+		this.threshold = pref.threshold;
 	}
 }

@@ -24,7 +24,7 @@ public class IFSMaker {
 	 *                Not used
 	 */
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		try {
 			final PrintStream file = new PrintStream("SierpinskiTriangle.bpm");
@@ -58,7 +58,7 @@ public class IFSMaker {
 	 * @param stream
 	 *                The stream to write to
 	 */
-	public static void writeToBPM(IFSAccumulator accu, PrintStream stream) {
+	public static void writeToBPM(final IFSAccumulator accu, final PrintStream stream) {
 		stream.println("P1");
 		stream.println(accu.width() + " " + accu.height());
 

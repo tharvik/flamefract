@@ -2,7 +2,7 @@ public class APITester {
 
 	private static ClassLoader	classLoader	= APITester.class.getClassLoader();
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		System.out.println("Welcome to the API tester for the PTI project.");
 		System.out.println("For any issue with the tool, please contact Michele Catasta "
 				+ "(michele.catasta@epfl.ch).\n");
@@ -41,7 +41,7 @@ public class APITester {
 				"color.RandomPalette", "flame.FlamePPMMaker" });
 	}
 
-	private static void testClasses(String[] classNames) throws ClassNotFoundException {
+	private static void testClasses(final String[] classNames) throws ClassNotFoundException {
 		for (final String clazz : classNames) {
 			try {
 				APITester.classLoader.loadClass("ch.epfl.flamemaker." + clazz);

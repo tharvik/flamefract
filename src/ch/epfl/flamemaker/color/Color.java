@@ -47,7 +47,7 @@ public final class Color {
 	 * 
 	 * @return The value encode in sRGB multiplied by max
 	 */
-	public static int sRGBEncode(double v, int max) {
+	public static int sRGBEncode(final double v, final int max) {
 		if (v <= 0.0031308) {
 			return (int) (12.92 * v * max);
 		}
@@ -67,7 +67,7 @@ public final class Color {
 	 * @throws IllegalArgumentException
 	 *                 if the value is not between 0 and 1 (both included)
 	 */
-	public Color(double r, double g, double b) {
+	public Color(final double r, final double g, final double b) {
 
 		// if r,g,b not in [0,1]
 		if (r < 0 || g < 0 || b < 0 || r > 1 || g > 1 || b > 1) {
@@ -86,11 +86,11 @@ public final class Color {
 	 * @return Colors as an int, a value by byte in red, green, blue order
 	 */
 	public int asPackedRGB() {
-		int color = sRGBEncode(this.r, 255);
+		int color = Color.sRGBEncode(this.r, 255);
 		color = color << 8;
-		color += sRGBEncode(this.g, 255);
+		color += Color.sRGBEncode(this.g, 255);
 		color = color << 8;
-		color += sRGBEncode(this.b, 255);
+		color += Color.sRGBEncode(this.b, 255);
 		return color;
 	}
 
@@ -132,7 +132,7 @@ public final class Color {
 	 *                 if the proportion is not between 0 and 1 (both
 	 *                 included)
 	 */
-	public Color mixWith(Color that, double proportion) {
+	public Color mixWith(final Color that, final double proportion) {
 		if (proportion < 0 || proportion > 1) {
 			throw new IllegalArgumentException();
 		}

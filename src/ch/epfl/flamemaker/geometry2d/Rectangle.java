@@ -37,7 +37,7 @@ public final class Rectangle {
 	 *                 if the width or the height <= 0 (mathematically
 	 *                 impossible)
 	 */
-	public Rectangle(Point center, double width, double height) {
+	public Rectangle(final Point center, final double width, final double height) {
 
 		if (width <= 0 || height <= 0) {
 			throw new IllegalArgumentException();
@@ -83,7 +83,7 @@ public final class Rectangle {
 	 * 
 	 * @return True if the given point is in the rectangle
 	 */
-	public boolean contains(Point p) {
+	public boolean contains(final Point p) {
 		return (p.x() >= this.left() && p.x() < this.right() && p.y() >= this.bottom() && p.y() < this.top());
 	}
 
@@ -98,7 +98,7 @@ public final class Rectangle {
 	 * @throws IllegalArgumentException
 	 *                 if the ratio <= 0
 	 */
-	public Rectangle expandToAspectRatio(double aspectRatio) {
+	public Rectangle expandToAspectRatio(final double aspectRatio) {
 		if (aspectRatio <= 0) {
 			throw new IllegalArgumentException();
 		}

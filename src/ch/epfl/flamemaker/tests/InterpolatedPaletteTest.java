@@ -44,7 +44,7 @@ public class InterpolatedPaletteTest extends PaletteTest {
 	}
 
 	@Override
-	Palette newPalette(List<Color> colors) {
+	Palette newPalette(final List<Color> colors) {
 		return new InterpolatedPalette(colors);
 	}
 }

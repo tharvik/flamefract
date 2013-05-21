@@ -28,34 +28,22 @@ public class Flame {
 		 */
 		private final ArrayList<FlameTransformation.Builder>	list;
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			Builder other = (Builder) obj;
-			if (list == null) {
-				if (other.list != null) {
-					return false;
+		/**
+		 * Copy-construct a new {@link Builder} based on the given one
+		 * 
+		 * @param copy
+		 *                The {@link Builder} to copy
+		 */
+		public Builder(final Builder copy) {
+			this.list = new ArrayList<FlameTransformation.Builder>();
+			for (final FlameTransformation.Builder builder : copy.list) {
+				final double[] array = new double[6];
+				for (int i = 0; i < array.length; i++) {
+					array[i] = builder.getVariationWeightValue(i);
 				}
-			} else if (!list.equals(other.list)) {
-				return false;
+				this.list.add(new FlameTransformation.Builder(new FlameTransformation(builder
+						.getAffineTransformation(), array)));
 			}
-
-			final Iterator<FlameTransformation.Builder> i = this.list.iterator(), o = other.list.iterator();
-			for (; i.hasNext() && o.hasNext();) {
-				if (!i.next().equals(o.next())) {
-					return false;
-				}
-			}
-
-			return true;
 		}
 
 		/**
@@ -64,29 +52,11 @@ public class Flame {
 		 * @param flame
 		 *                The {@link Flame} to take as base
 		 */
-		public Builder(Flame flame) {
+		public Builder(final Flame flame) {
 			// deep copy of the list of the given Flame
 			this.list = new ArrayList<FlameTransformation.Builder>();
 			for (final FlameTransformation flameTransformation : flame.transformations) {
 				this.list.add(new FlameTransformation.Builder(flameTransformation));
-			}
-		}
-
-		/**
-		 * Copy-construct a new {@link Builder} based on the given one
-		 * 
-		 * @param copy
-		 *                The {@link Builder} to copy
-		 */
-		public Builder(Builder copy) {
-			this.list = new ArrayList<FlameTransformation.Builder>();
-			for (FlameTransformation.Builder builder : copy.list) {
-				double[] array = new double[6];
-				for (int i = 0; i < array.length; i++) {
-					array[i] = builder.getVariationWeightValue(i);
-				}
-				this.list.add(new FlameTransformation.Builder(new FlameTransformation(builder
-						.getAffineTransformation(), array)));
 			}
 		}
 
@@ -97,7 +67,7 @@ public class Flame {
 		 *                The {@link FlameTransformation} to add to the
 		 *                end of the list
 		 */
-		public void addTransformation(FlameTransformation transformation) {
+		public void addTransformation(final FlameTransformation transformation) {
 			this.list.add(new FlameTransformation.Builder(transformation));
 		}
 
@@ -116,7 +86,7 @@ public class Flame {
 		 *                 If the index is less than zero of greater
 		 *                 than the max index of the list
 		 */
-		public AffineTransformation affineTransformation(int index) {
+		public AffineTransformation affineTransformation(final int index) {
 			this.checkIndex(index);
 			return this.list.get(index).getAffineTransformation();
 		}
@@ -138,6 +108,36 @@ public class Flame {
 			return new Flame(transformations);
 		}
 
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (this.getClass() != obj.getClass()) {
+				return false;
+			}
+			final Builder other = (Builder) obj;
+			if (this.list == null) {
+				if (other.list != null) {
+					return false;
+				}
+			} else if (!this.list.equals(other.list)) {
+				return false;
+			}
+
+			final Iterator<FlameTransformation.Builder> i = this.list.iterator(), o = other.list.iterator();
+			for (; i.hasNext() && o.hasNext();) {
+				if (!i.next().equals(o.next())) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		/**
 		 * Remove the {@link FlameTransformation} at the given index
 		 * 
@@ -148,7 +148,7 @@ public class Flame {
 		 *                 If the index is less than zero of greater
 		 *                 than the max index of the list
 		 */
-		public void removeTransformation(int index) {
+		public void removeTransformation(final int index) {
 			this.checkIndex(index);
 			this.list.remove(index);
 		}
@@ -167,7 +167,7 @@ public class Flame {
 		 *                 If the index is less than zero of greater
 		 *                 than the max index of the list
 		 */
-		public void setAffineTransformation(int index, AffineTransformation newTransformation) {
+		public void setAffineTransformation(final int index, final AffineTransformation newTransformation) {
 			this.checkIndex(index);
 			this.list.get(index).setAffineTransformation(newTransformation);
 		}
@@ -188,7 +188,7 @@ public class Flame {
 		 *                 If the index is less than zero of greater
 		 *                 than the max index of the list
 		 */
-		public void setVariationWeight(int index, Variation variation, double newWeight) {
+		public void setVariationWeight(final int index, final Variation variation, final double newWeight) {
 			this.checkIndex(index);
 			this.list.get(index).setVariationWeight(variation.index(), newWeight);
 		}
@@ -219,7 +219,7 @@ public class Flame {
 		 *                 If the index is less than zero of greater
 		 *                 than the max index of the list
 		 */
-		public double variationWeight(int index, Variation variation) {
+		public double variationWeight(final int index, final Variation variation) {
 			this.checkIndex(index);
 			return this.list.get(index).getVariationWeightValue(variation.index());
 		}
@@ -234,7 +234,7 @@ public class Flame {
 		 *                 If the index is less than zero of greater
 		 *                 than the max index of the list
 		 */
-		private void checkIndex(int index) {
+		private void checkIndex(final int index) {
 			if (index < 0 || index >= this.transformationCount()) {
 				throw new IndexOutOfBoundsException();
 			}
@@ -259,7 +259,7 @@ public class Flame {
 	 *                The {@link FlameTransformation} to use to generate the
 	 *                fractal
 	 */
-	public Flame(List<FlameTransformation> transformations) {
+	public Flame(final List<FlameTransformation> transformations) {
 		this.transformations = new ArrayList<FlameTransformation>(transformations);
 
 		this.arrayIndex = new double[this.transformations.size()];
@@ -343,14 +343,14 @@ public class Flame {
 			return;
 		}
 
-		for (Thread thread : threads) {
+		for (final Thread thread : threads) {
 			thread.start();
 		}
 
-		for (Thread thread : threads) {
+		for (final Thread thread : threads) {
 			try {
 				thread.join();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
@@ -374,7 +374,7 @@ public class Flame {
 	 * 
 	 * @return A {@link FlameAccumulator} with the generate fractal
 	 */
-	public FlameAccumulator compute(Rectangle frame, int width, int height, int density) {
+	public FlameAccumulator compute(final Rectangle frame, final int width, final int height, final int density) {
 
 		final Random rand = new Random();
 		final int m = density * width * height;
@@ -415,14 +415,14 @@ public class Flame {
 			return image.build();
 		}
 
-		for (Thread thread : threads) {
+		for (final Thread thread : threads) {
 			thread.start();
 		}
 
-		for (Thread thread : threads) {
+		for (final Thread thread : threads) {
 			try {
 				thread.join();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}

@@ -17,19 +17,19 @@ public abstract class Variation implements Transformation {
 	public final static List<Variation>	ALL_VARIATIONS	= Arrays.asList(new Variation(Variation.total++,
 										"Linear") {
 									@Override
-									public Point transformPoint(Point p) {
+									public Point transformPoint(final Point p) {
 										return p;
 									}
 								}, new Variation(Variation.total++, "Sinusoidal") {
 									@Override
-									public Point transformPoint(Point p) {
+									public Point transformPoint(final Point p) {
 										final double x = Math.sin(p.x());
 										final double y = Math.sin(p.y());
 										return new Point(x, y);
 									}
 								}, new Variation(Variation.total++, "Spherical") {
 									@Override
-									public Point transformPoint(Point p) {
+									public Point transformPoint(final Point p) {
 										final double x = p.x()
 												/ Math.pow(p.r(), 2);
 										final double y = p.y()
@@ -38,7 +38,7 @@ public abstract class Variation implements Transformation {
 									}
 								}, new Variation(Variation.total++, "Swirl") {
 									@Override
-									public Point transformPoint(Point p) {
+									public Point transformPoint(final Point p) {
 										final double r = Math.pow(p.r(), 2);
 										final double x = p.x() * Math.sin(r)
 												- p.y() * Math.cos(r);
@@ -48,7 +48,7 @@ public abstract class Variation implements Transformation {
 									}
 								}, new Variation(Variation.total++, "Horseshoe") {
 									@Override
-									public Point transformPoint(Point p) {
+									public Point transformPoint(final Point p) {
 										final double x = (p.x() - p.y())
 												* (p.x() + p.y())
 												/ p.r();
@@ -58,7 +58,7 @@ public abstract class Variation implements Transformation {
 									}
 								}, new Variation(Variation.total++, "Bubble") {
 									@Override
-									public Point transformPoint(Point p) {
+									public Point transformPoint(final Point p) {
 										final double r = Math.pow(p.r(), 2) + 4;
 										final double x = 4 * p.x() / (r);
 										final double y = 4 * p.y() / (r);
@@ -88,7 +88,7 @@ public abstract class Variation implements Transformation {
 	 * @param name
 	 *                The name
 	 */
-	private Variation(int index, String name) {
+	private Variation(final int index, final String name) {
 		this.name = name;
 		this.index = index;
 	}

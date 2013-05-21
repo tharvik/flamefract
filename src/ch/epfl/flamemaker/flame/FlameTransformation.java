@@ -17,32 +17,6 @@ public class FlameTransformation implements Transformation {
 	 */
 	public static class Builder {
 
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			
-			if (obj == null) {
-				return false;
-			}
-			if (getClass() != obj.getClass()) {
-				return false;
-			}
-			Builder other = (Builder) obj;
-			if (affineTransformation == null) {
-				if (other.affineTransformation != null) {
-					return false;
-				}
-			} else if (!affineTransformation.equals(other.affineTransformation)) {
-				return false;
-			}
-			if (!Arrays.equals(variationWeight, other.variationWeight)) {
-				return false;
-			}
-			return true;
-		}
-
 		/**
 		 * The AffineTransformation used in every transformPoint
 		 */
@@ -64,7 +38,7 @@ public class FlameTransformation implements Transformation {
 		 *                 if the given index is not between 0 and 5
 		 *                 (both included)
 		 */
-		private static void checkIndex(int index) {
+		private static void checkIndex(final int index) {
 			if (index < 0 || index >= 6) {
 				throw new IndexOutOfBoundsException();
 			}
@@ -79,7 +53,7 @@ public class FlameTransformation implements Transformation {
 		 * @param variationWeight
 		 *                The weight of every variation
 		 */
-		public Builder(AffineTransformation affineTransformation, double[] variationWeight) {
+		public Builder(final AffineTransformation affineTransformation, final double[] variationWeight) {
 
 			FlameTransformation.checkValue(variationWeight);
 			this.affineTransformation = affineTransformation;
@@ -97,7 +71,7 @@ public class FlameTransformation implements Transformation {
 		 * @param flameTransformation
 		 *                The FlameTransformation to build upon
 		 */
-		public Builder(FlameTransformation flameTransformation) {
+		public Builder(final FlameTransformation flameTransformation) {
 			this.affineTransformation = flameTransformation.affineTransformation;
 			this.variationWeight = flameTransformation.variationWeight;
 		}
@@ -111,6 +85,32 @@ public class FlameTransformation implements Transformation {
 		 */
 		public FlameTransformation build() {
 			return new FlameTransformation(this.affineTransformation, this.variationWeight);
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+
+			if (obj == null) {
+				return false;
+			}
+			if (this.getClass() != obj.getClass()) {
+				return false;
+			}
+			final Builder other = (Builder) obj;
+			if (this.affineTransformation == null) {
+				if (other.affineTransformation != null) {
+					return false;
+				}
+			} else if (!this.affineTransformation.equals(other.affineTransformation)) {
+				return false;
+			}
+			if (!Arrays.equals(this.variationWeight, other.variationWeight)) {
+				return false;
+			}
+			return true;
 		}
 
 		/**
@@ -134,7 +134,7 @@ public class FlameTransformation implements Transformation {
 		 *                 if the given index is not between 0 and 5
 		 *                 (both included)
 		 */
-		public double getVariationWeightValue(int index) {
+		public double getVariationWeightValue(final int index) {
 			Builder.checkIndex(index);
 			return this.variationWeight[index];
 		}
@@ -145,7 +145,7 @@ public class FlameTransformation implements Transformation {
 		 * @param affineTransformation
 		 *                The new AffineTransformation
 		 */
-		public void setAffineTransformation(AffineTransformation affineTransformation) {
+		public void setAffineTransformation(final AffineTransformation affineTransformation) {
 			this.affineTransformation = affineTransformation;
 		}
 
@@ -162,7 +162,7 @@ public class FlameTransformation implements Transformation {
 		 *                 if the given index is not between 0 and 5
 		 *                 (both included)
 		 */
-		public void setVariationWeight(int index, double value) {
+		public void setVariationWeight(final int index, final double value) {
 			Builder.checkIndex(index);
 			this.variationWeight[index] = value;
 		}
@@ -190,7 +190,7 @@ public class FlameTransformation implements Transformation {
 	 *                 included)
 	 * 
 	 */
-	private static void checkValue(double[] variationWeight) {
+	private static void checkValue(final double[] variationWeight) {
 		if (variationWeight == null || variationWeight.length != 6) {
 			throw new IllegalArgumentException();
 		}
@@ -211,7 +211,7 @@ public class FlameTransformation implements Transformation {
 	 *                 in variationWeight is not between 0 and 1 (both
 	 *                 included)
 	 */
-	public FlameTransformation(AffineTransformation affineTransformation, double[] variationWeight) {
+	public FlameTransformation(final AffineTransformation affineTransformation, final double[] variationWeight) {
 		this.affineTransformation = affineTransformation;
 
 		FlameTransformation.checkValue(variationWeight);

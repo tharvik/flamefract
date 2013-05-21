@@ -25,7 +25,7 @@ public class InterpolatedPalette implements Palette {
 	 *                 if the size of the given {@link List} is less than
 	 *                 two
 	 */
-	public InterpolatedPalette(List<Color> colors) {
+	public InterpolatedPalette(final List<Color> colors) {
 
 		// because, if we do not have two colors, the palette will not
 		// been bound and thus not usable
@@ -40,8 +40,8 @@ public class InterpolatedPalette implements Palette {
 	}
 
 	@Override
-	public Color colorForIndex(double index) {
-		
+	public Color colorForIndex(final double index) {
+
 		if (index > 1 || index < 0) {
 			System.out.println(index);
 			throw new IllegalArgumentException();

@@ -15,7 +15,7 @@ public final class IFSAccumulator {
 	 * @param isHit
 	 *                bidimensional array of booleans
 	 */
-	public IFSAccumulator(boolean[][] isHit) {
+	public IFSAccumulator(final boolean[][] isHit) {
 		this.isHit = new boolean[isHit.length][isHit[0].length];
 
 		// Deep copy of the array
@@ -49,7 +49,7 @@ public final class IFSAccumulator {
 	 *                 if x or y are less than zero or if x is greater than
 	 *                 the width or y is greater than the height
 	 */
-	public boolean isHit(int x, int y) {
+	public boolean isHit(final int x, final int y) {
 		if (x > this.width() || x < 0 || y > this.height() || y < 0) {
 			throw new IndexOutOfBoundsException();
 		}

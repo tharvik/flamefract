@@ -37,7 +37,7 @@ public class IFSAccumulatorBuilder {
 	 * @throws IllegalArgumentException
 	 *                 if the width or height are less or equal to zero
 	 */
-	public IFSAccumulatorBuilder(Rectangle frame, int width, int height) {
+	public IFSAccumulatorBuilder(final Rectangle frame, final int width, final int height) {
 		if (width <= 0 || height <= 0) {
 			throw new IllegalArgumentException();
 		}

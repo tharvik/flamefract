@@ -29,7 +29,7 @@ public final class Point {
 	 * @param y
 	 *                The y value
 	 */
-	public Point(double x, double y) {
+	public Point(final double x, final double y) {
 		this.x = x;
 		this.y = y;
 	}

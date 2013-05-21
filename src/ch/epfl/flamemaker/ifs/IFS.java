@@ -32,7 +32,7 @@ public final class IFS {
 	 *                The {@link AffineTransformation} to use to generate
 	 *                the fractal
 	 */
-	public IFS(List<AffineTransformation> transformations) {
+	public IFS(final List<AffineTransformation> transformations) {
 		this.transformations = new ArrayList<AffineTransformation>(transformations);
 	}
 
@@ -54,7 +54,7 @@ public final class IFS {
 	 * 
 	 * @return A {@link IFSAccumulator} with the generate fractal
 	 */
-	public IFSAccumulator compute(Rectangle frame, int width, int height, int density) {
+	public IFSAccumulator compute(final Rectangle frame, final int width, final int height, final int density) {
 
 		final Random random = new Random();
 		Point p = Point.ORIGIN;

@@ -20,7 +20,7 @@ public class RandomPalette implements Palette {
 	 * @param numberOfRandomColor
 	 *                Total number of wanted {@link Color}
 	 */
-	public RandomPalette(int numberOfRandomColor) {
+	public RandomPalette(final int numberOfRandomColor) {
 		final Random random = new Random();
 		final ArrayList<Color> list = new ArrayList<Color>();
 		for (int i = 0; i < numberOfRandomColor; i++) {
@@ -40,7 +40,7 @@ public class RandomPalette implements Palette {
 	}
 
 	@Override
-	public Color colorForIndex(double index) {
+	public Color colorForIndex(final double index) {
 		return this.palette.colorForIndex(index);
 	}
 

@@ -45,7 +45,7 @@ public class ObservableFlameBuilder {
 	 * @param flame
 	 *                The {@link Flame} to take as base
 	 */
-	public ObservableFlameBuilder(Flame flame) {
+	public ObservableFlameBuilder(final Flame flame) {
 		this.builder = new Flame.Builder(flame);
 		this.observers = new HashSet<ObservableFlameBuilder.Observer>();
 	}
@@ -57,41 +57,12 @@ public class ObservableFlameBuilder {
 	 * @param builder
 	 *                The {@link ObservableFlameBuilder} to copy
 	 */
-	public ObservableFlameBuilder(ObservableFlameBuilder builder) {
+	public ObservableFlameBuilder(final ObservableFlameBuilder builder) {
 		this.builder = new Builder(builder.builder);
 		this.observers = new HashSet<ObservableFlameBuilder.Observer>();
-		for (Observer observer : builder.observers) {
+		for (final Observer observer : builder.observers) {
 			this.observers.add(observer);
 		}
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		ObservableFlameBuilder other = (ObservableFlameBuilder) obj;
-		if (builder == null) {
-			if (other.builder != null) {
-				return false;
-			}
-		} else if (!builder.equals(other.builder)) {
-			return false;
-		}
-		if (observers == null) {
-			if (other.observers != null) {
-				return false;
-			}
-		} else if (!observers.equals(other.observers)) {
-			return false;
-		}
-		return true;
 	}
 
 	/**
@@ -101,7 +72,7 @@ public class ObservableFlameBuilder {
 	 *                An {@link Observer} to add to set of known
 	 *                {@link Observer}
 	 */
-	public void addObserver(Observer observer) {
+	public void addObserver(final Observer observer) {
 		this.observers.add(observer);
 	}
 
@@ -112,7 +83,7 @@ public class ObservableFlameBuilder {
 	 *                The {@link FlameTransformation} to add to the end of
 	 *                the list
 	 */
-	public void addTransformation(FlameTransformation transformation) {
+	public void addTransformation(final FlameTransformation transformation) {
 		this.builder.addTransformation(transformation);
 		this.warnObservers();
 	}
@@ -131,7 +102,7 @@ public class ObservableFlameBuilder {
 	 *                 If the index is less than zero of greater than the
 	 *                 max index of the list
 	 */
-	public AffineTransformation affineTransformation(int index) {
+	public AffineTransformation affineTransformation(final int index) {
 		return this.builder.affineTransformation(index);
 	}
 
@@ -144,6 +115,35 @@ public class ObservableFlameBuilder {
 		return this.builder.build();
 	}
 
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final ObservableFlameBuilder other = (ObservableFlameBuilder) obj;
+		if (this.builder == null) {
+			if (other.builder != null) {
+				return false;
+			}
+		} else if (!this.builder.equals(other.builder)) {
+			return false;
+		}
+		if (this.observers == null) {
+			if (other.observers != null) {
+				return false;
+			}
+		} else if (!this.observers.equals(other.observers)) {
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Remove the given {@link Observer}
 	 * 
@@ -151,7 +151,7 @@ public class ObservableFlameBuilder {
 	 *                An {@link Observer} to remove from the set of known
 	 *                {@link Observer}
 	 */
-	public void removeObserver(Observer observer) {
+	public void removeObserver(final Observer observer) {
 		this.observers.remove(observer);
 	}
 
@@ -165,7 +165,7 @@ public class ObservableFlameBuilder {
 	 *                 If the index is less than zero of greater than the
 	 *                 max index of the list
 	 */
-	public void removeTransformation(int index) {
+	public void removeTransformation(final int index) {
 		this.builder.removeTransformation(index);
 		this.warnObservers();
 	}
@@ -184,7 +184,7 @@ public class ObservableFlameBuilder {
 	 *                 If the index is less than zero of greater than the
 	 *                 max index of the list
 	 */
-	public void setAffineTransformation(int index, AffineTransformation newTransformation) {
+	public void setAffineTransformation(final int index, final AffineTransformation newTransformation) {
 		this.builder.setAffineTransformation(index, newTransformation);
 		this.warnObservers();
 	}
@@ -205,7 +205,7 @@ public class ObservableFlameBuilder {
 	 *                 If the index is less than zero of greater than the
 	 *                 max index of the list
 	 */
-	public void setVariationWeight(int index, Variation variation, double newWeight) {
+	public void setVariationWeight(final int index, final Variation variation, final double newWeight) {
 		this.builder.setVariationWeight(index, variation, newWeight);
 		this.warnObservers();
 	}
@@ -235,7 +235,7 @@ public class ObservableFlameBuilder {
 	 *                 If the index is less than zero of greater than the
 	 *                 max index of the list
 	 */
-	public double variationWeight(int index, Variation variation) {
+	public double variationWeight(final int index, final Variation variation) {
 		return this.builder.variationWeight(index, variation);
 	}
 
