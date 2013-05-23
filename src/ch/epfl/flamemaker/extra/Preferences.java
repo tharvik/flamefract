@@ -11,10 +11,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.color.InterpolatedPalette;
 import ch.epfl.flamemaker.color.Palette;
+import ch.epfl.flamemaker.color.RandomPalette;
 import ch.epfl.flamemaker.flame.Flame;
 import ch.epfl.flamemaker.flame.FlameTransformation;
 import ch.epfl.flamemaker.flame.Variation;
@@ -39,6 +43,11 @@ public class Preferences {
 		 * The {@link Color} of the background we use to build the image
 		 */
 		private Color				background;
+
+		/**
+		 * A logger used to output warnings and errors
+		 */
+		private final Logger			logger;
 
 		/**
 		 * The {@link Builder} we are currently working on
@@ -139,15 +148,26 @@ public class Preferences {
 		 *                 there is not exactly three values
 		 */
 		private static Color parseColor(final String value) {
-			final String[] strings = Builder.splitValue(value);
-
-			if (strings.length != 3) {
-				throw new IllegalArgumentException("must be only three values seperated by comas");
-			}
 
 			final double values[] = new double[3];
-			for (int i = 0; i < strings.length; i++) {
-				values[i] = Builder.parseDouble(strings[i]);
+			if (value.equals("random")) {
+
+				Random random = new Random();
+				for (int i = 0; i < values.length; i++) {
+					values[i] = random.nextDouble() * Double.MAX_VALUE / (Double.MAX_VALUE - 1);
+				}
+			} else {
+
+				final String[] strings = Builder.splitValue(value);
+
+				if (strings.length != 3) {
+					throw new IllegalArgumentException(
+							"must be only three values seperated by comas");
+				}
+
+				for (int i = 0; i < strings.length; i++) {
+					values[i] = Builder.parseDouble(strings[i]);
+				}
 			}
 
 			return new Color(values[0], values[1], values[2]);
@@ -219,30 +239,50 @@ public class Preferences {
 		 */
 		private static void parseMatrix(final String value, final ArrayList<AffineTransformation> affines) {
 
-			final String[] split = Builder.splitValue(value);
-
-			if (split.length != 2) {
-				throw new IllegalArgumentException("must be only two lines in the matrix");
-			}
-
-			final String[][] lines = new String[2][];
-
-			lines[0] = Builder.splitValue(split[0]);
-			lines[1] = Builder.splitValue(split[1]);
-
-			for (final String[] line : lines) {
-				if (line.length != 3) {
-					throw new IllegalArgumentException(
-							"each line must be only three values seperated by comas");
-				}
-			}
-
+			// contain the values
 			final double[][] values = new double[2][3];
-			for (int i = 0; i < lines.length; i++) {
-				final String[] line = lines[i];
 
-				for (int j = 0; j < line.length; j++) {
-					values[i][j] = Builder.parseDouble(line[j]);
+			if (value.equals("random")) {
+
+				Random random = new Random();
+				for (int i = 0; i < values.length; i++) {
+					for (int j = 0; j < values[0].length; j++) {
+
+						// because we need every value
+						// between 0 and 1 inclusive
+						// (and not exclusive as in
+						// Random)
+						values[i][j] = (random.nextBoolean() ? 1 : -1) * random.nextDouble()
+								* Double.MAX_VALUE / (Double.MAX_VALUE - 1);
+					}
+				}
+
+			} else {
+
+				final String[] split = Builder.splitValue(value);
+
+				if (split.length != 2) {
+					throw new IllegalArgumentException("must be only two lines in the matrix");
+				}
+
+				final String[][] lines = new String[2][];
+
+				lines[0] = Builder.splitValue(split[0]);
+				lines[1] = Builder.splitValue(split[1]);
+
+				for (final String[] line : lines) {
+					if (line.length != 3) {
+						throw new IllegalArgumentException(
+								"each line must be only three values seperated by comas");
+					}
+				}
+
+				for (int i = 0; i < lines.length; i++) {
+					final String[] line = lines[i];
+
+					for (int j = 0; j < line.length; j++) {
+						values[i][j] = Builder.parseDouble(line[j]);
+					}
 				}
 			}
 
@@ -268,6 +308,11 @@ public class Preferences {
 		 *                 there is not exactly three values
 		 */
 		private static Palette parsePalette(final String value) {
+
+			if (value.equals("random")) {
+				return new RandomPalette(3);
+			}
+
 			final String[] strings = Builder.splitValue(value);
 
 			if (strings.length != 3) {
@@ -366,15 +411,29 @@ public class Preferences {
 		 * 
 		 */
 		private static void parseWeight(final String value, final ArrayList<double[]> weights) {
-			final String[] split = Builder.splitValue(value);
-
-			if (split.length != 6) {
-				throw new IllegalArgumentException("must be only six values seperated by comas");
-			}
-
 			final double[] array = new double[6];
-			for (int i = 0; i < split.length; i++) {
-				array[i] = Builder.parseDouble(split[i]);
+
+			if (value.equals("random")) {
+
+				Random random = new Random();
+				for (int i = 0; i < array.length; i++) {
+
+					// because we need every value
+					// between 0 and 1 inclusive
+					// (and not exclusive as in
+					// Random)
+					array[i] = random.nextDouble() * Double.MAX_VALUE / (Double.MAX_VALUE - 1);
+				}
+			} else {
+				final String[] split = Builder.splitValue(value);
+
+				if (split.length != 6) {
+					throw new IllegalArgumentException("must be only six values seperated by comas");
+				}
+
+				for (int i = 0; i < split.length; i++) {
+					array[i] = Builder.parseDouble(split[i]);
+				}
 			}
 
 			weights.add(array);
@@ -458,7 +517,7 @@ public class Preferences {
 			stream.println();
 			stream.println("## Core part (everything which is not directly GUI)");
 			stream.println();
-			stream.println("# Density of the computation (the more, the more point it'll generate)");
+			stream.println("# Density of the computation (the more, the more point it will generate)");
 			stream.println("density = 50");
 			stream.println();
 			stream.println("# Number of threads used in the computation (will be set to numberOfCore + 1");
@@ -466,9 +525,11 @@ public class Preferences {
 			stream.println("#threads = 5");
 			stream.println();
 			stream.println("# Color of the background (in RGB), values as double, min 0, max 1");
+			stream.println("# The magic word \"random\" will generate a color with random values (quite ugly)");
 			stream.println("color = (0,0,0)");
 			stream.println();
 			stream.println("# Palette of colors, same behavious as above");
+			stream.println("# The magic word \"random\" will generate a palette with random values (still ugly)");
 			stream.println("palette = ((1,0,0),(0,1,0),(0,0,1))");
 			stream.println();
 			stream.println("# Frame of the fractal, the default relevant part to consider in computation.");
@@ -483,6 +544,7 @@ public class Preferences {
 			stream.println("# Notice the name is only matrix; the order of the matrix is relevant and thus");
 			stream.println("# each new matrix will not overwrite the older value rather will add a new");
 			stream.println("# matrix to the default list");
+			stream.println("# The magic word \"random\" means to generate a new matrix with random values");
 			stream.println("matrix = ((-0.4113504,-0.7124804,-0.4),(0.7124795,-0.4113508,0.8))");
 			stream.println("matrix = ((-0.3957339,0,-1.6),(0,-0.3957337,0.2))");
 			stream.println("matrix = ((0.4810169,0,1),(0,0.4810169,0.9))");
@@ -495,6 +557,7 @@ public class Preferences {
 			}
 			stream.println();
 			stream.println("# As for the matrix, every weight add up rather than crush");
+			stream.println("# As for the matrix, \"random\" will generate a random weight between 0 and 1");
 			stream.println("weight = (1,0.1,0,0,0,0)");
 			stream.println("weight = (0,0,0,0,0.8,1)");
 			stream.println("weight = (1,0,0,0,0,0)");
@@ -521,6 +584,7 @@ public class Preferences {
 		private Builder() {
 
 			this.path = "flamefract.conf";
+			this.logger = Logger.getLogger(Builder.class.getName());
 
 			// Set the basic values, to avoid any empty values
 			this.builder = Preferences.defaults.builder;
@@ -546,7 +610,8 @@ public class Preferences {
 					file.close();
 
 				} catch (final FileNotFoundException e1) {
-					System.out.println("Unable to read or write configuration file, using default values");
+					this.logger.log(Level.WARNING,
+							"Unable to read or write configuration file, using default values");
 				}
 			}
 
@@ -699,7 +764,8 @@ public class Preferences {
 				if (string != "readConf") {
 					string = "readConf --> " + string;
 				}
-				System.out.println("at line " + num + ": " + string + ": " + e.getMessage());
+				this.logger.log(Level.SEVERE, "Error in configuration at line " + num + ": " + string
+						+ ": " + e.getMessage());
 				System.exit(1);
 			}
 		}

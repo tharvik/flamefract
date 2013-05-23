@@ -15,6 +15,8 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -346,6 +348,11 @@ public class FlameMakerGUI {
 		private int				refresh;
 
 		/**
+		 * A {@link Logger} used to warn of too high refresh rate
+		 */
+		private final Logger logger;
+		
+		/**
 		 * The number of points computed every time
 		 */
 		private int				step;
@@ -387,6 +394,7 @@ public class FlameMakerGUI {
 			this.refresh = Preferences.values.refresh;
 			// Use a low value just to have something to test
 			this.step = 1000;
+			this.logger = Logger.getLogger(FlameBuilderPreviewComponent.class.getName());
 
 			this.builder.addObserver(this);
 			this.computedBuilder = new ObservableFlameBuilder(this.builder);
@@ -448,9 +456,8 @@ public class FlameMakerGUI {
 				this.step *= (this.refresh / (double) clock.time());
 				if ((this.refresh / (double) clock.time()) < 1
 						&& this.step < Preferences.values.threshold) {
-					System.out.println("Your time setting (the refresh rate) is too low, and thus,");
-					System.out.println("we can't keep up. We're adjusting it for now, but");
-					System.out.println("consider adding an higher value to the preferences.");
+
+					this.logger.log(Level.WARNING, "Your time setting (the refresh rate) is too low, and thus, we can't keep up. We're adjusting it for now, but consider adding an higher value to the preferences.");
 					this.refresh += 100;
 					this.step = 1000;
 				}

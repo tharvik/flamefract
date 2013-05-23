@@ -5,6 +5,9 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 /**
  * Main class</br> Used to initiate the whole program, in particular the GUI.
+ * 
+ * @author Subri Guy-Laurent - 228357
+ * @author Rousset Valérian - 229049
  */
 public class FlameMaker {
 	/**
