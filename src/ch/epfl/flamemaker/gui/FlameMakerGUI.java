@@ -350,8 +350,8 @@ public class FlameMakerGUI {
 		/**
 		 * A {@link Logger} used to warn of too high refresh rate
 		 */
-		private final Logger logger;
-		
+		private final Logger			logger;
+
 		/**
 		 * The number of points computed every time
 		 */
@@ -415,6 +415,19 @@ public class FlameMakerGUI {
 			return new Dimension(200, 100);
 		}
 
+		/**
+		 * Draw the loading bar while computing the fractal
+		 * 
+		 * @param g
+		 *                The {@link Graphics} to draw to
+		 * @param value
+		 *                The value, 0 means nothing done, 1 means done
+		 */
+		private void paintLoading(final Graphics g, final double value) {
+			g.setColor(new java.awt.Color(0xFF)); // blue
+			g.drawLine(0, getHeight() - 1, (int) (value * getWidth()), getHeight() - 1);
+		}
+
 		@Override
 		protected void paintComponent(final Graphics g) {
 
@@ -450,6 +463,7 @@ public class FlameMakerGUI {
 				clock.start();
 				this.builder.build().compute(this.step, this.accuBuilder);
 				this.paintAccuBuilder(g);
+				this.paintLoading(g, (double) this.totalDensity / (this.density * width * height));
 				clock.stop();
 
 				// Accurate the step
@@ -457,7 +471,8 @@ public class FlameMakerGUI {
 				if ((this.refresh / (double) clock.time()) < 1
 						&& this.step < Preferences.values.threshold) {
 
-					this.logger.log(Level.WARNING, "Your time setting (the refresh rate) is too low, and thus, we can't keep up. We're adjusting it for now, but consider adding an higher value to the preferences.");
+					this.logger.log(Level.WARNING,
+							"Your time setting (the refresh rate) is too low, and thus, we can't keep up. We're adjusting it for now, but consider adding an higher value to the preferences.");
 					this.refresh += 100;
 					this.step = 1000;
 				}
