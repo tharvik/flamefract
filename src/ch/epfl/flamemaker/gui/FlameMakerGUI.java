@@ -425,7 +425,8 @@ public class FlameMakerGUI {
 		 */
 		private void paintLoading(final Graphics g, final double value) {
 			g.setColor(new java.awt.Color(0xFF)); // blue
-			g.drawLine(0, getHeight() - 1, (int) (value * getWidth()), getHeight() - 1);
+			g.fillRect(0, getHeight() - 3, (int) (value * getWidth()), 3);
+//			g.drawLine(0, getHeight() - 1, (int) (value * getWidth()), getHeight() - 1);
 		}
 
 		@Override

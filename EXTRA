@@ -1,0 +1,6 @@
+- add loading bar under the fractal (better user interface)
+- add incremental generation of the fractal (better user interface (no more freeze)), with scaling algorythm (if too much time passed to generate a step, will lower number of points computed, if too fast, will generate more points, if too much time and low points will slowdown refresh rate)
+- add configuration file, set default matrix, default weight, density, ... (cf. comments of file)
+	- magic value "random" which will generate a random value for a given field (not every field (refresh rate random is non-sense)
+	- support for comments ('#' as start)
+- add multithreads to the generation of the fractal (still under testing, seem to work badly)
