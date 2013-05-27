@@ -81,7 +81,7 @@ public class FlameMakerGUI {
 		 */
 		private final Rectangle			frame;
 		/**
-		 * The selected transformation (draw in red in the component)
+		 * The selected transformation (drawn in red in the component)
 		 */
 		private int				highlightedTransformationIndex;
 		/**
@@ -271,10 +271,10 @@ public class FlameMakerGUI {
 	private static class FlameBuilderPreviewComponent extends JComponent implements Observer {
 
 		/**
-		 * Represent a really simple clock, you can start it, stop it
-		 * and know the time it took
+		 * Represent a really simple chronometer, you can start it, stop it
+		 * and know the time it took.
 		 */
-		private class Clock {
+		private class Chrono {
 			/**
 			 * The time of start
 			 */
@@ -283,25 +283,26 @@ public class FlameMakerGUI {
 			 * The time of end
 			 */
 			private long	end;
+			 // TODO initialize at 0
 
 			/**
-			 * Start the {@link Clock}
+			 * Start the {@link Chrono}
 			 */
 			public void start() {
 				this.begin = System.currentTimeMillis();
 			}
 
 			/**
-			 * Stop the {@link Clock}
+			 * Stop the {@link Chrono}
 			 */
 			public void stop() {
 				this.end = System.currentTimeMillis();
 			}
 
 			/**
-			 * Return the time measured by the {@link Clock}
+			 * Return the time measured by the {@link Chrono}
 			 * 
-			 * @return The time measured by the {@link Clock}
+			 * @return The time measured by the {@link Chrono}
 			 */
 			public long time() {
 				return this.end - this.begin;
@@ -460,7 +461,7 @@ public class FlameMakerGUI {
 
 			} else if (this.totalDensity < this.density * width * height) {
 				this.totalDensity += this.step;
-				final Clock clock = new Clock();
+				final Chrono clock = new Chrono();
 				clock.start();
 				this.builder.build().compute(this.step, this.accuBuilder);
 				this.paintAccuBuilder(g);
