@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -31,9 +32,13 @@ import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -271,8 +276,8 @@ public class FlameMakerGUI {
 	private static class FlameBuilderPreviewComponent extends JComponent implements Observer {
 
 		/**
-		 * Represent a really simple chronometer, you can start it, stop it
-		 * and know the time it took.
+		 * Represent a really simple chronometer, you can start it, stop
+		 * it and know the time it took.
 		 */
 		private class Chrono {
 			/**
@@ -283,7 +288,14 @@ public class FlameMakerGUI {
 			 * The time of end
 			 */
 			private long	end;
-			 // TODO initialize at 0
+
+			/**
+			 * Construct a {@link Chrono} with the fields as zero
+			 */
+			public Chrono() {
+				this.begin = 0;
+				this.end = 0;
+			}
 
 			/**
 			 * Start the {@link Chrono}
@@ -340,18 +352,18 @@ public class FlameMakerGUI {
 		 */
 		private final Rectangle			frame;
 		/**
+		 * A {@link Logger} used to warn of too high refresh rate
+		 */
+		private final Logger			logger;
+		/**
 		 * The {@link Palette} used to compute
 		 */
 		private final Palette			palette;
+
 		/**
 		 * The refresh time
 		 */
 		private int				refresh;
-
-		/**
-		 * A {@link Logger} used to warn of too high refresh rate
-		 */
-		private final Logger			logger;
 
 		/**
 		 * The number of points computed every time
@@ -414,20 +426,6 @@ public class FlameMakerGUI {
 		@Override
 		public Dimension getPreferredSize() {
 			return new Dimension(200, 100);
-		}
-
-		/**
-		 * Draw the loading bar while computing the fractal
-		 * 
-		 * @param g
-		 *                The {@link Graphics} to draw to
-		 * @param value
-		 *                The value, 0 means nothing done, 1 means done
-		 */
-		private void paintLoading(final Graphics g, final double value) {
-			g.setColor(new java.awt.Color(0xFF)); // blue
-			g.fillRect(0, getHeight() - 3, (int) (value * getWidth()), 3);
-//			g.drawLine(0, getHeight() - 1, (int) (value * getWidth()), getHeight() - 1);
 		}
 
 		@Override
@@ -510,6 +508,21 @@ public class FlameMakerGUI {
 				}
 			}
 			g.drawImage(image, 0, 0, null);
+		}
+
+		/**
+		 * Draw the loading bar while computing the fractal
+		 * 
+		 * @param g
+		 *                The {@link Graphics} to draw to
+		 * @param value
+		 *                The value, 0 means nothing done, 1 means done
+		 */
+		private void paintLoading(final Graphics g, final double value) {
+			g.setColor(new java.awt.Color(0xFF)); // blue
+			g.fillRect(0, this.getHeight() - 3, (int) (value * this.getWidth()), 3);
+			// g.drawLine(0, getHeight() - 1, (int) (value *
+			// getWidth()), getHeight() - 1);
 		}
 	}
 
@@ -678,7 +691,7 @@ public class FlameMakerGUI {
 	 * {@link Preferences}
 	 */
 	public FlameMakerGUI() {
-		this.builder = Preferences.values.builder;
+		this.builder = new ObservableFlameBuilder(Preferences.values.builder);
 		this.background = Preferences.values.background;
 		this.palette = Preferences.values.palette;
 		this.frame = Preferences.values.frame;
@@ -743,8 +756,93 @@ public class FlameMakerGUI {
 		frame.getContentPane().add(this.getUpPanel(), BorderLayout.CENTER);
 		frame.getContentPane().add(this.getDownPanel(), BorderLayout.PAGE_END);
 
+		frame.setJMenuBar(this.getMenuBar());
+
 		frame.pack();
 		frame.setVisible(true);
+	}
+
+	/**
+	 * Return an {@link AffineTransformation} at the given position and with
+	 * the given value
+	 * 
+	 * @param i
+	 *                The vertical position in the array
+	 * @param j
+	 *                The horizontal position in the array
+	 * @return a new {@link ActionListener} to use at the given place in the
+	 *         array
+	 */
+	private ActionListener getActionListener(final int i, final int j) {
+
+		final int value = (i << 2) + j;
+		switch (value) {
+		case (0 << 2) + 0:
+
+			// new
+			return new ActionListener() {
+
+				@Override
+				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+					while (FlameMakerGUI.this.builder.transformationCount() > 1) {
+						FlameMakerGUI.this.builder.removeTransformation(0);
+					}
+
+					for (int k = 0; k < Preferences.defaults.builder.transformationCount(); k++) {
+
+						final double[] array = new double[6];
+						for (int l = 0; l < 6; l++) {
+							array[l] = Preferences.defaults.builder.variationWeight(k,
+									Variation.ALL_VARIATIONS.get(l));
+						}
+						final AffineTransformation affine = Preferences.defaults.builder
+								.affineTransformation(k);
+
+						final FlameTransformation trans = new FlameTransformation(affine, array);
+
+						FlameMakerGUI.this.builder.addTransformation(trans);
+					}
+
+					FlameMakerGUI.this.builder.removeTransformation(0);
+					FlameMakerGUI.this.setSelectedTransformationIndex(0);
+				}
+			};
+		case (0 << 2) + 2:
+			return new ActionListener() {
+
+				@Override
+				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+					// load
+				}
+			};
+		case (0 << 2) + 3:
+			return new ActionListener() {
+
+				@Override
+				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+					// save conf
+				}
+			};
+		case (0 << 2) + 4:
+			return new ActionListener() {
+
+				@Override
+				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+					// save image
+				}
+			};
+		case (0 << 2) + 6:
+			return new ActionListener() {
+
+				@Override
+				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+					System.exit(0);
+				}
+			};
+
+		default:
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/**
@@ -1007,6 +1105,64 @@ public class FlameMakerGUI {
 				this.density));
 
 		return panel;
+	}
+
+	/**
+	 * Return the {@link JMenuBar} with the menus
+	 * 
+	 * @return The {@link JMenuBar} with the menus
+	 */
+	private JMenuBar getMenuBar() {
+		final JMenuBar bar = new JMenuBar();
+
+		final String[][] names = { { "Nouveau", "--", "Charger", "Enregister", "Enregister l'image", "--",
+				"Quitter" } };
+		final int[][] keyEvents = { { KeyEvent.VK_N, -1, KeyEvent.VK_C, KeyEvent.VK_E, KeyEvent.VK_E, -1,
+				KeyEvent.VK_Q } };
+
+		final int c = ActionEvent.CTRL_MASK;
+		final int s = ActionEvent.SHIFT_MASK;
+		final int[][] actionEvents = { { c, c, c, c, c | s, c, c } };
+
+		final JMenuItem[][] items = new JMenuItem[names.length][names[0].length];
+		final ActionListener[][] actions = new ActionListener[names.length][names[0].length];
+
+		final JMenu[] menus = new JMenu[names.length];
+
+		for (int i = 0; i < actions.length; i++) {
+			for (int j = 0; j < actions[i].length; j++) {
+
+				if (names[i][j].compareTo("--") == 0) {
+					continue;
+				}
+
+				actions[i][j] = this.getActionListener(i, j);
+			}
+		}
+
+		for (int i = 0; i < menus.length; i++) {
+			menus[i] = new JMenu("Fichier");
+
+			for (int j = 0; j < items[i].length; j++) {
+
+				if (names[i][j].compareTo("--") == 0) {
+					menus[i].addSeparator();
+					continue;
+				}
+
+				final JMenuItem item = new JMenuItem(names[i][j], keyEvents[i][j]);
+				item.setMnemonic(keyEvents[i][j]);
+				item.setAccelerator(KeyStroke.getKeyStroke(keyEvents[i][j], actionEvents[i][j]));
+				item.addActionListener(actions[i][j]);
+
+				menus[i].add(item);
+				items[i][j] = item;
+			}
+
+			bar.add(menus[i]);
+		}
+
+		return bar;
 	}
 
 	/**

@@ -85,8 +85,7 @@ public class FlameAccumulator {
 		 * @param colorIndex
 		 *                The index of the color for this point
 		 */
-		// FIXME lock the arrays to avoid any errors
-		public void hit(Point p, final double colorIndex) {
+		public synchronized void hit(Point p, final double colorIndex) {
 			if (!this.frame.contains(p)) {
 				return;
 			}

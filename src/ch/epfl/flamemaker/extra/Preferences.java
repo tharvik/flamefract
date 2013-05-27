@@ -45,11 +45,6 @@ public class Preferences {
 		private Color				background;
 
 		/**
-		 * A logger used to output warnings and errors
-		 */
-		private final Logger			logger;
-
-		/**
 		 * The {@link Builder} we are currently working on
 		 */
 		private final ObservableFlameBuilder	builder;
@@ -63,6 +58,11 @@ public class Preferences {
 		 * The scope of the fractal
 		 */
 		private Rectangle			frame;
+
+		/**
+		 * A logger used to output warnings and errors
+		 */
+		private final Logger			logger;
 
 		/**
 		 * The {@link Palette} we use to build the image
@@ -152,7 +152,7 @@ public class Preferences {
 			final double values[] = new double[3];
 			if (value.equals("random")) {
 
-				Random random = new Random();
+				final Random random = new Random();
 				for (int i = 0; i < values.length; i++) {
 					values[i] = random.nextDouble() * Double.MAX_VALUE / (Double.MAX_VALUE - 1);
 				}
@@ -244,7 +244,7 @@ public class Preferences {
 
 			if (value.equals("random")) {
 
-				Random random = new Random();
+				final Random random = new Random();
 				for (int i = 0; i < values.length; i++) {
 					for (int j = 0; j < values[0].length; j++) {
 
@@ -415,7 +415,7 @@ public class Preferences {
 
 			if (value.equals("random")) {
 
-				Random random = new Random();
+				final Random random = new Random();
 				for (int i = 0; i < array.length; i++) {
 
 					// because we need every value
@@ -587,7 +587,7 @@ public class Preferences {
 			this.logger = Logger.getLogger(Builder.class.getName());
 
 			// Set the basic values, to avoid any empty values
-			this.builder = Preferences.defaults.builder;
+			this.builder = new ObservableFlameBuilder(Preferences.defaults.builder);
 			this.background = Preferences.defaults.background;
 			this.palette = Preferences.defaults.palette;
 			this.frame = Preferences.defaults.frame;
@@ -875,7 +875,7 @@ public class Preferences {
 			final Rectangle frame, final Palette palette, final int threads, final int refresh,
 			final int step, final int threshold) {
 		this.background = background;
-		this.builder = builder;
+		this.builder = new ObservableFlameBuilder(builder);
 		this.density = density;
 		this.frame = frame;
 		this.palette = palette;
@@ -894,7 +894,7 @@ public class Preferences {
 	 */
 	private Preferences(final Preferences pref) {
 		this.background = pref.background;
-		this.builder = pref.builder;
+		this.builder = new ObservableFlameBuilder(pref.builder);
 		this.density = pref.density;
 		this.frame = pref.frame;
 		this.palette = pref.palette;
