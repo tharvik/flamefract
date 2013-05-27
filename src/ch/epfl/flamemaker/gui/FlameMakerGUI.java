@@ -688,15 +688,9 @@ public class FlameMakerGUI {
 	}
 
 	/**
-	 * The {@link TransformationsListModel} of the GUI, we need it to update
-	 * the list of {@link Transformation}
-	 */
-	private TransformationsListModel	model;
-
-	/**
 	 * The array of the add and remove buttons
 	 */
-	private JButton[]			buttons;
+	private JButton[]	buttons;
 
 	/**
 	 * Construct a {@link FlameMakerGUI} with the values in the
@@ -798,7 +792,8 @@ public class FlameMakerGUI {
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
 
 					while (FlameMakerGUI.this.builder.transformationCount() > 1) {
-						FlameMakerGUI.this.model.removeTransformation(0);
+						FlameMakerGUI.this.buttons[1].getActionListeners()[0]
+								.actionPerformed(null);
 					}
 
 					for (int k = 0; k < Preferences.defaults.builder.transformationCount(); k++) {
@@ -816,7 +811,7 @@ public class FlameMakerGUI {
 						FlameMakerGUI.this.builder.addTransformation(trans);
 					}
 
-					FlameMakerGUI.this.model.removeTransformation(0);
+					FlameMakerGUI.this.buttons[1].getActionListeners()[0].actionPerformed(null);
 					setSelectedTransformationIndex(0);
 
 					if (Preferences.defaults.builder.transformationCount() > 1) {
@@ -1207,10 +1202,13 @@ public class FlameMakerGUI {
 	 * @param list
 	 *                The {@link JList} to select a new
 	 *                {@link Transformation}
+	 * @param model
+	 *                The {@link TransformationsListModel} to act upon
+	 * 
 	 * @return A {@link JPanel} with the buttons to remove or add a
 	 *         {@link Transformation}
 	 */
-	private JPanel getTransformationButtons(final JList<String> list) {
+	private JPanel getTransformationButtons(final JList<String> list, final TransformationsListModel model) {
 		final JPanel panel = new JPanel();
 		this.buttons = new JButton[2];
 
@@ -1261,13 +1259,13 @@ public class FlameMakerGUI {
 	 */
 	private JPanel getTransformationEdition() {
 		final JPanel panel = new JPanel();
-		this.model = new TransformationsListModel("Transformation n°");
+		final TransformationsListModel model = new TransformationsListModel("Transformation n°");
 		final JList<String> list = this.getTransformationList(model);
 
 		panel.setLayout(new BorderLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Transformations"));
 		panel.add(new JScrollPane(list), BorderLayout.CENTER);
-		panel.add(this.getTransformationButtons(list), BorderLayout.PAGE_END);
+		panel.add(this.getTransformationButtons(list, model), BorderLayout.PAGE_END);
 
 		return panel;
 	}
