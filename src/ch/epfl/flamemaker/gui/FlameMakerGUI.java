@@ -12,6 +12,7 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.HashSet;
@@ -687,6 +688,17 @@ public class FlameMakerGUI {
 	}
 
 	/**
+	 * The {@link TransformationsListModel} of the GUI, we need it to update
+	 * the list of {@link Transformation}
+	 */
+	private TransformationsListModel	model;
+
+	/**
+	 * The array of the add and remove buttons
+	 */
+	private JButton[]			buttons;
+
+	/**
 	 * Construct a {@link FlameMakerGUI} with the values in the
 	 * {@link Preferences}
 	 */
@@ -777,15 +789,16 @@ public class FlameMakerGUI {
 
 		final int value = (i << 2) + j;
 		switch (value) {
-		case (0 << 2) + 0:
 
+		case (0 << 2) + 0:
 			// new
 			return new ActionListener() {
 
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+
 					while (FlameMakerGUI.this.builder.transformationCount() > 1) {
-						FlameMakerGUI.this.builder.removeTransformation(0);
+						FlameMakerGUI.this.model.removeTransformation(0);
 					}
 
 					for (int k = 0; k < Preferences.defaults.builder.transformationCount(); k++) {
@@ -803,10 +816,17 @@ public class FlameMakerGUI {
 						FlameMakerGUI.this.builder.addTransformation(trans);
 					}
 
-					FlameMakerGUI.this.builder.removeTransformation(0);
-					FlameMakerGUI.this.setSelectedTransformationIndex(0);
+					FlameMakerGUI.this.model.removeTransformation(0);
+					setSelectedTransformationIndex(0);
+
+					if (Preferences.defaults.builder.transformationCount() > 1) {
+						for (JButton button : buttons) {
+							button.setEnabled(true);
+						}
+					}
 				}
 			};
+
 		case (0 << 2) + 2:
 			return new ActionListener() {
 
@@ -815,22 +835,38 @@ public class FlameMakerGUI {
 					// load
 				}
 			};
+
 		case (0 << 2) + 3:
+			// save conf
 			return new ActionListener() {
 
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
-					// save conf
+					final Preferences pref = new Preferences(background, builder, density, frame,
+							palette, Preferences.defaults.threads,
+							Preferences.defaults.refresh, Preferences.defaults.step,
+							Preferences.defaults.threshold, Preferences.defaults.path);
+
+					try {
+						final PrintStream file = new PrintStream(pref.path);
+						pref.writeConfiguration(file);
+						file.close();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+
 				}
 			};
+
 		case (0 << 2) + 4:
+			// save image
 			return new ActionListener() {
 
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
-					// save image
 				}
 			};
+
 		case (0 << 2) + 6:
 			return new ActionListener() {
 
@@ -1115,9 +1151,8 @@ public class FlameMakerGUI {
 	private JMenuBar getMenuBar() {
 		final JMenuBar bar = new JMenuBar();
 
-		final String[][] names = { { "Nouveau", "--", "Charger", "Enregister", "Enregister l'image", "--",
-				"Quitter" } };
-		final int[][] keyEvents = { { KeyEvent.VK_N, -1, KeyEvent.VK_C, KeyEvent.VK_E, KeyEvent.VK_E, -1,
+		final String[][] names = { { "Nouveau", "--", "Charger", "Sauver", "Sauver l'image", "--", "Quitter" } };
+		final int[][] keyEvents = { { KeyEvent.VK_N, -1, KeyEvent.VK_C, KeyEvent.VK_S, KeyEvent.VK_S, -1,
 				KeyEvent.VK_Q } };
 
 		final int c = ActionEvent.CTRL_MASK;
@@ -1169,18 +1204,15 @@ public class FlameMakerGUI {
 	 * Return a {@link JPanel} with the buttons to remove or add a
 	 * {@link Transformation}
 	 * 
-	 * @param model
-	 *                The {@link TransformationsListModel} used for the
-	 *                add/remove function
 	 * @param list
 	 *                The {@link JList} to select a new
 	 *                {@link Transformation}
 	 * @return A {@link JPanel} with the buttons to remove or add a
 	 *         {@link Transformation}
 	 */
-	private JPanel getTransformationButtons(final TransformationsListModel model, final JList<String> list) {
+	private JPanel getTransformationButtons(final JList<String> list) {
 		final JPanel panel = new JPanel();
-		final JButton buttons[] = new JButton[2];
+		this.buttons = new JButton[2];
 
 		buttons[0] = new JButton("Ajouter");
 		buttons[1] = new JButton("Supprimer");
@@ -1229,13 +1261,13 @@ public class FlameMakerGUI {
 	 */
 	private JPanel getTransformationEdition() {
 		final JPanel panel = new JPanel();
-		final TransformationsListModel model = new TransformationsListModel("Transformation n°");
+		this.model = new TransformationsListModel("Transformation n°");
 		final JList<String> list = this.getTransformationList(model);
 
 		panel.setLayout(new BorderLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Transformations"));
 		panel.add(new JScrollPane(list), BorderLayout.CENTER);
-		panel.add(this.getTransformationButtons(model, list), BorderLayout.PAGE_END);
+		panel.add(this.getTransformationButtons(list), BorderLayout.PAGE_END);
 
 		return panel;
 	}

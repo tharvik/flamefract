@@ -501,83 +501,6 @@ public class Preferences {
 		}
 
 		/**
-		 * Write the default configuration file to the given
-		 * {@link PrintStream} (usually a file)
-		 * 
-		 * @param stream
-		 *                The stream to write to
-		 */
-		private static void writeConf(final PrintStream stream) {
-			stream.println("# Default configuration file for flamefract");
-			stream.println();
-			stream.println("# Every times the is a '#', it means the begin of a comment which won't be relevant");
-			stream.println("# and thus won't be parsed");
-			stream.println("# Every settings will have the following template");
-			stream.println("#  variable = value # eventually a comment");
-			stream.println();
-			stream.println("## Core part (everything which is not directly GUI)");
-			stream.println();
-			stream.println("# Density of the computation (the more, the more point it will generate)");
-			stream.println("density = 50");
-			stream.println();
-			stream.println("# Number of threads used in the computation (will be set to numberOfCore + 1");
-			stream.println("# if there is no value)");
-			stream.println("#threads = 5");
-			stream.println();
-			stream.println("# Color of the background (in RGB), values as double, min 0, max 1");
-			stream.println("# The magic word \"random\" will generate a color with random values (quite ugly)");
-			stream.println("color = (0,0,0)");
-			stream.println();
-			stream.println("# Palette of colors, same behavious as above");
-			stream.println("# The magic word \"random\" will generate a palette with random values (still ugly)");
-			stream.println("palette = ((1,0,0),(0,1,0),(0,0,1))");
-			stream.println();
-			stream.println("# Frame of the fractal, the default relevant part to consider in computation.");
-			stream.println("# The first value is the center of the frame (as a point), then come the width");
-			stream.println("# and height");
-			stream.println("frame = ((-0.25,0),5,4)");
-			stream.println();
-			stream.println("# The matrix part is a bit more tricky: the value name have a bit different");
-			stream.println("# meaning. But first, how to write a matrix. We only need the first two lines");
-			stream.println("# of the matrix, the last is only (0,0,1) and thus isn't relevant for you.");
-			stream.println("# You only have to write, as an array, the first two line, each in a sub-array.");
-			stream.println("# Notice the name is only matrix; the order of the matrix is relevant and thus");
-			stream.println("# each new matrix will not overwrite the older value rather will add a new");
-			stream.println("# matrix to the default list");
-			stream.println("# The magic word \"random\" means to generate a new matrix with random values");
-			stream.println("matrix = ((-0.4113504,-0.7124804,-0.4),(0.7124795,-0.4113508,0.8))");
-			stream.println("matrix = ((-0.3957339,0,-1.6),(0,-0.3957337,0.2))");
-			stream.println("matrix = ((0.4810169,0,1),(0,0.4810169,0.9))");
-			stream.println();
-			stream.println("# Then come the weight of every variation, as a size six array, the order is");
-
-			stream.print("# ");
-			for (final Variation var : Variation.ALL_VARIATIONS) {
-				stream.print(var.name() + ", ");
-			}
-			stream.println();
-			stream.println("# As for the matrix, every weight add up rather than crush");
-			stream.println("# As for the matrix, \"random\" will generate a random weight between 0 and 1");
-			stream.println("weight = (1,0.1,0,0,0,0)");
-			stream.println("weight = (0,0,0,0,0.8,1)");
-			stream.println("weight = (1,0,0,0,0,0)");
-			stream.println();
-			stream.println("## GUI part");
-			stream.println();
-			stream.println("# The time in ms between every refresh of the fractal");
-			stream.println("refresh = 200");
-			stream.println();
-			stream.println("# The number of points computed beetween every refresh");
-			stream.println("# If unset, we will monitor the computation to set the best value");
-			stream.println("# (not really recommanded to set it yourself, but hey, it's your choice!)");
-			stream.println("#step = 20000");
-			stream.println("");
-			stream.println("# The threshold in number of points where we will increase the refresh time");
-			stream.println("# It won't be used if we have a fixed value for step");
-			stream.println("threshold = 10000");
-		}
-
-		/**
 		 * Construct a new {@link Builder} which try to load the file or
 		 * fall back on default configuration
 		 */
@@ -592,10 +515,15 @@ public class Preferences {
 			this.palette = Preferences.defaults.palette;
 			this.frame = Preferences.defaults.frame;
 			this.density = Preferences.defaults.density;
-			this.threads = Preferences.defaults.threads;
 			this.step = Preferences.defaults.step;
 			this.refresh = Preferences.defaults.refresh;
 			this.threshold = Preferences.defaults.threshold;
+
+			if (Preferences.defaults.threads == -1) {
+				this.threads = Runtime.getRuntime().availableProcessors() + 1;
+			} else {
+				this.threads = Preferences.defaults.threads;
+			}
 
 			try {
 				final BufferedReader reader = Files.newBufferedReader(Paths.get(this.path),
@@ -606,7 +534,7 @@ public class Preferences {
 
 				try {
 					final PrintStream file = new PrintStream(this.path);
-					Preferences.Builder.writeConf(file);
+					this.build().writeConfiguration(file);
 					file.close();
 
 				} catch (final FileNotFoundException e1) {
@@ -657,7 +585,7 @@ public class Preferences {
 		 */
 		private Preferences build() {
 			return new Preferences(this.background, this.builder, this.density, this.frame, this.palette,
-					this.threads, this.refresh, this.step, this.threshold);
+					this.threads, this.refresh, this.step, this.threshold, this.path);
 		}
 
 		/**
@@ -774,17 +702,14 @@ public class Preferences {
 	/**
 	 * All the defaults values of the {@link Preferences}
 	 */
-	public final static Preferences		defaults	= new Preferences(
-										Color.BLACK,
+	public final static Preferences		defaults	= new Preferences(Color.BLACK,
 										Preferences.Builder.generateSharkFin(),
-										50,
-										new Rectangle(new Point(-0.25, 0), 5, 4),
+										50, new Rectangle(new Point(-0.25, 0),
+												5, 4),
 										new InterpolatedPalette(Arrays.asList(
 												Color.RED, Color.GREEN,
-												Color.BLUE)),
-										Runtime.getRuntime()
-												.availableProcessors() + 1,
-										100, -1, 10000);
+												Color.BLUE)), -1, 100,
+										-1, 10000, "flamefract.conf");
 
 	/**
 	 * All the values of the {@link Preferences} set by the builder
@@ -839,11 +764,106 @@ public class Preferences {
 	public final int			threshold;
 
 	/**
+	 * Path to the configuration file
+	 */
+	public final String			path;
+
+	/**
 	 * Construct a new {@link Preferences} by loading the file in
 	 * {@link Builder}
 	 */
 	private Preferences() {
 		this(new Preferences.Builder().build());
+	}
+
+	/**
+	 * Write the default configuration file to the given {@link PrintStream}
+	 * (usually a file)
+	 * 
+	 * @param stream
+	 *                The stream to write to
+	 */
+	public void writeConfiguration(final PrintStream stream) {
+		stream.println("# Default configuration file for flamefract");
+		stream.println();
+		stream.println("# Every times the is a '#', it means the begin of a comment which won't be relevant");
+		stream.println("# and thus won't be parsed");
+		stream.println("# Every settings will have the following template");
+		stream.println("#  variable = value # eventually a comment");
+		stream.println();
+		stream.println("## Core part (everything which is not directly GUI)");
+		stream.println();
+		stream.println("# Density of the computation (the more, the more point it will generate)");
+		stream.println("density = " + this.density);
+		stream.println();
+		stream.println("# Number of threads used in the computation (will be set to numberOfCore + 1");
+		stream.println("# if there is no value or the magic \"-1\")");
+		if (this.threads == -1) {
+			stream.println("#threads = 8");
+		} else {
+			stream.println("threads = " + this.threads);
+		}
+		stream.println();
+		stream.println("# Color of the background (in RGB), values as double, min 0, max 1");
+		stream.println("# The magic word \"random\" will generate a color with random values (quite ugly)");
+		stream.println("color = " + this.background);
+		stream.println();
+		stream.println("# Palette of colors, same behavious as above");
+		stream.println("# The magic word \"random\" will generate a palette with random values (still ugly)");
+		stream.println("palette = " + this.palette);
+		stream.println();
+		stream.println("# Frame of the fractal, the default relevant part to consider in computation.");
+		stream.println("# The first value is the center of the frame (as a point), then come the width");
+		stream.println("# and height");
+		stream.println("frame = " + this.frame);
+		stream.println();
+		stream.println("# The matrix part is a bit more tricky: the value name have a bit different");
+		stream.println("# meaning. But first, how to write a matrix. We only need the first two lines");
+		stream.println("# of the matrix, the last is only (0,0,1) and thus isn't relevant for you.");
+		stream.println("# You only have to write, as an array, the first two line, each in a sub-array.");
+		stream.println("# Notice the name is only matrix; the order of the matrix is relevant and thus");
+		stream.println("# each new matrix will not overwrite the older value rather will add a new");
+		stream.println("# matrix to the default list");
+		stream.println("# The magic word \"random\" means to generate a new matrix with random values");
+		for (int i = 0; i < this.builder.transformationCount(); i++) {
+			stream.println("matrix = " + this.builder.affineTransformation(i));
+		}
+
+		stream.println();
+		stream.println("# Then come the weight of every variation, as a size six array, the order is");
+
+		stream.print("# ");
+		for (final Variation var : Variation.ALL_VARIATIONS) {
+			stream.print(var.name() + ", ");
+		}
+		stream.println();
+		stream.println("# As for the matrix, every weight add up rather than crush");
+		stream.println("# As for the matrix, \"random\" will generate a random weight between 0 and 1");
+		for (int i = 0; i < this.builder.transformationCount(); i++) {
+			stream.print("weight = (");
+			for (Variation var : Variation.ALL_VARIATIONS) {
+				stream.print(this.builder.variationWeight(i, var) + (var.index() == 5 ? ")" : ","));
+			}
+			stream.println();
+		}
+		stream.println();
+		stream.println("## GUI part");
+		stream.println();
+		stream.println("# The time in ms between every refresh of the fractal");
+		stream.println("refresh = " + this.refresh);
+		stream.println();
+		stream.println("# The number of points computed beetween every refresh");
+		stream.println("# If unset, we will monitor the computation to set the best value");
+		stream.println("# (not really recommanded to set it yourself, but hey, it's your choice!)");
+		if (this.step == -1) {
+			stream.println("#step = 20000");
+		} else {
+			stream.println("step = " + this.step);
+		}
+		stream.println("");
+		stream.println("# The threshold in number of points where we will increase the refresh time");
+		stream.println("# It won't be used if we have a fixed value for step");
+		stream.println("threshold = " + this.threshold);
 	}
 
 	/**
@@ -870,10 +890,12 @@ public class Preferences {
 	 * @param threshold
 	 *                The threshold in number of points where we will
 	 *                increase the refresh time
+	 * @param path
+	 *                The path to the configuation file
 	 */
-	private Preferences(final Color background, final ObservableFlameBuilder builder, final int density,
+	public Preferences(final Color background, final ObservableFlameBuilder builder, final int density,
 			final Rectangle frame, final Palette palette, final int threads, final int refresh,
-			final int step, final int threshold) {
+			final int step, final int threshold, final String path) {
 		this.background = background;
 		this.builder = new ObservableFlameBuilder(builder);
 		this.density = density;
@@ -883,6 +905,7 @@ public class Preferences {
 		this.refresh = refresh;
 		this.step = step;
 		this.threshold = threshold;
+		this.path = path;
 	}
 
 	/**
@@ -902,5 +925,6 @@ public class Preferences {
 		this.refresh = pref.refresh;
 		this.step = pref.step;
 		this.threshold = pref.threshold;
+		this.path = pref.path;
 	}
 }

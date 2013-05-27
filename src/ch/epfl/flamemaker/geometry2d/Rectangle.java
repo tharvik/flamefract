@@ -159,7 +159,7 @@ public final class Rectangle {
 	 */
 	@Override
 	public String toString() {
-		return ("(" + this.center().toString() + "," + this.width() + "," + this.height + ")");
+		return ("(" + this.center() + "," + this.width() + "," + this.height + ")");
 	}
 
 	/**
