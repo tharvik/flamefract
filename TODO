@@ -1,1 +1,13 @@
 add saving images
+add interaction to fractal/transformation canvas
+save configuration file (actual state)
+correct errors in colorForIndex
+add number to transformation canvas
+fullscreen of fractal (double-clic full, double-clic escape)
+save old configuration
+reduce size of list
+add menu
+choose size component (between component)
+add loading bar round
+scrool on board of component
+time remaining for computation
