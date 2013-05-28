@@ -522,8 +522,6 @@ public class FlameMakerGUI {
 		private void paintLoading(final Graphics g, final double value) {
 			g.setColor(new java.awt.Color(0xFF)); // blue
 			g.fillRect(0, this.getHeight() - 3, (int) (value * this.getWidth()), 3);
-			// g.drawLine(0, getHeight() - 1, (int) (value *
-			// getWidth()), getHeight() - 1);
 		}
 	}
 
@@ -768,24 +766,44 @@ public class FlameMakerGUI {
 		frame.setVisible(true);
 	}
 
+	private enum menus {
+		NEW_FRACTAL("Nouveau", KeyEvent.VK_N), LOAD_CONF("Charger", KeyEvent.VK_L), SAVE_CONF("Sauver",
+				KeyEvent.VK_S), SAVE_IMAGE("Sauver l'image", KeyEvent.SHIFT_DOWN_MASK | KeyEvent.VK_S), EXIT(
+				"Quitter", KeyEvent.VK_Q), FULLSCREEN("Plein écran", KeyEvent.VK_F), SLIDESHOW(
+				"Diaporama", KeyEvent.VK_D), ABOUT("À propos", KeyEvent.VK_F1);
+
+		private final String	name;
+		private final int	keyEvent;
+
+		menus(String name, int keyEvent) {
+			this.name = name;
+			this.keyEvent = keyEvent;
+		}
+
+		public int getKeyEvent() {
+			return keyEvent;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+	}
+
 	/**
-	 * Return an {@link AffineTransformation} at the given position and with
-	 * the given value
+	 * Return an {@link ActionListener} for the given {@link menus}
 	 * 
-	 * @param i
-	 *                The vertical position in the array
-	 * @param j
-	 *                The horizontal position in the array
+	 * @param m
+	 *                The {@link menus} to retrieve
+	 * 
 	 * @return a new {@link ActionListener} to use at the given place in the
 	 *         array
 	 */
-	private ActionListener getActionListener(final int i, final int j) {
+	private ActionListener getActionListener(menus m) {
 
-		final int value = (i << 2) + j;
-		switch (value) {
+		switch (m) {
 
-		case (0 << 2) + 0:
-			// new
+		case NEW_FRACTAL:
 			return new ActionListener() {
 
 				@Override
@@ -822,17 +840,15 @@ public class FlameMakerGUI {
 				}
 			};
 
-		case (0 << 2) + 2:
+		case LOAD_CONF:
 			return new ActionListener() {
 
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
-					// load
 				}
 			};
 
-		case (0 << 2) + 3:
-			// save conf
+		case SAVE_CONF:
 			return new ActionListener() {
 
 				@Override
@@ -853,8 +869,7 @@ public class FlameMakerGUI {
 				}
 			};
 
-		case (0 << 2) + 4:
-			// save image
+		case SAVE_IMAGE:
 			return new ActionListener() {
 
 				@Override
@@ -862,7 +877,7 @@ public class FlameMakerGUI {
 				}
 			};
 
-		case (0 << 2) + 6:
+		case EXIT:
 			return new ActionListener() {
 
 				@Override
@@ -1146,18 +1161,12 @@ public class FlameMakerGUI {
 	private JMenuBar getMenuBar() {
 		final JMenuBar bar = new JMenuBar();
 
-		final String[][] names = { { "Nouveau", "--", "Charger", "Sauver", "Sauver l'image", "--", "Quitter" } };
-		final int[][] keyEvents = { { KeyEvent.VK_N, -1, KeyEvent.VK_C, KeyEvent.VK_S, KeyEvent.VK_S, -1,
-				KeyEvent.VK_Q } };
+		final int s = menus.values().length;
+		
+		final JMenuItem[][] items = new JMenuItem[s][s];
+		final ActionListener[][] actions = new ActionListener[s][s];
 
-		final int c = ActionEvent.CTRL_MASK;
-		final int s = ActionEvent.SHIFT_MASK;
-		final int[][] actionEvents = { { c, c, c, c, c | s, c, c } };
-
-		final JMenuItem[][] items = new JMenuItem[names.length][names[0].length];
-		final ActionListener[][] actions = new ActionListener[names.length][names[0].length];
-
-		final JMenu[] menus = new JMenu[names.length];
+		final JMenu[] menus = new JMenu[s];
 
 		for (int i = 0; i < actions.length; i++) {
 			for (int j = 0; j < actions[i].length; j++) {
