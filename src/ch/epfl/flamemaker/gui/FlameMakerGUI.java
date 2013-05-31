@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -12,6 +13,8 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -28,6 +31,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.InputVerifier;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFrame;
@@ -37,22 +41,26 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 
 import ch.epfl.flamemaker.color.Color;
 import ch.epfl.flamemaker.color.Palette;
 import ch.epfl.flamemaker.extra.Preferences;
 import ch.epfl.flamemaker.flame.Flame;
 import ch.epfl.flamemaker.flame.FlameAccumulator;
+import ch.epfl.flamemaker.flame.FlamePPMMaker;
 import ch.epfl.flamemaker.flame.FlameTransformation;
 import ch.epfl.flamemaker.flame.FlameTransformation.Builder;
 import ch.epfl.flamemaker.flame.Variation;
@@ -280,7 +288,7 @@ public class FlameMakerGUI {
 		 * Represent a really simple chronometer, you can start it, stop
 		 * it and know the time it took.
 		 */
-		private class Chrono {
+		private static class Chrono {
 			/**
 			 * The time of start
 			 */
@@ -766,40 +774,246 @@ public class FlameMakerGUI {
 		frame.setVisible(true);
 	}
 
-	private enum menus {
-		NEW_FRACTAL("Nouveau", KeyEvent.VK_N), LOAD_CONF("Charger", KeyEvent.VK_L), SAVE_CONF("Sauver",
-				KeyEvent.VK_S), SAVE_IMAGE("Sauver l'image", KeyEvent.SHIFT_DOWN_MASK | KeyEvent.VK_S), EXIT(
-				"Quitter", KeyEvent.VK_Q), FULLSCREEN("Plein écran", KeyEvent.VK_F), SLIDESHOW(
-				"Diaporama", KeyEvent.VK_D), ABOUT("À propos", KeyEvent.VK_F1);
+	/**
+	 * The enum describing the menus. It contains the items of the menu too
+	 */
+	private static enum Menus {
 
+		/**
+		 * The file menu, with a readable name
+		 */
+		FILE("Fichier"),
+		/**
+		 * The view menu, with a readable name
+		 */
+		VIEW("Affichage"),
+		/**
+		 * The about menu, with a readable name
+		 */
+		ABOUT("À propos");
+
+		/**
+		 * A readable name
+		 */
 		private final String	name;
-		private final int	keyEvent;
 
-		menus(String name, int keyEvent) {
+		/**
+		 * Construct a new Menus with the given name
+		 * 
+		 * @param name
+		 *                The readable name of the menu
+		 */
+		private Menus(String name) {
 			this.name = name;
-			this.keyEvent = keyEvent;
 		}
 
-		public int getKeyEvent() {
-			return keyEvent;
-		}
-
+		/**
+		 * Return the readable name of the menu
+		 * 
+		 * @return The readable name of the menu
+		 */
 		public String getName() {
 			return name;
 		}
 
+		/**
+		 * All the items if the menus
+		 */
+		public static enum Items {
+			/**
+			 * Reset the fractal to his default state
+			 */
+			NEW_FRACTAL(Menus.FILE, 0, "Nouveau", KeyEvent.VK_N, 0),
+			/**
+			 * Load a new configuration file
+			 */
+			LOAD_CONF(Menus.FILE, 2, "Charger", KeyEvent.VK_L, 0),
+			/**
+			 * Save the actual state of the program
+			 */
+			SAVE_CONF(Menus.FILE, 3, "Sauver", KeyEvent.VK_S, 0),
+			/**
+			 * Export the resulting image
+			 */
+			SAVE_IMAGE(Menus.FILE, 4, "Sauver l'image", KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK),
+			/**
+			 * Exit the program
+			 */
+			EXIT(Menus.FILE, 6, "Quitter", KeyEvent.VK_Q, 0),
+			/**
+			 * Put the fractal in full screen
+			 */
+			FULLSCREEN(Menus.VIEW, 0, "Plein écran", KeyEvent.VK_F, 0),
+			/**
+			 * Begin a nice slide show
+			 */
+			SLIDESHOW(Menus.VIEW, 2, "Diaporama", KeyEvent.VK_D, 0),
+			/**
+			 * Popup some info about the program
+			 */
+			ABOUT(Menus.ABOUT, 0, "À propos", KeyEvent.VK_H, 0);
+
+			/**
+			 * A readable name
+			 */
+			private final String	name;
+
+			/**
+			 * The key to react to
+			 */
+			private final int	keyEvent;
+
+			/**
+			 * The modifier for the key, to which we add the
+			 * CTRL_DOWN_MASK
+			 */
+			private final int	modifier;
+
+			/**
+			 * The {@link Menus} the item should be
+			 */
+			private final Menus	menu;
+
+			/**
+			 * The position of the item (if there is a gap, let's
+			 * put a separator
+			 */
+			private final int	pos;
+
+			/**
+			 * Construct a new menu item with the given values
+			 * 
+			 * @param menu
+			 *                The {@link Menus} the item should be
+			 * @param pos
+			 *                The position of the item (if there is
+			 *                a gap, let's put a separator
+			 * @param name
+			 *                A readable name
+			 * @param keyEvent
+			 *                The key to react to
+			 * @param modifier
+			 *                The modifier for the key, to which we
+			 *                add the CTRL_DOWN_MASK
+			 */
+			private Items(final Menus menu, final int pos, final String name, final int keyEvent,
+					final int modifier) {
+				this.menu = menu;
+				this.name = name;
+				this.keyEvent = keyEvent;
+				this.pos = pos;
+				this.modifier = modifier;
+			}
+
+			/**
+			 * Return the modifier for the key
+			 * 
+			 * @return The modifier for the key
+			 */
+			public int getModifier() {
+				return modifier;
+			}
+
+			/**
+			 * Return the {@link KeyEvent} to react to
+			 * 
+			 * @return The {@link KeyEvent} to react to
+			 */
+			public int getKeyEvent() {
+				return keyEvent;
+			}
+
+			/**
+			 * Return the readable name for the item
+			 * 
+			 * @return The readable name for the item
+			 */
+			public String getName() {
+				return name;
+			}
+
+			/**
+			 * @return The {@link Menus} to which it should be
+			 */
+			public Menus getMenu() {
+				return menu;
+			}
+
+			/**
+			 * Return the position in the menu, if there is a gap,
+			 * then it should have a separator
+			 * 
+			 * @return The position in the menu
+			 */
+			public int getPos() {
+				return pos;
+			}
+		}
 	}
 
 	/**
-	 * Return an {@link ActionListener} for the given {@link menus}
+	 * Return an {@link ActionListener} for the given {@link Menus.Items}
 	 * 
 	 * @param m
-	 *                The {@link menus} to retrieve
+	 *                The {@link Menus.Items} to retrieve
 	 * 
 	 * @return a new {@link ActionListener} to use at the given place in the
 	 *         array
 	 */
-	private ActionListener getActionListener(menus m) {
+	private ActionListener getActionListener(Menus.Items m) {
+
+		class Compute extends SwingWorker<Void, Void> {
+
+			private File	file;
+
+			public Compute(File file) {
+				this.file = file;
+			}
+
+			@Override
+			protected Void doInBackground() {
+				final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+				final int m = d.height * d.width * density;
+
+				final JProgressBar bar = new JProgressBar(0, m);
+				final JLabel text = new JLabel("Calcul de l'image");
+				
+				final JPanel panel = new JPanel();
+				panel.add(bar);
+				panel.add(text);
+				
+				final JFrame window = new JFrame("Sauvegarde de l'image");
+				window.add(panel);
+				window.pack();
+				window.setVisible(true);
+
+				final Rectangle actualFrame = frame.expandToAspectRatio(d.width / (double) d.height);
+				final FlameAccumulator.Builder accuBuilder = new FlameAccumulator.Builder(actualFrame,
+						d.width, d.height);
+				final Flame flame = builder.build();
+
+				for (int total = 0; total < m; total += 5000) {
+					flame.compute(5000, accuBuilder);
+					bar.setValue(total / 2);
+				}
+
+				try {
+					text.setText("Écriture de l'image");
+					final PrintStream stream = new PrintStream(file);
+					final FlameAccumulator accu = accuBuilder.build();
+
+					for (int i = 0; i < accu.height(); i++) {
+						FlamePPMMaker.writeToPPMIncremental(accu, stream, i);
+						bar.setValue(m / 2 + i * m / accu.width());
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+
+		}
 
 		switch (m) {
 
@@ -874,6 +1088,42 @@ public class FlameMakerGUI {
 
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+					final JFileChooser chooser = new JFileChooser();
+					chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+					chooser.setMultiSelectionEnabled(false);
+					chooser.setName("FlameFract");
+					chooser.setFileFilter(new FileFilter() {
+
+						@Override
+						public String getDescription() {
+							return "Only images";
+						}
+
+						@Override
+						public boolean accept(final File f) {
+							if (f.isDirectory()) {
+								return true;
+							}
+
+							final String ext = f.getName().replaceAll(".*\\.", "");
+							switch (ext) {
+							case "ppm":
+								return true;
+
+							default:
+								return false;
+							}
+
+						}
+					});
+
+					if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+						final File file = chooser.getSelectedFile();
+
+						Compute comp = new Compute(file);
+						comp.execute();
+					}
+
 				}
 			};
 
@@ -887,7 +1137,9 @@ public class FlameMakerGUI {
 			};
 
 		default:
-			throw new IllegalArgumentException();
+			return null;
+			// TODO
+			// throw new IllegalArgumentException();
 		}
 	}
 
@@ -1161,44 +1413,42 @@ public class FlameMakerGUI {
 	private JMenuBar getMenuBar() {
 		final JMenuBar bar = new JMenuBar();
 
-		final int s = menus.values().length;
-		
-		final JMenuItem[][] items = new JMenuItem[s][s];
-		final ActionListener[][] actions = new ActionListener[s][s];
-
-		final JMenu[] menus = new JMenu[s];
-
-		for (int i = 0; i < actions.length; i++) {
-			for (int j = 0; j < actions[i].length; j++) {
-
-				if (names[i][j].compareTo("--") == 0) {
-					continue;
-				}
-
-				actions[i][j] = this.getActionListener(i, j);
+		int h = Integer.MIN_VALUE;
+		final int w = Menus.values().length;
+		final int array[] = new int[w];
+		for (Menus.Items item : Menus.Items.values()) {
+			final int pos = item.getMenu().ordinal();
+			array[pos]++;
+			if (array[pos] > h) {
+				h = array[pos];
 			}
 		}
 
-		for (int i = 0; i < menus.length; i++) {
-			menus[i] = new JMenu("Fichier");
+		final JMenu[] menus = new JMenu[w];
+		for (Menus menu : Menus.values()) {
+			menus[menu.ordinal()] = new JMenu(menu.getName());
+		}
 
-			for (int j = 0; j < items[i].length; j++) {
+		Menus.Items old = null;
+		for (Menus.Items item : Menus.Items.values()) {
+			final int pos = item.getMenu().ordinal();
 
-				if (names[i][j].compareTo("--") == 0) {
-					menus[i].addSeparator();
-					continue;
-				}
-
-				final JMenuItem item = new JMenuItem(names[i][j], keyEvents[i][j]);
-				item.setMnemonic(keyEvents[i][j]);
-				item.setAccelerator(KeyStroke.getKeyStroke(keyEvents[i][j], actionEvents[i][j]));
-				item.addActionListener(actions[i][j]);
-
-				menus[i].add(item);
-				items[i][j] = item;
+			if (item.getPos() > 0 && item.getPos() - old.getPos() > 1) {
+				menus[pos].addSeparator();
 			}
 
-			bar.add(menus[i]);
+			final JMenuItem place = new JMenuItem(item.getName(), item.getKeyEvent());
+			place.setMnemonic(item.getKeyEvent());
+			place.setAccelerator(KeyStroke.getKeyStroke(item.getKeyEvent(),
+					KeyEvent.CTRL_DOWN_MASK | item.getModifier()));
+			place.addActionListener(getActionListener(item));
+
+			menus[pos].add(place);
+			old = item;
+		}
+
+		for (JMenu menu : menus) {
+			bar.add(menu);
 		}
 
 		return bar;

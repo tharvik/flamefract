@@ -125,7 +125,7 @@ public class FlamePPMMaker {
 	 * @param stream
 	 *                The stream to write the fractal to
 	 */
-	private static void writeToPPM(final FlameAccumulator accu, final PrintStream stream) {
+	public static void writeToPPM(final FlameAccumulator accu, final PrintStream stream) {
 		stream.println("P3");
 		stream.println(accu.width() + " " + accu.height());
 		stream.println(100);
@@ -147,5 +147,39 @@ public class FlamePPMMaker {
 			}
 			stream.println(line);
 		}
+	}
+
+	/**
+	 * Write the line wanted of a {@link FlameAccumulator} to a stream
+	 * 
+	 * @param accu
+	 *                The accumulator containing a fractal
+	 * @param stream
+	 *                The stream to write the fractal to
+	 * @param y
+	 *                The line to write (if 0, add the header)
+	 */
+	public static void writeToPPMIncremental(final FlameAccumulator accu, final PrintStream stream, final int y) {
+		if (y == 0) {
+			stream.println("P3");
+			stream.println(accu.width() + " " + accu.height());
+			stream.println(100);
+		}
+
+		// the default palette
+		final ArrayList<Color> list = new ArrayList<Color>(3);
+		list.add(Color.RED);
+		list.add(Color.GREEN);
+		list.add(Color.BLUE);
+		final Palette palette = new InterpolatedPalette(list);
+
+		String line = new String();
+		for (int x = 0; x < accu.width(); x++) {
+			final Color c = accu.color(palette, Color.BLACK, x, accu.height() - y - 1);
+			line += (Color.sRGBEncode(c.red(), 100)) + " ";
+			line += (Color.sRGBEncode(c.green(), 100)) + " ";
+			line += (Color.sRGBEncode(c.blue(), 100)) + " ";
+		}
+		stream.println(line);
 	}
 }

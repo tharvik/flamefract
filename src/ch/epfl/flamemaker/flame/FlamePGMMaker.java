@@ -167,7 +167,7 @@ public class FlamePGMMaker {
 	 * @param stream
 	 *                The stream to write the fractal to
 	 */
-	private static void writeToPGM(final FlameAccumulator accu, final PrintStream stream) {
+	public static void writeToPGM(final FlameAccumulator accu, final PrintStream stream) {
 		stream.println("P2");
 		stream.println(accu.width() + " " + accu.height());
 		stream.println(100);
