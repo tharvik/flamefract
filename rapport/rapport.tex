@@ -1,0 +1,53 @@
+\documentclass[a4paper]{article}
+
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+
+\author{Valérian Rousset \and Guy-Laurent Subri}
+\title{Rapport du projet Flamefract}
+
+\begin{document}
+\maketitle
+
+\section*{Améliorations}
+
+\subsection*{Barre de chargement}
+Nous avons ajouté une barre de chargement sous l'image de la fractale. Cette barre s'affiche uniquement lorsque la fractale est calculée. Elle est discrète et utile pour l'utilisateur, d'autant plus que celui-ci voit sa fractale apparaître petit à petit (amélioration expliquée plus tard).
+
+\subsection*{Apparation "incrémentale" de la fractale}
+L'apparition "incrémentale" de la fractale permet à l'utilisateur de voir la fractale se déssiner petit à petit devant ses yeux émerveillé par la beauté de l'image qu'il a crée (ou presque)!
+
+Avant cette feature, nous devions attendre, sans savoir quoi que ce soit sur l'état du calcul, avant de voir apparître brusquement une nouvelle fractale (en particulier si on met le GUI en plein écarn \ldots). Cette feature est plus "user-friendly" qu'autre chose, mais elle est assez élégante.
+
+\subsection*{Fichier de configuration}
+Tous les deux, nous aimons avoir le contrôle sur notre système et sur les programmes que nous utilisons, et nous apprécions particulièrement le fait de pouvoir configurer les programmes à notre guise. C'est pourquoi nous avons mis en place un fichier de configuration!
+
+Dans ce fichier, nous pouvons changer la matrice de base, les poids accordés aux différentes transformations, la "density" de l'image, \ldots
+
+Le fichier de configuration supporte les commentaires.
+
+\subsection*{Menus et raccourcis}
+Nous avons décidé d'implémenter des menus et des raccourcis clavier (car nous aimons pouvoir gérer le maximum de choses sans avoir besoin de la souris).
+
+Nous avons plusieurs menus, qui permettent d'afficher d'autres fonctionnalités (terminées ou non), comme, par exemple, la sauvegarde de l'image.
+
+\subsection*{Sauvegarde de l'image}
+Générer des fractales dans une fenêtre créée avec Swing, c'est bien, mais avoir cette fractale en fond d'écran c'est mieux. C'est pourquoi nous voulions, dès le départ, avoir la possibilité de sauver les images que nous avons créées.
+
+\subsection*{Sauvegarde de la configuraiton de l'image}
+L'idée de sauver la configuration (c'est-à-dire le poids des variations, le nombre de transformations, etc\ldots) est venue du fait que si nous enregistrions une image, nous ne pouvions pas reprendre l'image et modifier quelques paramètres. Nous nous sommes donc dit qu'il nous \textit{fallait} pouvoir reprendre la configuration d'une image.
+
+\subsection*{Divers}
+\subsubsection*{Menu "À propos"}
+
+\subsubsection*{Réinitilisation}
+
+\subsubsection*{}
+
+\subsubsection*{}
+
+\subsection*{}
+\end{document}
