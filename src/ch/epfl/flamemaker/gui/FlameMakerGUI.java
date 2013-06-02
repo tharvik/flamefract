@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -786,11 +788,7 @@ public class FlameMakerGUI {
 		/**
 		 * The view menu, with a readable name
 		 */
-		VIEW("Affichage"),
-		/**
-		 * The about menu, with a readable name
-		 */
-		ABOUT("À propos");
+		VIEW("Affichage");
 
 		/**
 		 * A readable name
@@ -825,10 +823,6 @@ public class FlameMakerGUI {
 			 */
 			NEW_FRACTAL(Menus.FILE, 0, "Nouveau", KeyEvent.VK_N, 0),
 			/**
-			 * Load a new configuration file
-			 */
-			LOAD_CONF(Menus.FILE, 2, "Charger", KeyEvent.VK_L, 0),
-			/**
 			 * Save the actual state of the program
 			 */
 			SAVE_CONF(Menus.FILE, 3, "Sauver", KeyEvent.VK_S, 0),
@@ -843,15 +837,7 @@ public class FlameMakerGUI {
 			/**
 			 * Put the fractal in full screen
 			 */
-			FULLSCREEN(Menus.VIEW, 0, "Plein écran", KeyEvent.VK_F, 0),
-			/**
-			 * Begin a nice slide show
-			 */
-			SLIDESHOW(Menus.VIEW, 2, "Diaporama", KeyEvent.VK_D, 0),
-			/**
-			 * Popup some info about the program
-			 */
-			ABOUT(Menus.ABOUT, 0, "À propos", KeyEvent.VK_H, 0);
+			FULLSCREEN(Menus.VIEW, 0, "Plein écran", KeyEvent.VK_F, 0);
 
 			/**
 			 * A readable name
@@ -965,24 +951,28 @@ public class FlameMakerGUI {
 		class Compute extends SwingWorker<Void, Void> {
 
 			private File	file;
+			private JFrame	window;
 
-			public Compute(File file) {
+			public Compute(File file, JFrame window) {
 				this.file = file;
+				this.window = window;
 			}
 
 			@Override
 			protected Void doInBackground() {
-				final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+				 final Dimension d =
+				 Toolkit.getDefaultToolkit().getScreenSize();
+//				final Dimension d = new Dimension(100, 100);
 				final int m = d.height * d.width * density;
 
 				final JProgressBar bar = new JProgressBar(0, m);
 				final JLabel text = new JLabel("Calcul de l'image");
-				
+
 				final JPanel panel = new JPanel();
 				panel.add(bar);
 				panel.add(text);
-				
-				final JFrame window = new JFrame("Sauvegarde de l'image");
+
+				window.setTitle("Sauvegarde de l'image");
 				window.add(panel);
 				window.pack();
 				window.setVisible(true);
@@ -1006,6 +996,7 @@ public class FlameMakerGUI {
 						FlamePPMMaker.writeToPPMIncremental(accu, stream, i);
 						bar.setValue(m / 2 + i * m / accu.width());
 					}
+
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				}
@@ -1051,14 +1042,6 @@ public class FlameMakerGUI {
 							button.setEnabled(true);
 						}
 					}
-				}
-			};
-
-		case LOAD_CONF:
-			return new ActionListener() {
-
-				@Override
-				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
 				}
 			};
 
@@ -1120,8 +1103,20 @@ public class FlameMakerGUI {
 					if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
 						final File file = chooser.getSelectedFile();
 
-						Compute comp = new Compute(file);
+						final JFrame frame = new JFrame();
+						final Compute comp = new Compute(file, frame);
 						comp.execute();
+						comp.addPropertyChangeListener(new PropertyChangeListener() {
+							
+							@Override
+							public void propertyChange(PropertyChangeEvent evt) {
+								if (evt.getPropertyName() == "state") {
+									if ("DONE".compareTo(evt.getNewValue().toString()) == 0) {
+										frame.setVisible(false);				
+									}
+								}
+							}
+						});
 					}
 
 				}
@@ -1133,6 +1128,22 @@ public class FlameMakerGUI {
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
 					System.exit(0);
+				}
+			};
+
+		case FULLSCREEN:
+			return new ActionListener() {
+
+				@Override
+				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
+					final JFrame panel = new JFrame();
+					panel.add(new FlameBuilderPreviewComponent(builder, background, palette, frame,
+							density));
+
+					final GraphicsEnvironment ge = GraphicsEnvironment
+							.getLocalGraphicsEnvironment();
+					final GraphicsDevice gd = ge.getDefaultScreenDevice();
+					gd.setFullScreenWindow(panel);
 				}
 			};
 
