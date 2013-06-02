@@ -10,6 +10,7 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -536,6 +537,167 @@ public class FlameMakerGUI {
 	}
 
 	/**
+	 * The enum describing the menus. It contains the items of the menu too
+	 */
+	private static enum Menus {
+
+		/**
+		 * The file menu, with a readable name
+		 */
+		FILE("Fichier"),
+		/**
+		 * The view menu, with a readable name
+		 */
+		VIEW("Affichage");
+
+		/**
+		 * All the items if the menus
+		 */
+		public static enum Items {
+			/**
+			 * Reset the fractal to his default state
+			 */
+			NEW_FRACTAL(Menus.FILE, 0, "Nouveau", KeyEvent.VK_N, 0),
+			/**
+			 * Save the actual state of the program
+			 */
+			SAVE_CONF(Menus.FILE, 2, "Sauver", KeyEvent.VK_S, 0),
+			/**
+			 * Export the resulting image
+			 */
+			SAVE_IMAGE(Menus.FILE, 3, "Sauver l'image", KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK),
+			/**
+			 * Exit the program
+			 */
+			EXIT(Menus.FILE, 5, "Quitter", KeyEvent.VK_Q, 0),
+			/**
+			 * Put the fractal in full screen
+			 */
+			FULLSCREEN(Menus.VIEW, 0, "Plein écran", KeyEvent.VK_F, 0);
+
+			/**
+			 * The key to react to
+			 */
+			private final int	keyEvent;
+
+			/**
+			 * The {@link Menus} the item should be
+			 */
+			private final Menus	menu;
+
+			/**
+			 * The modifier for the key, to which we add the
+			 * CTRL_DOWN_MASK
+			 */
+			private final int	modifier;
+
+			/**
+			 * A readable name
+			 */
+			private final String	name;
+
+			/**
+			 * The position of the item (if there is a gap, let's
+			 * put a separator
+			 */
+			private final int	pos;
+
+			/**
+			 * Construct a new menu item with the given values
+			 * 
+			 * @param menu
+			 *                The {@link Menus} the item should be
+			 * @param pos
+			 *                The position of the item (if there is
+			 *                a gap, let's put a separator
+			 * @param name
+			 *                A readable name
+			 * @param keyEvent
+			 *                The key to react to
+			 * @param modifier
+			 *                The modifier for the key, to which we
+			 *                add the CTRL_DOWN_MASK
+			 */
+			private Items(final Menus menu, final int pos, final String name, final int keyEvent,
+					final int modifier) {
+				this.menu = menu;
+				this.name = name;
+				this.keyEvent = keyEvent;
+				this.pos = pos;
+				this.modifier = modifier;
+			}
+
+			/**
+			 * Return the {@link KeyEvent} to react to
+			 * 
+			 * @return The {@link KeyEvent} to react to
+			 */
+			public int getKeyEvent() {
+				return this.keyEvent;
+			}
+
+			/**
+			 * @return The {@link Menus} to which it should be
+			 */
+			public Menus getMenu() {
+				return this.menu;
+			}
+
+			/**
+			 * Return the modifier for the key
+			 * 
+			 * @return The modifier for the key
+			 */
+			public int getModifier() {
+				return this.modifier;
+			}
+
+			/**
+			 * Return the readable name for the item
+			 * 
+			 * @return The readable name for the item
+			 */
+			public String getName() {
+				return this.name;
+			}
+
+			/**
+			 * Return the position in the menu, if there is a gap,
+			 * then it should have a separator
+			 * 
+			 * @return The position in the menu
+			 */
+			public int getPos() {
+				return this.pos;
+			}
+		}
+
+		/**
+		 * A readable name
+		 */
+		private final String	name;
+
+		/**
+		 * Construct a new Menus with the given name
+		 * 
+		 * @param name
+		 *                The readable name of the menu
+		 */
+		private Menus(final String name) {
+			this.name = name;
+		}
+
+		/**
+		 * Return the readable name of the menu
+		 * 
+		 * @return The readable name of the menu
+		 */
+		public String getName() {
+			return this.name;
+		}
+	}
+
+	/**
 	 * Define the concept of observer: the changedObservedValue function in
 	 * every {@link Observer} will be fired by the target every time the
 	 * value (given by the context) inside the target is changed
@@ -621,6 +783,11 @@ public class FlameMakerGUI {
 	private final ObservableFlameBuilder	builder;
 
 	/**
+	 * The array of the add and remove buttons
+	 */
+	private JButton[]			buttons;
+
+	/**
 	 * The number of iteration
 	 */
 	private final int			density;
@@ -694,11 +861,6 @@ public class FlameMakerGUI {
 			throw new IllegalArgumentException();
 		}
 	}
-
-	/**
-	 * The array of the add and remove buttons
-	 */
-	private JButton[]	buttons;
 
 	/**
 	 * Construct a {@link FlameMakerGUI} with the values in the
@@ -777,167 +939,6 @@ public class FlameMakerGUI {
 	}
 
 	/**
-	 * The enum describing the menus. It contains the items of the menu too
-	 */
-	private static enum Menus {
-
-		/**
-		 * The file menu, with a readable name
-		 */
-		FILE("Fichier"),
-		/**
-		 * The view menu, with a readable name
-		 */
-		VIEW("Affichage");
-
-		/**
-		 * A readable name
-		 */
-		private final String	name;
-
-		/**
-		 * Construct a new Menus with the given name
-		 * 
-		 * @param name
-		 *                The readable name of the menu
-		 */
-		private Menus(String name) {
-			this.name = name;
-		}
-
-		/**
-		 * Return the readable name of the menu
-		 * 
-		 * @return The readable name of the menu
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * All the items if the menus
-		 */
-		public static enum Items {
-			/**
-			 * Reset the fractal to his default state
-			 */
-			NEW_FRACTAL(Menus.FILE, 0, "Nouveau", KeyEvent.VK_N, 0),
-			/**
-			 * Save the actual state of the program
-			 */
-			SAVE_CONF(Menus.FILE, 3, "Sauver", KeyEvent.VK_S, 0),
-			/**
-			 * Export the resulting image
-			 */
-			SAVE_IMAGE(Menus.FILE, 4, "Sauver l'image", KeyEvent.VK_S, KeyEvent.SHIFT_DOWN_MASK),
-			/**
-			 * Exit the program
-			 */
-			EXIT(Menus.FILE, 6, "Quitter", KeyEvent.VK_Q, 0),
-			/**
-			 * Put the fractal in full screen
-			 */
-			FULLSCREEN(Menus.VIEW, 0, "Plein écran", KeyEvent.VK_F, 0);
-
-			/**
-			 * A readable name
-			 */
-			private final String	name;
-
-			/**
-			 * The key to react to
-			 */
-			private final int	keyEvent;
-
-			/**
-			 * The modifier for the key, to which we add the
-			 * CTRL_DOWN_MASK
-			 */
-			private final int	modifier;
-
-			/**
-			 * The {@link Menus} the item should be
-			 */
-			private final Menus	menu;
-
-			/**
-			 * The position of the item (if there is a gap, let's
-			 * put a separator
-			 */
-			private final int	pos;
-
-			/**
-			 * Construct a new menu item with the given values
-			 * 
-			 * @param menu
-			 *                The {@link Menus} the item should be
-			 * @param pos
-			 *                The position of the item (if there is
-			 *                a gap, let's put a separator
-			 * @param name
-			 *                A readable name
-			 * @param keyEvent
-			 *                The key to react to
-			 * @param modifier
-			 *                The modifier for the key, to which we
-			 *                add the CTRL_DOWN_MASK
-			 */
-			private Items(final Menus menu, final int pos, final String name, final int keyEvent,
-					final int modifier) {
-				this.menu = menu;
-				this.name = name;
-				this.keyEvent = keyEvent;
-				this.pos = pos;
-				this.modifier = modifier;
-			}
-
-			/**
-			 * Return the modifier for the key
-			 * 
-			 * @return The modifier for the key
-			 */
-			public int getModifier() {
-				return modifier;
-			}
-
-			/**
-			 * Return the {@link KeyEvent} to react to
-			 * 
-			 * @return The {@link KeyEvent} to react to
-			 */
-			public int getKeyEvent() {
-				return keyEvent;
-			}
-
-			/**
-			 * Return the readable name for the item
-			 * 
-			 * @return The readable name for the item
-			 */
-			public String getName() {
-				return name;
-			}
-
-			/**
-			 * @return The {@link Menus} to which it should be
-			 */
-			public Menus getMenu() {
-				return menu;
-			}
-
-			/**
-			 * Return the position in the menu, if there is a gap,
-			 * then it should have a separator
-			 * 
-			 * @return The position in the menu
-			 */
-			public int getPos() {
-				return pos;
-			}
-		}
-	}
-
-	/**
 	 * Return an {@link ActionListener} for the given {@link Menus.Items}
 	 * 
 	 * @param m
@@ -946,14 +947,14 @@ public class FlameMakerGUI {
 	 * @return a new {@link ActionListener} to use at the given place in the
 	 *         array
 	 */
-	private ActionListener getActionListener(Menus.Items m) {
+	private ActionListener getActionListener(final Menus.Items m) {
 
 		class Compute extends SwingWorker<Void, Void> {
 
-			private File	file;
-			private JFrame	window;
+			private final File	file;
+			private final JFrame	window;
 
-			public Compute(File file, JFrame window) {
+			public Compute(final File file, final JFrame window) {
 				this.file = file;
 				this.window = window;
 			}
@@ -961,24 +962,25 @@ public class FlameMakerGUI {
 			@Override
 			protected Void doInBackground() {
 				final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-				final int m = d.height * d.width * density;
+				final int m = d.height * d.width * FlameMakerGUI.this.density;
 
 				final JProgressBar bar = new JProgressBar(0, m);
 				bar.setString("Calcul de l'image");
 				bar.setStringPainted(true);
-				
+
 				final JPanel panel = new JPanel();
 				panel.add(bar);
 
-				window.setTitle("Sauvegarde de l'image");
-				window.add(panel);
-				window.pack();
-				window.setVisible(true);
+				this.window.setTitle("Sauvegarde de l'image");
+				this.window.add(panel);
+				this.window.pack();
+				this.window.setVisible(true);
 
-				final Rectangle actualFrame = frame.expandToAspectRatio(d.width / (double) d.height);
+				final Rectangle actualFrame = FlameMakerGUI.this.frame.expandToAspectRatio(d.width
+						/ (double) d.height);
 				final FlameAccumulator.Builder accuBuilder = new FlameAccumulator.Builder(actualFrame,
 						d.width, d.height);
-				final Flame flame = builder.build();
+				final Flame flame = FlameMakerGUI.this.builder.build();
 
 				for (int total = 0; total < m; total += 5000) {
 					flame.compute(5000, accuBuilder);
@@ -987,17 +989,17 @@ public class FlameMakerGUI {
 
 				try {
 					bar.setString("Écriture de l'image");
-					final PrintStream stream = new PrintStream(file);
+					final PrintStream stream = new PrintStream(this.file);
 					final FlameAccumulator accu = accuBuilder.build();
 
-					bar.setMaximum(accu.height()*2);
-					
+					bar.setMaximum(accu.height() * 2);
+
 					for (int i = 0; i < accu.height(); i++) {
 						FlamePPMMaker.writeToPPMIncremental(accu, stream, i);
 						bar.setValue(accu.height() + i);
 					}
 
-				} catch (FileNotFoundException e) {
+				} catch (final FileNotFoundException e) {
 					e.printStackTrace();
 				}
 
@@ -1035,10 +1037,10 @@ public class FlameMakerGUI {
 					}
 
 					FlameMakerGUI.this.buttons[1].getActionListeners()[0].actionPerformed(null);
-					setSelectedTransformationIndex(0);
+					FlameMakerGUI.this.setSelectedTransformationIndex(0);
 
 					if (Preferences.defaults.builder.transformationCount() > 1) {
-						for (JButton button : buttons) {
+						for (final JButton button : FlameMakerGUI.this.buttons) {
 							button.setEnabled(true);
 						}
 					}
@@ -1050,16 +1052,18 @@ public class FlameMakerGUI {
 
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
-					final Preferences pref = new Preferences(background, builder, density, frame,
-							palette, Preferences.defaults.threads,
-							Preferences.defaults.refresh, Preferences.defaults.step,
-							Preferences.defaults.threshold, Preferences.defaults.path);
+					final Preferences pref = new Preferences(FlameMakerGUI.this.background,
+							FlameMakerGUI.this.builder, FlameMakerGUI.this.density,
+							FlameMakerGUI.this.frame, FlameMakerGUI.this.palette,
+							Preferences.defaults.threads, Preferences.defaults.refresh,
+							Preferences.defaults.step, Preferences.defaults.threshold,
+							Preferences.defaults.path);
 
 					try {
 						final PrintStream file = new PrintStream(pref.path);
 						pref.writeConfiguration(file);
 						file.close();
-					} catch (Exception e1) {
+					} catch (final Exception e1) {
 						e1.printStackTrace();
 					}
 
@@ -1078,11 +1082,6 @@ public class FlameMakerGUI {
 					chooser.setFileFilter(new FileFilter() {
 
 						@Override
-						public String getDescription() {
-							return "Only images";
-						}
-
-						@Override
 						public boolean accept(final File f) {
 							if (f.isDirectory()) {
 								return true;
@@ -1098,6 +1097,11 @@ public class FlameMakerGUI {
 							}
 
 						}
+
+						@Override
+						public String getDescription() {
+							return "Only images";
+						}
 					});
 
 					if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -1109,7 +1113,7 @@ public class FlameMakerGUI {
 						comp.addPropertyChangeListener(new PropertyChangeListener() {
 
 							@Override
-							public void propertyChange(PropertyChangeEvent evt) {
+							public void propertyChange(final PropertyChangeEvent evt) {
 								if (evt.getPropertyName() == "state") {
 									if ("DONE".compareTo(evt.getNewValue()
 											.toString()) == 0) {
@@ -1138,11 +1142,12 @@ public class FlameMakerGUI {
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
 					final JFrame window = new JFrame();
-					window.add(new FlameBuilderPreviewComponent(builder, background, palette, frame,
-							density));
+					window.add(new FlameBuilderPreviewComponent(FlameMakerGUI.this.builder,
+							FlameMakerGUI.this.background, FlameMakerGUI.this.palette,
+							FlameMakerGUI.this.frame, FlameMakerGUI.this.density));
 					window.pack();
 					window.setVisible(true);
-					
+
 					final GraphicsEnvironment ge = GraphicsEnvironment
 							.getLocalGraphicsEnvironment();
 					final GraphicsDevice gd = ge.getDefaultScreenDevice();
@@ -1428,7 +1433,7 @@ public class FlameMakerGUI {
 		int h = Integer.MIN_VALUE;
 		final int w = Menus.values().length;
 		final int array[] = new int[w];
-		for (Menus.Items item : Menus.Items.values()) {
+		for (final Menus.Items item : Menus.Items.values()) {
 			final int pos = item.getMenu().ordinal();
 			array[pos]++;
 			if (array[pos] > h) {
@@ -1437,12 +1442,12 @@ public class FlameMakerGUI {
 		}
 
 		final JMenu[] menus = new JMenu[w];
-		for (Menus menu : Menus.values()) {
+		for (final Menus menu : Menus.values()) {
 			menus[menu.ordinal()] = new JMenu(menu.getName());
 		}
 
 		Menus.Items old = null;
-		for (Menus.Items item : Menus.Items.values()) {
+		for (final Menus.Items item : Menus.Items.values()) {
 			final int pos = item.getMenu().ordinal();
 
 			if (item.getPos() > 0 && item.getPos() - old.getPos() > 1) {
@@ -1451,15 +1456,15 @@ public class FlameMakerGUI {
 
 			final JMenuItem place = new JMenuItem(item.getName(), item.getKeyEvent());
 			place.setMnemonic(item.getKeyEvent());
-			place.setAccelerator(KeyStroke.getKeyStroke(item.getKeyEvent(),
-					KeyEvent.CTRL_DOWN_MASK | item.getModifier()));
-			place.addActionListener(getActionListener(item));
+			place.setAccelerator(KeyStroke.getKeyStroke(item.getKeyEvent(), InputEvent.CTRL_DOWN_MASK
+					| item.getModifier()));
+			place.addActionListener(this.getActionListener(item));
 
 			menus[pos].add(place);
 			old = item;
 		}
 
-		for (JMenu menu : menus) {
+		for (final JMenu menu : menus) {
 			bar.add(menu);
 		}
 
@@ -1483,23 +1488,23 @@ public class FlameMakerGUI {
 		final JPanel panel = new JPanel();
 		this.buttons = new JButton[2];
 
-		buttons[0] = new JButton("Ajouter");
-		buttons[1] = new JButton("Supprimer");
+		this.buttons[0] = new JButton("Ajouter");
+		this.buttons[1] = new JButton("Supprimer");
 
-		buttons[0].addActionListener(new ActionListener() {
+		this.buttons[0].addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
 				model.addTransformation();
 				list.setSelectedIndex(FlameMakerGUI.this.builder.transformationCount() - 1);
 
-				if (!buttons[1].isEnabled()) {
-					buttons[1].setEnabled(true);
+				if (!FlameMakerGUI.this.buttons[1].isEnabled()) {
+					FlameMakerGUI.this.buttons[1].setEnabled(true);
 				}
 			}
 		});
 
-		buttons[1].addActionListener(new ActionListener() {
+		this.buttons[1].addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
@@ -1509,14 +1514,14 @@ public class FlameMakerGUI {
 						: old);
 
 				if (FlameMakerGUI.this.builder.transformationCount() == 1) {
-					buttons[1].setEnabled(false);
+					FlameMakerGUI.this.buttons[1].setEnabled(false);
 				}
 			}
 		});
 
 		panel.setLayout(new GridLayout(1, 2));
-		panel.add(buttons[0]);
-		panel.add(buttons[1]);
+		panel.add(this.buttons[0]);
+		panel.add(this.buttons[1]);
 
 		return panel;
 	}
