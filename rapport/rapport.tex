@@ -40,7 +40,7 @@ Les menus principaux ("Fichier" et "Affichage"), ainsi que leurs contenu sont de
 \paragraph{Sauvegarde de l'image}
 Générer des fractales dans une fenêtre créée avec Swing, c'est bien, mais avoir cette fractale en fond d'écran, c'est mieux. C'est pourquoi nous voulions, dès le départ, avoir la possibilité de sauver les images que nous avons créées.
 
-Pour sauvegarder, nous laissons le choix à l'utilisateur de l'endroit et du nom pour l'image, pour nous calculons dans le fond la fractal (pour la taille de l'écran, l'idée étant que c'est probablement la plus grande résolution que l'utilisateur ait besoin), et l'enregistrons dans le fichier demandé. Par l'utilisation d'un builder et d'un enrigistreur incrémentale, nous pouvons afficher une barre de chargement durant le calcul.
+Pour sauvegarder, nous laissons le choix à l'utilisateur de l'endroit et du nom de l'image, puis nous calculons la fractal (avec la taille de l'écran, l'idée étant que c'est probablement la plus grande résolution que l'utilisateur ait besoin), et l'enregistrons dans le fichier demandé. Par l'utilisation d'un builder et d'un exportateur de fichier incrémentale, nous pouvons afficher une barre de chargement durant le calcul.
 
 \paragraph{Sauvegarde de la configuraiton de l'image}
 L'idée de sauver la configuration (c'est-à-dire le poids des variations, le nombre de transformations, etc\ldots) est venue du fait que si nous enregistrions une image, nous ne pouvions pas reprendre l'image et modifier quelques paramètres. Nous nous sommes donc dit qu'il nous \textit{fallait} pouvoir reprendre la configuration d'une image.
