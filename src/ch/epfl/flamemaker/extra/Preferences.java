@@ -429,7 +429,7 @@ public class Preferences {
 
 				if (split.length != 6) {
 					throw new IllegalArgumentException("must be only six values seperated by comas");
-				}
+				}''
 
 				for (int i = 0; i < split.length; i++) {
 					array[i] = Builder.parseDouble(split[i]);
