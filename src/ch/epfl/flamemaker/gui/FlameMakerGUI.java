@@ -960,17 +960,15 @@ public class FlameMakerGUI {
 
 			@Override
 			protected Void doInBackground() {
-				 final Dimension d =
-				 Toolkit.getDefaultToolkit().getScreenSize();
-//				final Dimension d = new Dimension(100, 100);
+				final Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 				final int m = d.height * d.width * density;
 
 				final JProgressBar bar = new JProgressBar(0, m);
-				final JLabel text = new JLabel("Calcul de l'image");
-
+				bar.setString("Calcul de l'image");
+				bar.setStringPainted(true);
+				
 				final JPanel panel = new JPanel();
 				panel.add(bar);
-				panel.add(text);
 
 				window.setTitle("Sauvegarde de l'image");
 				window.add(panel);
@@ -988,13 +986,15 @@ public class FlameMakerGUI {
 				}
 
 				try {
-					text.setText("Écriture de l'image");
+					bar.setString("Écriture de l'image");
 					final PrintStream stream = new PrintStream(file);
 					final FlameAccumulator accu = accuBuilder.build();
 
+					bar.setMaximum(accu.height()*2);
+					
 					for (int i = 0; i < accu.height(); i++) {
 						FlamePPMMaker.writeToPPMIncremental(accu, stream, i);
-						bar.setValue(m / 2 + i * m / accu.width());
+						bar.setValue(accu.height() + i);
 					}
 
 				} catch (FileNotFoundException e) {
@@ -1107,12 +1107,13 @@ public class FlameMakerGUI {
 						final Compute comp = new Compute(file, frame);
 						comp.execute();
 						comp.addPropertyChangeListener(new PropertyChangeListener() {
-							
+
 							@Override
 							public void propertyChange(PropertyChangeEvent evt) {
 								if (evt.getPropertyName() == "state") {
-									if ("DONE".compareTo(evt.getNewValue().toString()) == 0) {
-										frame.setVisible(false);				
+									if ("DONE".compareTo(evt.getNewValue()
+											.toString()) == 0) {
+										frame.setVisible(false);
 									}
 								}
 							}
@@ -1136,21 +1137,21 @@ public class FlameMakerGUI {
 
 				@Override
 				public void actionPerformed(@SuppressWarnings("unused") final ActionEvent e) {
-					final JFrame panel = new JFrame();
-					panel.add(new FlameBuilderPreviewComponent(builder, background, palette, frame,
+					final JFrame window = new JFrame();
+					window.add(new FlameBuilderPreviewComponent(builder, background, palette, frame,
 							density));
-
+					window.pack();
+					window.setVisible(true);
+					
 					final GraphicsEnvironment ge = GraphicsEnvironment
 							.getLocalGraphicsEnvironment();
 					final GraphicsDevice gd = ge.getDefaultScreenDevice();
-					gd.setFullScreenWindow(panel);
+					gd.setFullScreenWindow(window);
 				}
 			};
 
 		default:
-			return null;
-			// TODO
-			// throw new IllegalArgumentException();
+			throw new IllegalArgumentException();
 		}
 	}
 
